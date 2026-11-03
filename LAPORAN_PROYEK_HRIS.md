@@ -71,19 +71,19 @@ Navigasi sidebar telah dirombak mengikuti 7 domain standar HRIS enterprise:
 ```
 
 ### Pemetaan Direktori di `resources/js/Pages/Admin/`:
-- `Beranda/` $\to$ **Index.jsx** *(Dashboard KPI & Grafik Recharts)*
-- `Karyawan/` $\to$ **Index.jsx** *(Direktori Data Karyawan, Form Modal, Impor/Ekspor)*
-- `Organisasi/` $\to$ **Index.jsx** *(Departemen & Hirarki Jabatan)*
-- `Kehadiran/` $\to$ **Index.jsx** *(Log Presensi Harian)*
-- `Jadwal/` $\to$ **Index.jsx** *(Roster Rotasi Shift 2-Grup A/B)*
-- `Lembur/` $\to$ **Index.jsx** *(Pencatatan Surat Perintah Lembur / SPL)*
-- `Cuti/` $\to$ **Index.jsx** *(Form Pengajuan Cuti & Izin)*
-- `SaldoCuti/` $\to$ **Index.jsx** *(Monitoring Plafon 12 Hari Cuti)*
-- `Payroll/` $\to$ **Index.jsx** *(Kalkulasi Gaji & Tunjangan)*
-- `SlipGaji/` $\to$ **Index.jsx** *(Arsip & Download Slip Gaji)*
-- `Laporan/` $\to$ **Index.jsx** *(Rekapitulasi Performa Bulanan)*
-- `Pengaturan/` $\to$ **Index.jsx** *(Kebijakan HR & Kalender Libur)*
-- `Audit/` $\to$ **Index.jsx** *(Rekam Jejak Log Audit)*
+- `Beranda/` $\to$ **Beranda.jsx** *(Dashboard KPI & Grafik Recharts)*
+- `Karyawan/` $\to$ **DataKaryawan.jsx** *(Direktori Data Karyawan, Form Modal, Impor/Ekspor)*
+- `Organisasi/` $\to$ **OrganisasiJabatan.jsx** *(Departemen & Hirarki Jabatan)*
+- `Kehadiran/` $\to$ **CatatanKehadiran.jsx** *(Log Presensi Harian)*
+- `Jadwal/` $\to$ **JadwalShift.jsx** *(Roster Rotasi Shift 2-Grup A/B)*
+- `Lembur/` $\to$ **LemburOvertime.jsx** *(Pencatatan Surat Perintah Lembur / SPL)*
+- `Cuti/` $\to$ **PengajuanCutiIzin.jsx** *(Form Pengajuan Cuti & Izin)*
+- `SaldoCuti/` $\to$ **SaldoKuotaCuti.jsx** *(Monitoring Plafon 12 Hari Cuti)*
+- `Payroll/` $\to$ **PenggajianPeriode.jsx** *(Kalkulasi Gaji & Tunjangan)*
+- `SlipGaji/` $\to$ **SlipGaji.jsx** *(Arsip & Download Slip Gaji)*
+- `Laporan/` $\to$ **LaporanRekap.jsx** *(Rekapitulasi Performa Bulanan)*
+- `Pengaturan/` $\to$ **PengaturanSistem.jsx** *(Kebijakan HR & Kalender Libur)*
+- `Audit/` $\to$ **LogAudit.jsx** *(Rekam Jejak Log Audit)*
 
 ---
 
@@ -96,7 +96,8 @@ Navigasi sidebar telah dirombak mengikuti 7 domain standar HRIS enterprise:
    - `<ModalFooter>`: Area tombol aksi bawah (*Batal*, *Simpan*, *Impor*).
 2. **[`table.jsx`](resources/js/components/ui/table.jsx)**:
    - `<Table>`, `<TableHeader>`, `<TableBody>`, `<TableFooter>`, `<TableRow>`, `<TableHead>`, `<TableCell>`, `<TableCaption>`, `<TableEmpty>`.
-   - Menghilangkan *CSS clash* lama (`th { font-size: 8px; }`), menghasilkan tipografi `TableHead` tebal, terstruktur, dan tersinkronisasi.
+   - **Toolbar & Filter Atomik (BARU)**: `<TableToolbar>`, `<TableSearch>`, `<TableFilterGroup>`, `<TableSelect>`.
+   - Menghilangkan *CSS clash* lama (`th { font-size: 8px; }`), menyediakan tata letak dropdown filter yang konsisten, tinggi seragam (`h-9`), ikon panah kustom (`ChevronDown`), dan tata letak responsif bebas pembungkusan (*wrapping*) canggung pada layar mobile/tablet.
 3. **[`text.jsx`](resources/js/components/ui/text.jsx)**:
    - Komponen tipografi polimorfik: `h1`-`h4`, `lead`, `body`, `small`, `muted`, `caption`, `eyebrow`, `code`, `metric`.
 4. **Komponen Atomik Lainnya**:
@@ -106,7 +107,7 @@ Navigasi sidebar telah dirombak mengikuti 7 domain standar HRIS enterprise:
 
 ## 4. Halaman Data Karyawan Yang Sudah Berjalan Penuh
 
-Lokasi: [`resources/js/Pages/Admin/Karyawan/Index.jsx`](resources/js/Pages/Admin/Karyawan/Index.jsx)
+Lokasi: [`resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx)
 - **10 Kolom Tabel**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
 - **Head Table Rapi & Simetris**: Kolom data badge/jam/status telah terpusat (*center-aligned*) simetris dengan kolom header.
 - **Fitur Aksi**:
@@ -118,14 +119,26 @@ Lokasi: [`resources/js/Pages/Admin/Karyawan/Index.jsx`](resources/js/Pages/Admin
 
 ---
 
-## 5. Rencana Aksi untuk Sesi Selanjutnya (Next Steps)
+## 5. Halaman Catatan Kehadiran Yang Sudah Berjalan Penuh
 
-1. **Modul Catatan Kehadiran (`Admin/Kehadiran/Index.jsx`)**:
-   - Membangun antarmuka presensi harian (check-in, check-out, menit terlambat, badge status kehadiran).
-   - Fitur filter per tanggal/rentang tanggal dan modal input manual presensi massal (menggunakan `Modal` atomik).
-2. **Modul Roster Jadwal & Grup (`Admin/Jadwal/Index.jsx`)**:
+Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx)
+- **Navigasi Tanggal Cepat**: Navigasi harian (kemarin, besok, date-picker kalender, tombol *Hari Ini*), lengkap dengan format bahasa Indonesia.
+- **5 Kartu KPI Real-time**: Total Jadwal, Tepat Waktu (dengan persentase), Terlambat (dengan total akumulasi menit keterlambatan), Izin/Sakit/Cuti, dan Alpha/Mangkir.
+- **Tabel Log Presensi**:
+  - Kolom: No, Karyawan (NIP & Jabatan), Divisi & Lokasi, Shift Terjadwal, Jam Masuk, Jam Pulang, Keterlambatan, Status Kehadiran (`.status-hadir`, `.status-terlambat`, dll.), Keterangan, dan Aksi.
+- **Fitur Aksi**:
+  - **Catat / Ubah Presensi (`ModalFormPresensi.jsx`)**: Menggunakan modal atomik, auto-detect shift karyawan, kalkulasi live menit terlambat berdasarkan jam masuk, dan pengubahan status otomatis.
+  - **Presensi Massal Cepat (`ModalPresensiMassal.jsx`)**: 1-klik tandai seluruh atau per-shift karyawan terjadwal sebagai *Hadir Tepat Waktu*.
+  - **Ekspor Excel**: 1-klik unduh `.xlsx` seluruh data terfilter per tanggal aktif via SheetJS.
+  - **Live Filter**: Pencarian teks nama/NIP + filter Status, Divisi, dan Shift.
+
+---
+
+## 6. Rencana Aksi untuk Sesi Selanjutnya (Next Steps)
+
+1. **Modul Roster Jadwal & Grup (`Admin/Jadwal/JadwalShift.jsx`)**:
    - Visualisasi kalender rotasi shift 2-grup (Grup A & Grup B).
    - Pengaturan pengecualian jadwal / tukar shift antar-karyawan via modal atomik.
-3. **Persistensi Database (Backend Migrations)**:
+2. **Persistensi Database (Backend Migrations)**:
    - Menghubungkan data dummy React ke tabel database riil (`employees`, `attendances`, `shifts`, `leaves`).
 

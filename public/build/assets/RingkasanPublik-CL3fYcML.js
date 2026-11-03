@@ -1,0 +1,11 @@
+import{d as e,j as a,H as s,P as n,L as t,E as i}from"./app-r3Y6ASvp.js";import{C as r,a as l}from"./card-DebcREBR.js";/**
+ * @license lucide-react v0.475.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const d=[["path",{d:"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4",key:"u53s6r"}],["polyline",{points:"10 17 15 12 10 7",key:"1ail0h"}],["line",{x1:"15",x2:"3",y1:"12",y2:"12",key:"v6grx8"}]],m=e("LogIn",d);/**
+ * @license lucide-react v0.475.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const c=[["path",{d:"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",key:"oel41y"}],["path",{d:"m9 12 2 2 4-4",key:"dzmm74"}]],x=e("ShieldCheck",c);function k(){return a.jsxs(a.Fragment,{children:[a.jsx(s,{title:"Ringkasan Publik"}),a.jsx(n,{eyebrow:"PORTAL TERBUKA",title:"Ringkasan Kehadiran Publik",subtitle:"Portal statistik agregat kehadiran tanpa menampilkan data pribadi karyawan.",actions:a.jsxs(t,{href:"/beranda",className:"button primary",children:[a.jsx(m,{className:"w-4 h-4"}),a.jsx("span",{children:"Masuk Admin"})]})}),a.jsx(r,{children:a.jsxs(l,{className:"p-12 text-center",children:[a.jsx("div",{className:"w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-navy mx-auto mb-4",children:a.jsx(i,{className:"w-6 h-6"})}),a.jsx("h3",{className:"text-base font-semibold text-navy mb-1",children:"Portal Ringkasan Publik"}),a.jsx("p",{className:"text-xs text-slate-500 max-w-md mx-auto mb-6",children:"Portal publik menyajikan metriks agregat kehadiran harian yang aman dan anonim."}),a.jsxs("div",{className:"inline-flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-md",children:[a.jsx(x,{className:"w-4 h-4"}),a.jsx("span",{children:"Privasi Terjaga: Menggunakan persistent User layout."})]})]})})]})}export{k as default};
