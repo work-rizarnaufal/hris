@@ -144,3 +144,4 @@ function ModalFooter({ className = '', children, ...props }) {
 }
 
 export { Modal, ModalHeader, ModalBody, ModalFooter };
+

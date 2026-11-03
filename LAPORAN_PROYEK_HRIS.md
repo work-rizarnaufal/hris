@@ -128,3 +128,4 @@ Lokasi: [`resources/js/Pages/Admin/Karyawan/Index.jsx`](resources/js/Pages/Admin
    - Pengaturan pengecualian jadwal / tukar shift antar-karyawan via modal atomik.
 3. **Persistensi Database (Backend Migrations)**:
    - Menghubungkan data dummy React ke tabel database riil (`employees`, `attendances`, `shifts`, `leaves`).
+
