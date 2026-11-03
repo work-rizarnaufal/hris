@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, UserPlus, Save, Building2, Clock, MapPin, Tag } from 'lucide-react';
-import { Button, Input, Text } from '@/components/ui';
+import { UserPlus, Save } from 'lucide-react';
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@/components/ui';
 
 const DIVISIONS = [
   'Operasional & Lapangan',
@@ -78,8 +78,6 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
     setErrors({});
   }, [initialData, isOpen]);
 
-  if (!isOpen) return null;
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -123,37 +121,21 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal wide animate-in fade-in zoom-in-95 duration-150">
-        {/* Header Modal */}
-        <div className="modal-heading">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-[#f7f2e8] text-[#c4a266]">
-                <UserPlus className="w-5 h-5" />
-              </span>
-              <h2 className="text-navy font-bold text-lg font-display">
-                {isEditing ? 'Ubah Data Karyawan' : 'Tambah Karyawan Baru'}
-              </h2>
-            </div>
-            <p className="text-slate-500 text-xs mt-1">
-              {isEditing
-                ? 'Perbarui informasi data induk, divisi, lokasi kerja, dan pengaturan shift.'
-                : 'Lengkapi formulir berikut untuk mendaftarkan karyawan ke dalam sistem HRIS.'}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <ModalHeader
+        icon={<UserPlus className="w-5 h-5" />}
+        title={isEditing ? 'Ubah Data Karyawan' : 'Tambah Karyawan Baru'}
+        description={
+          isEditing
+            ? 'Perbarui informasi data induk, divisi, lokasi kerja, dan pengaturan shift.'
+            : 'Lengkapi formulir berikut untuk mendaftarkan karyawan ke dalam sistem HRIS.'
+        }
+        onClose={onClose}
+      />
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit}>
-          <div className="form-grid">
+      <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+        <ModalBody>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Nama Lengkap */}
             <div>
               <label>
@@ -245,7 +227,7 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
             </div>
 
             {/* Template Jadwal Preset */}
-            <div className="full">
+            <div className="md:col-span-2">
               <label>
                 <span>Pilihan Preset Jadwal & Shift</span>
                 <select onChange={handleSchedulePresetChange} defaultValue="">
@@ -312,20 +294,18 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
               </label>
             </div>
           </div>
+        </ModalBody>
 
-          {/* Footer Actions */}
-          <div className="modal-footer">
-            <Button type="button" variant="secondary" onClick={onClose}>
-              Batal
-            </Button>
-            <Button type="submit" variant="default" className="bg-navy hover:bg-navy/90">
-              <Save className="w-4 h-4 mr-1.5" />
-              <span>{isEditing ? 'Simpan Perubahan' : 'Daftarkan Karyawan'}</span>
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <ModalFooter>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Batal
+          </Button>
+          <Button type="submit" variant="default" className="bg-navy hover:bg-navy/90">
+            <Save className="w-4 h-4 mr-1.5" />
+            <span>{isEditing ? 'Simpan Perubahan' : 'Daftarkan Karyawan'}</span>
+          </Button>
+        </ModalFooter>
+      </form>
+    </Modal>
   );
 }
-

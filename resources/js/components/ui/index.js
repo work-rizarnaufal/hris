@@ -10,3 +10,4 @@ export * from './page-header.jsx';
 export * from './page-container.jsx';
 export * from './table.jsx';
 export * from './text.jsx';
+export * from './modal.jsx';
