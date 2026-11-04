@@ -41,6 +41,7 @@ import {
   TableSearch,
   TableFilterGroup,
   TableSelect,
+  Toast,
 } from '@/components/ui';
 import ModalFormKaryawan from './Partials/ModalFormKaryawan.jsx';
 import ModalImporKaryawan from './Partials/ModalImporKaryawan.jsx';
@@ -326,23 +327,7 @@ export default function DataKaryawan() {
     <>
       <Head title="Data Karyawan" />
 
-      {/* Floating Alert Notifikasi */}
-      {alertInfo && (
-        <div
-          className={`fixed top-20 right-6 z-50 p-4 rounded-xl shadow-lg border flex items-center gap-3 transition-all animate-in slide-in-from-top-3 ${
-            alertInfo.type === 'warning'
-              ? 'bg-amber-50 border-amber-200 text-amber-900'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-          }`}
-        >
-          {alertInfo.type === 'warning' ? (
-            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
-          ) : (
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          )}
-          <span className="text-xs font-semibold">{alertInfo.message}</span>
-        </div>
-      )}
+      <Toast toast={alertInfo} onClose={() => setAlertInfo(null)} />
 
       {/* Page Header dengan Action Toolbar */}
       <PageHeader

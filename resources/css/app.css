@@ -732,6 +732,10 @@ tbody tr:hover {
   background: #934957;
 }
 
+.toast.warning {
+  background: #78541a;
+}
+
 /* Responsive */
 @media(max-width: 768px) {
   .sidebar {
