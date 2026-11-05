@@ -26,6 +26,7 @@ Every AI agent or assistant operating on this repository **MUST** adhere to the 
   - **Notifikasi**: `<Toast toast={alertInfo} onClose={() => setAlertInfo(null)} />` (wajib menggunakan komponen Toast atomik, dilarang membuat alert floating inline manual).
   - **Struktur Kartu & Kontainer**: `<Card>`, `<CardHeader>`, `<CardTitle>`, `<CardDescription>`, `<CardContent>`, `<PageHeader>`, `<PageContainer>`.
   - **Elemen Interaktif**: `<Button>` (gunakan varian yang tersedia: `primary`, `secondary`, `outline`, `ghost`, `danger`), `<Badge>`, `<Input>`.
+  - **Dokumen & Cetak (Print System)**: `<PrintButton>`, `<PrintHeader>`, `<PrintSignature>`, `<PrintOnly>`, `<PrintHidden>` ([`print.jsx`](resources/js/components/ui/print.jsx)).
 - **Dilarang Duplikasi**: Jangan membuat ulang komponen dengan variasi sendiri di dalam halaman jika komponen atomik sudah tersedia.
 
 ## 4. Project Documentation

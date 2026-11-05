@@ -5,7 +5,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@/com
 const TARGET_OPTIONS = [
   { value: 'ALL', label: 'Seluruh Karyawan Terjadwal' },
   { value: 'Shift 1 (Pagi)', label: 'Shift 1: Pagi (07:00 - 15:00)' },
-  { value: 'Shift 2 (Siang)', label: 'Shift 2: Siang (15:00 - 23:00)' },
+  { value: 'Shift 2 (Malam)', label: 'Shift 2: Malam (15:00 - 23:00)' },
   { value: 'Normal Office', label: 'Normal Office (08:00 - 17:00)' },
 ];
 
@@ -56,7 +56,7 @@ export default function ModalPresensiMassal({
         <ModalHeader
           title="Presensi Massal Cepat"
           description="Tandai kehadiran tepat waktu untuk banyak karyawan operasional sekaligus."
-          icon={Users}
+          icon={<Users className="w-5 h-5 text-[#c4a266]" />}
           onClose={onClose}
         />
 

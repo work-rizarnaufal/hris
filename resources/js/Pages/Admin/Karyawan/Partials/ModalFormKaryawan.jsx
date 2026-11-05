@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserPlus, Save } from 'lucide-react';
+import { UserPlus, Save, Pencil } from 'lucide-react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@/components/ui';
 
 const DIVISIONS = [
@@ -12,21 +12,14 @@ const DIVISIONS = [
 ];
 
 const LOCATIONS = [
-  'Pabrik A (Sidoarjo)',
-  'Kantor Utama (Surabaya)',
-  'Gudang B (Rungkut)',
-  'Site Operasional (Gresik)',
+  'SITE A CIMALAKA',
+  'SITE B PASEH',
 ];
 
-const GROUPS = ['Grup A', 'Grup B', 'Non-Shift'];
-
-const SCHEDULE_CATEGORIES = [
-  { label: 'Shift 1 (Pagi: 07:00 - 15:00)', in: '07:00', out: '15:00', cat: 'Shift 1 (Pagi)' },
-  { label: 'Shift 2 (Siang: 15:00 - 23:00)', in: '15:00', out: '23:00', cat: 'Shift 2 (Siang)' },
-  { label: 'Normal Office (08:00 - 17:00)', in: '08:00', out: '17:00', cat: 'Normal Office' },
-  { label: 'Security Shift 1 (06:30 - 14:30)', in: '06:30', out: '14:30', cat: 'Shift 1 (Pagi)' },
-  { label: 'Security Shift 2 (14:30 - 22:30)', in: '14:30', out: '22:30', cat: 'Shift 2 (Siang)' },
-  { label: 'Fleksibel Operasional', in: '08:30', out: '17:30', cat: 'Fleksibel' },
+const EMPLOYMENT_TYPES = [
+  'Tetap',
+  'Kontrak (PKWT)',
+  'Magang',
 ];
 
 export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData }) {
@@ -38,10 +31,10 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
     role: '',
     division: DIVISIONS[0],
     location: LOCATIONS[0],
-    group: GROUPS[0],
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '07:00',
-    checkOutTime: '15:00',
+    employmentType: EMPLOYMENT_TYPES[0],
+    email: '',
+    phone: '',
+    joinDate: new Date().toISOString().slice(0, 10),
     status: 'Aktif',
   });
 
@@ -55,10 +48,10 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
         role: initialData.role || '',
         division: initialData.division || DIVISIONS[0],
         location: initialData.location || LOCATIONS[0],
-        group: initialData.group || GROUPS[0],
-        scheduleCategory: initialData.scheduleCategory || 'Shift 1 (Pagi)',
-        checkInTime: initialData.checkInTime || '07:00',
-        checkOutTime: initialData.checkOutTime || '15:00',
+        employmentType: initialData.employmentType || EMPLOYMENT_TYPES[0],
+        email: initialData.email || '',
+        phone: initialData.phone || '',
+        joinDate: initialData.joinDate || new Date().toISOString().slice(0, 10),
         status: initialData.status || 'Aktif',
       });
     } else {
@@ -68,10 +61,10 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
         role: '',
         division: DIVISIONS[0],
         location: LOCATIONS[0],
-        group: GROUPS[0],
-        scheduleCategory: 'Shift 1 (Pagi)',
-        checkInTime: '07:00',
-        checkOutTime: '15:00',
+        employmentType: EMPLOYMENT_TYPES[0],
+        email: '',
+        phone: '',
+        joinDate: new Date().toISOString().slice(0, 10),
         status: 'Aktif',
       });
     }
@@ -86,27 +79,13 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
     }
   };
 
-  const handleSchedulePresetChange = (e) => {
-    const selected = SCHEDULE_CATEGORIES.find((s) => s.label === e.target.value);
-    if (selected) {
-      setFormData((prev) => ({
-        ...prev,
-        scheduleCategory: selected.cat,
-        checkInTime: selected.in,
-        checkOutTime: selected.out,
-      }));
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = 'Nama lengkap wajib diisi.';
     if (!formData.nip.trim()) newErrors.nip = 'NIP wajib diisi.';
-    if (!formData.role.trim()) newErrors.role = 'Jabatan wajib diisi.';
-    if (!formData.checkInTime) newErrors.checkInTime = 'Jam masuk wajib ditentukan.';
-    if (!formData.checkOutTime) newErrors.checkOutTime = 'Jam pulang wajib ditentukan.';
+    if (!formData.role.trim()) newErrors.role = 'Jabatan / posisi kerja wajib diisi.';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -123,12 +102,18 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalHeader
-        icon={<UserPlus className="w-5 h-5" />}
-        title={isEditing ? 'Ubah Data Karyawan' : 'Tambah Karyawan Baru'}
+        icon={
+          isEditing ? (
+            <Pencil className="w-5 h-5 text-[#c4a266]" />
+          ) : (
+            <UserPlus className="w-5 h-5 text-[#c4a266]" />
+          )
+        }
+        title={isEditing ? 'Ubah Profil Karyawan' : 'Daftarkan Karyawan Baru'}
         description={
           isEditing
-            ? 'Perbarui informasi data induk, divisi, lokasi kerja, dan pengaturan shift.'
-            : 'Lengkapi formulir berikut untuk mendaftarkan karyawan ke dalam sistem HRIS.'
+            ? 'Perbarui informasi data profil, divisi penempatan, status kepegawaian, dan kontak karyawan.'
+            : 'Lengkapi formulir berikut untuk mendaftarkan karyawan baru ke dalam database master HRIS.'
         }
         onClose={onClose}
       />
@@ -175,7 +160,7 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
                 <Input
                   type="text"
                   name="role"
-                  placeholder="Contoh: Staf Operasional, QA Officer"
+                  placeholder="Contoh: Senior Operator Lapangan"
                   value={formData.role}
                   onChange={handleChange}
                   className={errors.role ? 'border-rose-400 focus:ring-rose-400' : ''}
@@ -198,7 +183,7 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
               </label>
             </div>
 
-            {/* Lokasi Kerja */}
+            {/* Lokasi Penempatan */}
             <div>
               <label>
                 <span>Lokasi Penempatan Kerja *</span>
@@ -212,85 +197,70 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
               </label>
             </div>
 
-            {/* Grup Shift */}
+            {/* Status Hubungan Kerja */}
             <div>
               <label>
-                <span>Grup Kerja (Roster) *</span>
-                <select name="group" value={formData.group} onChange={handleChange}>
-                  {GROUPS.map((grp) => (
-                    <option key={grp} value={grp}>
-                      {grp}
+                <span>Status Hubungan Kerja *</span>
+                <select name="employmentType" value={formData.employmentType} onChange={handleChange}>
+                  {EMPLOYMENT_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
 
-            {/* Template Jadwal Preset */}
-            <div className="md:col-span-2">
-              <label>
-                <span>Pilihan Preset Jadwal & Shift</span>
-                <select onChange={handleSchedulePresetChange} defaultValue="">
-                  <option value="" disabled>-- Pilih Preset Jadwal Cepat --</option>
-                  {SCHEDULE_CATEGORIES.map((preset) => (
-                    <option key={preset.label} value={preset.label}>
-                      {preset.label}
-                    </option>
-                  ))}
-                </select>
-                <small>Memilih preset akan otomatis mengisi kategori, jam masuk, dan jam pulang di bawah.</small>
-              </label>
-            </div>
-
-            {/* Kategori Jadwal */}
+            {/* Email */}
             <div>
               <label>
-                <span>Kategori Jadwal *</span>
+                <span>Alamat Email</span>
                 <Input
-                  type="text"
-                  name="scheduleCategory"
-                  value={formData.scheduleCategory}
+                  type="email"
+                  name="email"
+                  placeholder="contoh: budi.santoso@perusahaan.com"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="Contoh: Shift 1 (Pagi)"
                 />
               </label>
             </div>
 
-            {/* Status Karyawan */}
+            {/* Nomor Telepon / WhatsApp */}
             <div>
               <label>
-                <span>Status Karyawan *</span>
+                <span>No. Telepon / WhatsApp</span>
+                <Input
+                  type="tel"
+                  name="phone"
+                  placeholder="Contoh: 0812-3456-7890"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* Tanggal Bergabung */}
+            <div>
+              <label>
+                <span>Tanggal Bergabung (Join Date)</span>
+                <Input
+                  type="date"
+                  name="joinDate"
+                  value={formData.joinDate}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
+
+            {/* Status Keaktifan */}
+            <div>
+              <label>
+                <span>Status Keaktifan Pegawai *</span>
                 <select name="status" value={formData.status} onChange={handleChange}>
                   <option value="Aktif">Aktif (Bekerja)</option>
                   <option value="Cuti">Sedang Cuti Resmi</option>
                   <option value="Non-Aktif">Non-Aktif / Resign</option>
                 </select>
-              </label>
-            </div>
-
-            {/* Jam Masuk */}
-            <div>
-              <label>
-                <span>Jam Masuk Kerja (WIB) *</span>
-                <Input
-                  type="time"
-                  name="checkInTime"
-                  value={formData.checkInTime}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-
-            {/* Jam Pulang */}
-            <div>
-              <label>
-                <span>Jam Pulang Kerja (WIB) *</span>
-                <Input
-                  type="time"
-                  name="checkOutTime"
-                  value={formData.checkOutTime}
-                  onChange={handleChange}
-                />
               </label>
             </div>
           </div>

@@ -519,43 +519,37 @@ h1 {
   background: #f1f3f6;
 }
 
+/* ==========================================================================
+   Fitur Hidden Scrollbar Terintegrasi (Cross-Browser, Tetap Mendukung Scroll Alami)
+   ========================================================================== */
+html,
+body,
+.table-scroll,
+.sidebar,
+.no-scrollbar,
+.scrollbar-none,
+.hide-scrollbar,
+[data-hidden-scrollbar] {
+  -ms-overflow-style: none !important; /* Internet Explorer & Edge Legacy */
+  scrollbar-width: none !important;    /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.table-scroll::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar,
+[data-hidden-scrollbar]::-webkit-scrollbar {
+  display: none !important;            /* Chrome, Safari, Edge Chromium, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
-}
-
-.table-scroll::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-
-.table-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.table-scroll::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 9999px;
-}
-
-.table-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
-}
-
-/* Hidden Scrollbar Utilities (Cross-Browser) */
-.no-scrollbar,
-.scrollbar-none {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
-}
-
-.no-scrollbar::-webkit-scrollbar,
-.scrollbar-none::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
 }
 
 table {
@@ -712,28 +706,38 @@ tbody tr:hover {
 /* Toast */
 .toast {
   position: fixed;
-  right: 25px;
-  bottom: 25px;
-  z-index: 80;
+  top: 24px;
+  right: 24px;
+  bottom: auto;
+  z-index: 100;
   display: flex;
-  gap: 11px;
+  gap: 12px;
   align-items: center;
-  background: #173c33;
+  background: #059669;
   color: #fff;
-  padding: 16px 18px;
-  border-radius: 9px;
+  padding: 13px 18px;
+  border-radius: 12px;
   font-size: 12px;
-  box-shadow: 0 5px 20px #10273f26;
-  max-width: min(550px, calc(100vw - 32px));
-  line-height: 1.6;
+  font-weight: 500;
+  box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  max-width: min(520px, calc(100vw - 32px));
+  line-height: 1.5;
 }
 
 .toast.error {
-  background: #934957;
+  background: #e11d48;
+  box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 .toast.warning {
-  background: #78541a;
+  background: #d97706;
+  box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.toast.info {
+  background: #2563eb;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive */
@@ -753,4 +757,81 @@ tbody tr:hover {
     display: inline-flex;
   }
 }
+
+@media(max-width: 640px) {
+  .toast {
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    bottom: auto;
+    max-width: calc(100vw - 32px);
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+}
+
+/* Print Optimization */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Sembunyikan navigasi, sidebar, topbar, toast, dan elemen non-cetak */
+  .sidebar,
+  .topbar,
+  .toast,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset margin dan padding shell */
+  .app-shell,
+  .main-shell,
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+  }
+
+  /* Container kartu dan rincian evaluasi */
+  .card,
+  [class*="Card"] {
+    box-shadow: none !important;
+    border-color: #cbd5e1 !important;
+    break-inside: avoid;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr, td, th {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Pastikan warna badge dan indikator tetap tercetak presisi */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
 

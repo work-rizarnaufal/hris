@@ -49,6 +49,7 @@ import {
 } from '@/components/ui';
 import ModalFormPresensi from './Partials/ModalFormPresensi.jsx';
 import ModalPresensiMassal from './Partials/ModalPresensiMassal.jsx';
+import { useActiveSite, matchesActiveSite } from '@/services/systemSettings';
 
 // Data Induk Karyawan HCGA (Sinkron dengan DataKaryawan)
 const MASTER_EMPLOYEES = [
@@ -58,7 +59,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0101',
     role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup A',
     scheduleCategory: 'Shift 1 (Pagi)',
     checkInTime: '07:00',
@@ -71,7 +72,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0102',
     role: 'HCGA Specialist',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    location: 'SITE A CIMALAKA',
     group: 'Non-Shift',
     scheduleCategory: 'Normal Office',
     checkInTime: '08:00',
@@ -84,9 +85,9 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0103',
     role: 'Operator Forklift Utama',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
+    scheduleCategory: 'Shift 2 (Malam)',
     checkInTime: '15:00',
     checkOutTime: '23:00',
     status: 'Aktif',
@@ -97,7 +98,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0104',
     role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup A',
     scheduleCategory: 'Shift 1 (Pagi)',
     checkInTime: '07:00',
@@ -110,11 +111,11 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0105',
     role: 'Danru Keamanan & K3',
     division: 'Security & Safety',
-    location: 'Site Operasional (Gresik)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup A',
     scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '06:30',
-    checkOutTime: '14:30',
+    checkInTime: '07:00',
+    checkOutTime: '15:00',
     status: 'Aktif',
   },
   {
@@ -123,7 +124,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0106',
     role: 'Staf Administrasi Payroll',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    location: 'SITE A CIMALAKA',
     group: 'Non-Shift',
     scheduleCategory: 'Normal Office',
     checkInTime: '08:00',
@@ -136,9 +137,9 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0107',
     role: 'Teknisi Maintenance Mesin',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE B PASEH',
     group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
+    scheduleCategory: 'Shift 2 (Malam)',
     checkInTime: '15:00',
     checkOutTime: '23:00',
     status: 'Aktif',
@@ -149,7 +150,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0108',
     role: 'Koordinator Gudang Bahan Baku',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'SITE B PASEH',
     group: 'Non-Shift',
     scheduleCategory: 'Normal Office',
     checkInTime: '08:00',
@@ -162,11 +163,11 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0109',
     role: 'Anggota Patroli Keamanan',
     division: 'Security & Safety',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE B PASEH',
     group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '14:30',
-    checkOutTime: '22:30',
+    scheduleCategory: 'Shift 2 (Malam)',
+    checkInTime: '15:00',
+    checkOutTime: '23:00',
     status: 'Aktif',
   },
   {
@@ -175,7 +176,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0110',
     role: 'IT Support & Sistem HRIS',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    location: 'SITE B PASEH',
     group: 'Non-Shift',
     scheduleCategory: 'Normal Office',
     checkInTime: '08:00',
@@ -188,7 +189,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0111',
     role: 'Operator Mesin CNC Milling',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE B PASEH',
     group: 'Grup A',
     scheduleCategory: 'Shift 1 (Pagi)',
     checkInTime: '07:00',
@@ -201,7 +202,7 @@ const MASTER_EMPLOYEES = [
     nip: 'HC-0112',
     role: 'Petugas Inventory & Stok',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'SITE B PASEH',
     group: 'Grup A',
     scheduleCategory: 'Shift 1 (Pagi)',
     checkInTime: '07:00',
@@ -239,6 +240,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Shift pagi berjalan lancar',
+    location: 'SITE A CIMALAKA',
   },
   {
     id: 102,
@@ -255,6 +257,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Tugas rekrutmen internal',
+    location: 'SITE A CIMALAKA',
   },
   {
     id: 103,
@@ -271,6 +274,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 18,
     deviation: '+18m',
     notes: 'Kendala macet jalur Rungkut',
+    location: 'SITE A CIMALAKA',
   },
   {
     id: 104,
@@ -287,6 +291,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Inspeksi jalur produksi A',
+    location: 'SITE A CIMALAKA',
   },
   {
     id: 105,
@@ -296,13 +301,14 @@ const INITIAL_ATTENDANCES = [
     division: 'Security & Safety',
     role: 'Danru Keamanan & K3',
     date: DEFAULT_DATE,
-    shift: 'Security Shift 1 (06:30 - 14:30)',
+    shift: 'Shift 1 (07:00 - 15:00)',
     status: 'Hadir',
-    checkIn: '06:20',
-    checkOut: '14:35',
+    checkIn: '06:50',
+    checkOut: '15:05',
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Serah terima pos jaga pagi',
+    location: 'SITE A CIMALAKA',
   },
   {
     id: 106,
@@ -319,6 +325,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: '-',
     notes: 'Cuti tahunan (Disetujui HR)',
+    location: 'SITE A CIMALAKA',
   },
   {
     id: 107,
@@ -335,6 +342,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Maintenance preventif mesin 3',
+    location: 'SITE B PASEH',
   },
   {
     id: 108,
@@ -351,6 +359,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Pemeriksaan stok harian',
+    location: 'SITE B PASEH',
   },
   {
     id: 109,
@@ -360,13 +369,14 @@ const INITIAL_ATTENDANCES = [
     division: 'Security & Safety',
     role: 'Anggota Patroli Keamanan',
     date: DEFAULT_DATE,
-    shift: 'Security Shift 2 (14:30 - 22:30)',
+    shift: 'Shift 2 (15:00 - 23:00)',
     status: 'Hadir',
-    checkIn: '14:25',
-    checkOut: '22:35',
+    checkIn: '14:50',
+    checkOut: '23:05',
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
     notes: 'Patroli perimeter site B',
+    location: 'SITE B PASEH',
   },
   {
     id: 110,
@@ -383,6 +393,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 24,
     deviation: '+24m',
     notes: 'Penanganan server lokal kantor',
+    location: 'SITE B PASEH',
   },
   {
     id: 111,
@@ -399,6 +410,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: '-',
     notes: 'Tanpa konfirmasi kehadiran',
+    location: 'SITE B PASEH',
   },
   {
     id: 112,
@@ -415,6 +427,7 @@ const INITIAL_ATTENDANCES = [
     lateMinutes: 0,
     deviation: '-',
     notes: 'Surat keterangan sakit faskes',
+    location: 'SITE B PASEH',
   },
 ];
 
@@ -422,6 +435,12 @@ export default function CatatanKehadiran() {
   const [selectedDate, setSelectedDate] = useState(DEFAULT_DATE);
   const [attendances, setAttendances] = useState(INITIAL_ATTENDANCES);
   const [employees] = useState(MASTER_EMPLOYEES);
+  const activeSite = useActiveSite();
+
+  // Filter Karyawan Berdasarkan Site Terpilih
+  const siteEmployees = useMemo(() => {
+    return employees.filter((emp) => matchesActiveSite(emp.location, activeSite.id));
+  }, [employees, activeSite]);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -439,7 +458,6 @@ export default function CatatanKehadiran() {
 
   const showAlert = (message, type = 'success') => {
     setAlertInfo({ message, type });
-    setTimeout(() => setAlertInfo(null), 3500);
   };
 
   // Navigasi Tanggal
@@ -470,14 +488,20 @@ export default function CatatanKehadiran() {
     }
   }, [selectedDate]);
 
-  // Data Presensi Sesuai Tanggal Terpilih
+  // Data Presensi Sesuai Tanggal Terpilih & Site Aktif
   const currentDayAttendances = useMemo(() => {
-    return attendances.filter((att) => att.date === selectedDate);
-  }, [attendances, selectedDate]);
+    return attendances
+      .filter((att) => att.date === selectedDate)
+      .filter((att) => {
+        const emp = employees.find((e) => e.id === att.employeeId);
+        const loc = att.location || emp?.location;
+        return matchesActiveSite(loc, activeSite?.id);
+      });
+  }, [attendances, selectedDate, employees, activeSite]);
 
   // Statistik Real-time Harian
   const stats = useMemo(() => {
-    const totalScheduled = employees.length;
+    const totalScheduled = siteEmployees.length;
     const presentOnTime = currentDayAttendances.filter((a) => a.status === 'Hadir').length;
     const lateRecords = currentDayAttendances.filter((a) => a.status === 'Terlambat');
     const lateCount = lateRecords.length;
@@ -505,7 +529,7 @@ export default function CatatanKehadiran() {
       unrecordedCount,
       attendanceRate,
     };
-  }, [currentDayAttendances, employees]);
+  }, [currentDayAttendances, siteEmployees]);
 
   // Filtered List Presensi
   const filteredAttendances = useMemo(() => {
@@ -590,6 +614,7 @@ export default function CatatanKehadiran() {
       nip: emp.nip,
       division: emp.division,
       role: emp.role,
+      location: emp.location || 'SITE A CIMALAKA',
       date,
       shift: emp.scheduleCategory || 'Shift 1 (07:00 - 15:00)',
       status: 'Hadir',
@@ -626,6 +651,7 @@ export default function CatatanKehadiran() {
       'Nama Karyawan': rec.employeeName,
       Jabatan: rec.role,
       Divisi: rec.division,
+      'Lokasi Kerja': rec.location || employees.find((e) => e.id === rec.employeeId)?.location || 'SITE A CIMALAKA',
       'Shift Kerja': rec.shift,
       'Jam Masuk': rec.checkIn,
       'Jam Pulang': rec.checkOut,
@@ -667,9 +693,9 @@ export default function CatatanKehadiran() {
 
       {/* Page Header */}
       <PageHeader
-        eyebrow="WAKTU & KEHADIRAN"
+        eyebrow={`WAKTU & KEHADIRAN ${activeSite.id !== 'all' ? `· ${activeSite.code}` : ''}`}
         title="Catatan Kehadiran"
-        subtitle="Monitoring log presensi harian, tracking absensi, dan jam masuk/pulang karyawan operasional."
+        subtitle={`Monitoring log presensi harian area ${activeSite.name}, tracking absensi, dan jam operasional.`}
       >
         <div className="flex flex-wrap items-center gap-2.5">
           <Button
@@ -919,7 +945,7 @@ export default function CatatanKehadiran() {
             >
               <option value="ALL">Semua Shift</option>
               <option value="Shift 1">Shift 1 (Pagi)</option>
-              <option value="Shift 2">Shift 2 (Siang)</option>
+              <option value="Shift 2">Shift 2 (Malam)</option>
               <option value="Normal">Normal Office</option>
             </TableSelect>
 
@@ -943,42 +969,45 @@ export default function CatatanKehadiran() {
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow className="bg-slate-50/80 border-b border-slate-200/80">
-                <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">
-                  No
+              <TableRow className="bg-slate-50/80 border-b border-slate-200">
+                <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">
+                  NO
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[190px]">
-                  Karyawan
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[190px]">
+                  KARYAWAN
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">
-                  Divisi & Lokasi
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">
+                  DIVISI
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">
-                  Shift Terjadwal
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[150px]">
+                  LOKASI KERJA
                 </TableHead>
-                <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">
-                  Jam Masuk
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">
+                  SHIFT TERJADWAL
                 </TableHead>
-                <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">
-                  Jam Pulang
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">
+                  JAM MASUK
                 </TableHead>
-                <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">
-                  Keterlambatan
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">
+                  JAM PULANG
                 </TableHead>
-                <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">
-                  Status
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">
+                  TERLAMBAT
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">
-                  Keterangan
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">
+                  STATUS
                 </TableHead>
-                <TableHead className="text-center text-xs font-semibold text-slate-600 w-20">
-                  Aksi
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">
+                  KETERANGAN
+                </TableHead>
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-20">
+                  AKSI
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredAttendances.length === 0 ? (
-                <TableEmpty colSpan={10}>
+                <TableEmpty colSpan={11}>
                   <div className="py-12 text-center">
                     <CalendarCheck className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                     <strong className="text-sm font-semibold text-slate-700 block mb-1">
@@ -1032,9 +1061,17 @@ export default function CatatanKehadiran() {
                         </div>
                       </TableCell>
 
-                      {/* 3. Divisi & Lokasi */}
+                      {/* 3. Divisi */}
                       <TableCell>
                         <div className="text-xs text-slate-700 font-medium">{rec.division}</div>
+                      </TableCell>
+
+                      {/* 4. Lokasi Kerja */}
+                      <TableCell>
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/90 text-xs font-medium">
+                          <MapPin className="w-3 h-3 text-[#c4a266] shrink-0" />
+                          <span className="truncate">{rec.location || employees.find((e) => e.id === rec.employeeId)?.location || 'SITE A CIMALAKA'}</span>
+                        </div>
                       </TableCell>
 
                       {/* 4. Shift Terjadwal */}
@@ -1156,7 +1193,7 @@ export default function CatatanKehadiran() {
         onClose={() => setIsFormOpen(false)}
         onSave={handleSaveRecord}
         initialData={editingData}
-        employees={employees}
+        employees={siteEmployees}
         currentDate={selectedDate}
       />
 
@@ -1165,7 +1202,7 @@ export default function CatatanKehadiran() {
         isOpen={isMassOpen}
         onClose={() => setIsMassOpen(false)}
         onExecute={handleExecuteMass}
-        employees={employees}
+        employees={siteEmployees}
         currentDate={selectedDate}
         existingAttendances={currentDayAttendances}
       />

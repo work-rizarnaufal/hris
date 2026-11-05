@@ -13,11 +13,8 @@ const STATUS_OPTIONS = [
 
 const SHIFT_OPTIONS = [
   { value: 'Shift 1 (07:00 - 15:00)', label: 'Shift 1: Pagi (07:00 - 15:00)', startTime: '07:00', endTime: '15:00' },
-  { value: 'Shift 2 (15:00 - 23:00)', label: 'Shift 2: Siang/Sore (15:00 - 23:00)', startTime: '15:00', endTime: '23:00' },
+  { value: 'Shift 2 (15:00 - 23:00)', label: 'Shift 2: Malam (15:00 - 23:00)', startTime: '15:00', endTime: '23:00' },
   { value: 'Normal Office (08:00 - 17:00)', label: 'Normal Office: Reguler (08:00 - 17:00)', startTime: '08:00', endTime: '17:00' },
-  { value: 'Security Shift 1 (06:30 - 14:30)', label: 'Security Shift 1: Pagi (06:30 - 14:30)', startTime: '06:30', endTime: '14:30' },
-  { value: 'Security Shift 2 (14:30 - 22:30)', label: 'Security Shift 2: Siang (14:30 - 22:30)', startTime: '14:30', endTime: '22:30' },
-  { value: 'Shift Malam (20:00 - 04:00)', label: 'Shift Malam: Operasional (20:00 - 04:00)', startTime: '20:00', endTime: '04:00' },
 ];
 
 function getStartMinute(shiftStr) {
@@ -189,7 +186,7 @@ export default function ModalFormPresensi({
               ? `Perbarui detail presensi untuk ${formData.employeeName || selectedEmp?.name || 'karyawan'}.`
               : 'Tambahkan catatan kehadiran individual karyawan ke dalam sistem operasional.'
           }
-          icon={CalendarCheck}
+          icon={<CalendarCheck className="w-5 h-5 text-[#c4a266]" />}
           onClose={onClose}
         />
 

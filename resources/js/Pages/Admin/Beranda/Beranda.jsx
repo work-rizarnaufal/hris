@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import {
   Users,
   CheckCircle2,
   Clock,
   AlertTriangle,
-  Calendar,
   Layers,
   ArrowUpRight,
   Plus,
   FileSpreadsheet,
-  Building,
   UserCheck,
 } from 'lucide-react';
 import {
@@ -21,7 +19,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
 } from 'recharts';
 import {
   Card,
@@ -39,26 +36,17 @@ import {
   TableCell,
   Text,
 } from '@/components/ui';
-import { colors } from '@/config/theme.js';
+import { useActiveSite, matchesActiveSite } from '@/services/systemSettings.js';
 
-// Dummy data kehadiran mingguan
-const weeklyTrendData = [
-  { day: 'Sen', hadir: 46, terlambat: 2, absen: 0 },
-  { day: 'Sel', hadir: 45, terlambat: 3, absen: 0 },
-  { day: 'Rab', hadir: 47, terlambat: 1, absen: 0 },
-  { day: 'Kam', hadir: 48, terlambat: 0, absen: 0 },
-  { day: 'Jum', hadir: 44, terlambat: 4, absen: 0 },
-  { day: 'Sab', hadir: 46, terlambat: 2, absen: 0 },
-];
-
-// Dummy data presensi terkini (hari ini)
-const recentAttendance = [
+// Master data presensi terkini (12 Karyawan HCGA di Site A & Site B)
+const ALL_RECENT_ATTENDANCE = [
   {
     id: 1,
     nip: 'HC-0101',
     name: 'Budi Santoso',
-    role: 'Staf Operasional',
+    role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
+    location: 'SITE A CIMALAKA',
     shift: 'Shift 1 (07:00 - 15:00)',
     time: '06:51 WIB',
     status: 'Hadir',
@@ -68,8 +56,9 @@ const recentAttendance = [
     id: 2,
     nip: 'HC-0102',
     name: 'Siti Rahmawati',
-    role: 'HCGA Officer',
+    role: 'HCGA Specialist',
     division: 'Human Capital & GA',
+    location: 'SITE A CIMALAKA',
     shift: 'General (08:00 - 17:00)',
     time: '07:48 WIB',
     status: 'Hadir',
@@ -79,8 +68,9 @@ const recentAttendance = [
     id: 3,
     nip: 'HC-0103',
     name: 'Ahmad Fauzi',
-    role: 'Operator Forklift',
+    role: 'Operator Forklift Utama',
     division: 'Logistik & Gudang',
+    location: 'SITE A CIMALAKA',
     shift: 'Shift 1 (07:00 - 15:00)',
     time: '07:18 WIB',
     status: 'Terlambat (18m)',
@@ -90,8 +80,9 @@ const recentAttendance = [
     id: 4,
     nip: 'HC-0104',
     name: 'Dewi Anggraini',
-    role: 'Quality Assurance',
+    role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
+    location: 'SITE A CIMALAKA',
     shift: 'Shift 1 (07:00 - 15:00)',
     time: '06:58 WIB',
     status: 'Hadir',
@@ -101,8 +92,9 @@ const recentAttendance = [
     id: 5,
     nip: 'HC-0105',
     name: 'Hendra Wijaya',
-    role: 'Koordinator Keamanan',
+    role: 'Danru Keamanan & K3',
     division: 'Security & Safety',
+    location: 'SITE A CIMALAKA',
     shift: 'Shift 1 (07:00 - 15:00)',
     time: '06:40 WIB',
     status: 'Hadir',
@@ -112,24 +104,91 @@ const recentAttendance = [
     id: 6,
     nip: 'HC-0106',
     name: 'Rina Marlina',
-    role: 'Administrasi Payroll',
+    role: 'Staf Administrasi Payroll',
     division: 'Human Capital & GA',
+    location: 'SITE A CIMALAKA',
     shift: 'General (08:00 - 17:00)',
     time: '-',
     status: 'Izin Resmi',
     statusClass: 'status-izin',
   },
-];
-
-// Ringkasan per divisi
-const divisionSummary = [
-  { name: 'Operasional & Lapangan', total: 24, present: 24, percent: 100 },
-  { name: 'Human Capital & GA', total: 8, present: 7, percent: 87.5 },
-  { name: 'Logistik & Gudang', total: 10, present: 9, percent: 90 },
-  { name: 'Security & Safety', total: 6, present: 6, percent: 100 },
+  {
+    id: 7,
+    nip: 'HC-0107',
+    name: 'Eko Prasetyo',
+    role: 'Teknisi Maintenance Mesin',
+    division: 'Operasional & Lapangan',
+    location: 'SITE B PASEH',
+    shift: 'Shift 2 (15:00 - 23:00)',
+    time: '14:50 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 8,
+    nip: 'HC-0108',
+    name: 'Maya Indah Lestari',
+    role: 'Koordinator Gudang Bahan Baku',
+    division: 'Logistik & Gudang',
+    location: 'SITE B PASEH',
+    shift: 'General (08:00 - 17:00)',
+    time: '07:55 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 9,
+    nip: 'HC-0109',
+    name: 'Joko Susilo',
+    role: 'Anggota Patroli Keamanan',
+    division: 'Security & Safety',
+    location: 'SITE B PASEH',
+    shift: 'Shift 2 (15:00 - 23:00)',
+    time: '14:50 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 10,
+    nip: 'HC-0110',
+    name: 'Dian Kusuma',
+    role: 'IT Support & Sistem HRIS',
+    division: 'Human Capital & GA',
+    location: 'SITE B PASEH',
+    shift: 'General (08:00 - 17:00)',
+    time: '08:24 WIB',
+    status: 'Terlambat (24m)',
+    statusClass: 'status-terlambat',
+  },
+  {
+    id: 11,
+    nip: 'HC-0111',
+    name: 'Wahyu Hidayat',
+    role: 'Operator Mesin CNC Milling',
+    division: 'Operasional & Lapangan',
+    location: 'SITE B PASEH',
+    shift: 'Shift 1 (07:00 - 15:00)',
+    time: '-',
+    status: 'Alpha',
+    statusClass: 'status-alpha',
+  },
+  {
+    id: 12,
+    nip: 'HC-0112',
+    name: 'Nurul Aini',
+    role: 'Petugas Inventory & Stok',
+    division: 'Logistik & Gudang',
+    location: 'SITE B PASEH',
+    shift: 'Shift 1 (07:00 - 15:00)',
+    time: '-',
+    status: 'Sakit',
+    statusClass: 'status-sakit',
+  },
 ];
 
 export default function Beranda() {
+  const activeSite = useActiveSite();
+
   const currentDateFormatted = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
     day: 'numeric',
@@ -138,15 +197,81 @@ export default function Beranda() {
     timeZone: 'Asia/Jakarta',
   }).format(new Date());
 
+  // Filter presensi hari ini sesuai site aktif
+  const recentAttendance = useMemo(() => {
+    return ALL_RECENT_ATTENDANCE.filter((item) =>
+      matchesActiveSite(item.location, activeSite?.id)
+    );
+  }, [activeSite]);
+
+  // Statistik Real-time Beranda
+  const kpiStats = useMemo(() => {
+    const total = recentAttendance.length;
+    const hadir = recentAttendance.filter(
+      (i) => i.status === 'Hadir' || i.status.startsWith('Terlambat')
+    ).length;
+    const tepatWaktu = recentAttendance.filter((i) => i.status === 'Hadir').length;
+    const terlambat = recentAttendance.filter((i) => i.status.startsWith('Terlambat')).length;
+    const legalAbsence = recentAttendance.filter(
+      (i) => i.status.includes('Izin') || i.status.includes('Sakit')
+    ).length;
+    const alpha = recentAttendance.filter((i) => i.status === 'Alpha').length;
+    const rate = total > 0 ? ((hadir / total) * 100).toFixed(1) : '0.0';
+
+    return { total, hadir, tepatWaktu, terlambat, legalAbsence, alpha, rate };
+  }, [recentAttendance]);
+
+  // Ringkasan performa per divisi
+  const divisionSummary = useMemo(() => {
+    const map = {};
+    recentAttendance.forEach((item) => {
+      if (!map[item.division]) {
+        map[item.division] = { name: item.division, total: 0, present: 0 };
+      }
+      map[item.division].total += 1;
+      if (item.status === 'Hadir' || item.status.startsWith('Terlambat')) {
+        map[item.division].present += 1;
+      }
+    });
+
+    const entries = Object.values(map);
+    if (entries.length === 0) {
+      return [
+        { name: 'Operasional & Lapangan', total: 0, present: 0, percent: 0 },
+        { name: 'Human Capital & GA', total: 0, present: 0, percent: 0 },
+        { name: 'Logistik & Gudang', total: 0, present: 0, percent: 0 },
+        { name: 'Security & Safety', total: 0, present: 0, percent: 0 },
+      ];
+    }
+
+    return entries.map((d) => ({
+      ...d,
+      percent: d.total > 0 ? Math.round((d.present / d.total) * 100) : 0,
+    }));
+  }, [recentAttendance]);
+
+  // Tren mingguan diskalakan dengan site aktif
+  const weeklyTrendData = useMemo(() => {
+    const scale = activeSite?.id === 'all' ? 1 : 0.5;
+    return [
+      { day: 'Sen', hadir: Math.round(46 * scale), terlambat: Math.max(1, Math.round(2 * scale)), absen: 0 },
+      { day: 'Sel', hadir: Math.round(45 * scale), terlambat: Math.max(1, Math.round(3 * scale)), absen: 0 },
+      { day: 'Rab', hadir: Math.round(47 * scale), terlambat: Math.max(1, Math.round(1 * scale)), absen: 0 },
+      { day: 'Kam', hadir: Math.round(48 * scale), terlambat: 0, absen: 0 },
+      { day: 'Jum', hadir: Math.round(44 * scale), terlambat: Math.max(1, Math.round(4 * scale)), absen: 0 },
+      { day: 'Sab', hadir: Math.round(46 * scale), terlambat: Math.max(1, Math.round(2 * scale)), absen: 0 },
+    ];
+  }, [activeSite]);
+
   return (
     <>
       <Head title="Beranda" />
 
       {/* Page Header dengan Quick Actions */}
       <PageHeader
-        eyebrow="PORTAL HCGA ATTENDANCE SYSTEM"
+        eyebrow={`PORTAL HCGA ATTENDANCE SYSTEM ${activeSite?.id !== 'all' ? `· ${activeSite?.code || ''}` : ''}`}
         title="Ringkasan Operasional & Kehadiran"
-        subtitle={`Monitoring kedisiplinan dan absensi harian area kerja operasional — ${currentDateFormatted}.`}
+        subtitle={`Monitoring kedisiplinan dan absensi harian area ${activeSite?.name || 'Operasional'} — ${currentDateFormatted}.`}
         actions={
           <div className="flex items-center gap-2">
             <Link href="/kehadiran" className="button primary">
@@ -171,7 +296,7 @@ export default function Beranda() {
                 Total Personel Aktif
               </div>
               <div className="text-3xl font-bold font-display text-navy">
-                48 <span className="text-sm font-normal text-slate-400">orang</span>
+                {kpiStats.total} <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
@@ -192,11 +317,11 @@ export default function Beranda() {
                 Tingkat Kehadiran
               </div>
               <div className="text-3xl font-bold font-display text-[#398872]">
-                95.8%
+                {kpiStats.rate}%
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#398872]" />
-                <span>46 dari 48 personel telah hadir</span>
+                <span>{kpiStats.hadir} dari {kpiStats.total} personel telah hadir</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#eef7f1] flex items-center justify-center text-[#398872] shrink-0">
@@ -213,11 +338,11 @@ export default function Beranda() {
                 Terlambat Masuk
               </div>
               <div className="text-3xl font-bold font-display text-[#ac8848]">
-                2 <span className="text-sm font-normal text-slate-400">orang</span>
+                {kpiStats.terlambat} <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-[#ac8848]" />
-                <span>Akumulasi: 28 menit</span>
+                <span>Deviasi jam masuk shift</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#fcf6e9] flex items-center justify-center text-[#ac8848] shrink-0">
@@ -234,11 +359,11 @@ export default function Beranda() {
                 Tidak Hadir (Legalitas)
               </div>
               <div className="text-3xl font-bold font-display text-[#1d3046]">
-                2 <span className="text-sm font-normal text-slate-400">orang</span>
+                {kpiStats.legalAbsence + kpiStats.alpha} <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-sky-500 inline-block" />
-                <span>1 Izin, 1 Sakit, 0 Alpha</span>
+                <span>{kpiStats.legalAbsence} Izin/Sakit, {kpiStats.alpha} Alpha</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#eff5fa] flex items-center justify-center text-[#698eb0] shrink-0">
@@ -262,7 +387,7 @@ export default function Beranda() {
               </Badge>
             </div>
             <div className="text-xs text-slate-500 mt-0.5">
-              Jam Kerja: 07:00 - 15:00 WIB • Grup B bertugas pada Shift Siang (15:00 - 23:00 WIB)
+              Jam Kerja: 07:00 - 15:00 WIB • Grup B bertugas pada Shift Malam (15:00 - 23:00 WIB)
             </div>
           </div>
         </div>
@@ -307,7 +432,7 @@ export default function Beranda() {
                 <BarChart data={weeklyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#edf2f7" />
                   <XAxis dataKey="day" tickLine={false} axisLine={{ stroke: '#e2e8f0' }} tick={{ fontSize: 12, fill: '#718096' }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#718096' }} domain={[0, 50]} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#718096' }} domain={[0, activeSite?.id === 'all' ? 50 : 25]} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#10273f',
@@ -356,7 +481,7 @@ export default function Beranda() {
             <div className="pt-3 border-t border-slate-100 mt-4">
               <div className="rounded-lg bg-slate-50 p-3 text-[11px] text-slate-500 flex items-center justify-between">
                 <span>Total Jadwal Shift Hari Ini</span>
-                <span className="font-semibold text-navy">48 Sesi</span>
+                <span className="font-semibold text-navy">{kpiStats.total} Sesi</span>
               </div>
             </div>
           </CardContent>
@@ -383,17 +508,17 @@ export default function Beranda() {
         <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>KARYAWAN</TableHead>
-                <TableHead>DIVISI</TableHead>
-                <TableHead>SHIFT KERJA</TableHead>
-                <TableHead>WAKTU MASUK</TableHead>
-                <TableHead>STATUS</TableHead>
+              <TableRow className="bg-slate-50/80 border-b border-slate-200">
+                <TableHead className="min-w-[200px] text-[11px] font-bold text-slate-700 tracking-wider">KARYAWAN</TableHead>
+                <TableHead className="min-w-[160px] text-[11px] font-bold text-slate-700 tracking-wider">DIVISI & LOKASI</TableHead>
+                <TableHead className="min-w-[150px] text-[11px] font-bold text-slate-700 tracking-wider">SHIFT KERJA</TableHead>
+                <TableHead className="w-28 text-center text-[11px] font-bold text-slate-700 tracking-wider">WAKTU MASUK</TableHead>
+                <TableHead className="w-32 text-center text-[11px] font-bold text-slate-700 tracking-wider">STATUS</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recentAttendance.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} className="hover:bg-slate-50/60 transition-colors">
                   <TableCell>
                     <div className="person">
                       <div className="avatar small font-bold text-slate-700">
@@ -405,12 +530,15 @@ export default function Beranda() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium text-slate-700">{item.division}</TableCell>
-                  <TableCell className="text-slate-500">{item.shift}</TableCell>
                   <TableCell>
+                    <span className="font-medium text-slate-700 block">{item.division}</span>
+                    <span className="text-[11px] text-slate-400 block mt-0.5">{item.location}</span>
+                  </TableCell>
+                  <TableCell className="text-slate-600 text-xs">{item.shift}</TableCell>
+                  <TableCell className="text-center font-mono text-xs">
                     <Text variant="code">{item.time}</Text>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <span className={`badge ${item.statusClass}`}>
                       <i />
                       {item.status}
@@ -425,4 +553,3 @@ export default function Beranda() {
     </>
   );
 }
-

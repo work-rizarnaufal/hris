@@ -10,9 +10,7 @@ import {
 
 const SHIFT_OPTIONS = [
   { value: 'Shift 1 (07:00 - 15:00)', label: 'Shift 1 (Pagi: 07:00 - 15:00)' },
-  { value: 'Shift 2 (15:00 - 23:00)', label: 'Shift 2 (Siang: 15:00 - 23:00)' },
-  { value: 'Security Shift 1 (06:30 - 14:30)', label: 'Security Shift 1 (06:30 - 14:30)' },
-  { value: 'Security Shift 2 (14:30 - 22:30)', label: 'Security Shift 2 (14:30 - 22:30)' },
+  { value: 'Shift 2 (15:00 - 23:00)', label: 'Shift 2 (Malam: 15:00 - 23:00)' },
   { value: 'Normal Office (08:00 - 17:00)', label: 'Normal Office (08:00 - 17:00)' },
   { value: 'Libur (OFF)', label: 'Libur (OFF / Tukar Hari Off)' },
 ];

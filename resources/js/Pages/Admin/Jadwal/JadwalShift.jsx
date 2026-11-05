@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
-import { getHolidays, formatDateDMY } from '@/services/systemSettings.js';
+import { getHolidays, formatDateDMY, useActiveSite, matchesActiveSite } from '@/services/systemSettings.js';
 import {
   CalendarDays,
   Clock,
@@ -14,6 +14,7 @@ import {
   RotateCcw,
   CheckCircle2,
   Trash2,
+  MapPin,
 } from 'lucide-react';
 import {
   Card,
@@ -48,7 +49,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0101',
     role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup A',
     baseShift: 'Shift 1 (07:00 - 15:00)',
     shiftCode: 'S1',
@@ -59,7 +60,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0102',
     role: 'HCGA Specialist',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    location: 'SITE A CIMALAKA',
     group: 'Non-Shift',
     baseShift: 'Normal Office (08:00 - 17:00)',
     shiftCode: 'NON',
@@ -70,7 +71,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0103',
     role: 'Operator Forklift Utama',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup B',
     baseShift: 'Shift 2 (15:00 - 23:00)',
     shiftCode: 'S2',
@@ -81,7 +82,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0104',
     role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup A',
     baseShift: 'Shift 1 (07:00 - 15:00)',
     shiftCode: 'S1',
@@ -92,10 +93,10 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0105',
     role: 'Danru Keamanan & K3',
     division: 'Security & Safety',
-    location: 'Site Operasional (Gresik)',
+    location: 'SITE A CIMALAKA',
     group: 'Grup A',
-    baseShift: 'Security Shift 1 (06:30 - 14:30)',
-    shiftCode: 'SEC1',
+    baseShift: 'Shift 1 (07:00 - 15:00)',
+    shiftCode: 'S1',
   },
   {
     id: 6,
@@ -103,7 +104,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0106',
     role: 'Staf Administrasi Payroll',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    location: 'SITE A CIMALAKA',
     group: 'Non-Shift',
     baseShift: 'Normal Office (08:00 - 17:00)',
     shiftCode: 'NON',
@@ -114,7 +115,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0107',
     role: 'Teknisi Maintenance Mesin',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE B PASEH',
     group: 'Grup B',
     baseShift: 'Shift 2 (15:00 - 23:00)',
     shiftCode: 'S2',
@@ -125,7 +126,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0108',
     role: 'Koordinator Gudang Bahan Baku',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'SITE B PASEH',
     group: 'Non-Shift',
     baseShift: 'Normal Office (08:00 - 17:00)',
     shiftCode: 'NON',
@@ -136,10 +137,10 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0109',
     role: 'Anggota Patroli Keamanan',
     division: 'Security & Safety',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE B PASEH',
     group: 'Grup B',
-    baseShift: 'Security Shift 2 (14:30 - 22:30)',
-    shiftCode: 'SEC2',
+    baseShift: 'Shift 2 (15:00 - 23:00)',
+    shiftCode: 'S2',
   },
   {
     id: 10,
@@ -147,7 +148,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0110',
     role: 'IT Support & Sistem HRIS',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    location: 'SITE B PASEH',
     group: 'Non-Shift',
     baseShift: 'Normal Office (08:00 - 17:00)',
     shiftCode: 'NON',
@@ -158,7 +159,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0111',
     role: 'Operator Mesin CNC Milling',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'SITE B PASEH',
     group: 'Grup A',
     baseShift: 'Shift 1 (07:00 - 15:00)',
     shiftCode: 'S1',
@@ -169,7 +170,7 @@ const EMPLOYEES_SCHEDULE = [
     nip: 'HC-0112',
     role: 'Petugas Inventory & Stok',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'SITE B PASEH',
     group: 'Grup A',
     baseShift: 'Shift 1 (07:00 - 15:00)',
     shiftCode: 'S1',
@@ -268,10 +269,10 @@ export default function JadwalShift() {
       employeeId: 9,
       employeeName: 'Joko Susilo',
       employeeNip: 'HC-0109',
-      sourceShift: 'Security Shift 2 (14:30 - 22:30)',
+      sourceShift: 'Shift 2 (15:00 - 23:00)',
       targetEmployeeName: '-',
       targetEmployeeNip: '-',
-      targetShift: 'Security Shift 1 (06:30 - 14:30)',
+      targetShift: 'Shift 1 (07:00 - 15:00)',
       reason: 'Penugasan khusus pengawalan audit K3 gerbang utama',
       status: 'Disetujui HCGA',
     },
@@ -295,6 +296,12 @@ export default function JadwalShift() {
 
   // Kalender Hari Libur Resmi yang Disinkronkan dari Modul Pengaturan Sistem
   const [holidays, setHolidays] = useState(() => getHolidays());
+  const activeSite = useActiveSite();
+
+  // Filter Karyawan Sesuai Site Aktif
+  const siteEmployees = useMemo(() => {
+    return employees.filter((emp) => matchesActiveSite(emp.location, activeSite.id));
+  }, [employees, activeSite]);
 
   // Listener Sinkronisasi Otomatis jika Pengaturan Hari Libur Diubah di Tab Lain/Modul Pengaturan
   useEffect(() => {
@@ -309,7 +316,7 @@ export default function JadwalShift() {
 
   // Filter Karyawan
   const filteredEmployees = useMemo(() => {
-    return employees.filter((emp) => {
+    return siteEmployees.filter((emp) => {
       const matchDivision = filterDivision === 'ALL' || emp.division === filterDivision;
       const matchGroup = filterGroup === 'ALL' || emp.group === filterGroup;
       const matchSearch =
@@ -319,19 +326,20 @@ export default function JadwalShift() {
         emp.role.toLowerCase().includes(searchQuery.toLowerCase());
       return matchDivision && matchGroup && matchSearch;
     });
-  }, [employees, filterDivision, filterGroup, searchQuery]);
+  }, [siteEmployees, filterDivision, filterGroup, searchQuery]);
 
   // Statistik Ringkasan Jadwal
   const stats = useMemo(() => {
-    const total = employees.length;
-    const groupA = employees.filter((e) => e.group === 'Grup A').length;
-    const groupB = employees.filter((e) => e.group === 'Grup B').length;
-    const unassigned = employees.filter((e) => e.group === 'Belum Ditetapkan').length;
-    const nonShift = employees.filter((e) => e.group === 'Non-Shift').length;
-    const totalExceptions = exceptions.length;
+    const total = siteEmployees.length;
+    const groupA = siteEmployees.filter((e) => e.group === 'Grup A').length;
+    const groupB = siteEmployees.filter((e) => e.group === 'Grup B').length;
+    const unassigned = siteEmployees.filter((e) => e.group === 'Belum Ditetapkan').length;
+    const nonShift = siteEmployees.filter((e) => e.group === 'Non-Shift').length;
+    const siteEmpIds = new Set(siteEmployees.map((e) => e.id));
+    const totalExceptions = exceptions.filter((ex) => siteEmpIds.has(ex.employeeId)).length;
     const totalManualSchedules = manualSchedules.length;
     return { total, groupA, groupB, unassigned, nonShift, totalExceptions, totalManualSchedules };
-  }, [employees, exceptions, manualSchedules]);
+  }, [siteEmployees, exceptions, manualSchedules]);
 
   // Handle Update Grup Karyawan per Individu (dari Kolom Dropdown)
   const handleUpdateEmployeeGroup = (empId, newGroup) => {
@@ -342,6 +350,18 @@ export default function JadwalShift() {
     setAlertInfo({
       type: 'success',
       message: `Grup kerja ${targetEmp?.name || 'personil'} berhasil diubah menjadi ${newGroup}.`,
+    });
+  };
+
+  // Handle Update Lengkap Penugasan Roster (Grup & Shift)
+  const handleUpdateEmployeeAssignment = (empId, updates) => {
+    const targetEmp = employees.find((e) => e.id === empId);
+    setEmployees((prev) =>
+      prev.map((emp) => (emp.id === empId ? { ...emp, ...updates } : emp))
+    );
+    setAlertInfo({
+      type: 'success',
+      message: `Penugasan roster ${targetEmp?.name || 'personil'} berhasil diperbarui.`,
     });
   };
 
@@ -442,7 +462,8 @@ export default function JadwalShift() {
     if (activeException) {
       const isTarget = activeException.type === 'swap' && activeException.targetEmployeeId === emp.id;
       return {
-        code: isTarget ? 'S1 (SWAP)' : 'S2 (SWAP)',
+        code: 'SWAP',
+        time: isTarget ? '07:00 - 15:00' : '15:00 - 23:00',
         label: `Tukar Shift: ${activeException.reason}`,
         badgeClass: 'bg-purple-100 text-purple-900 border-purple-300 font-bold',
       };
@@ -452,6 +473,7 @@ export default function JadwalShift() {
     if (emp.group === 'Belum Ditetapkan') {
       return {
         code: 'UNSET',
+        time: null,
         label: 'Grup Kerja Belum Ditetapkan',
         badgeClass: 'bg-slate-100 text-slate-400 border-slate-200 font-medium',
       };
@@ -462,13 +484,15 @@ export default function JadwalShift() {
       if (day.isWeekend) {
         return {
           code: 'OFF',
+          time: null,
           label: 'Libur Akhir Pekan',
           badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
         };
       }
       return {
         code: 'NON',
-        label: 'Office (08:00 - 17:00)',
+        time: '08:00 - 17:00',
+        label: 'Normal Office (08:00 - 17:00)',
         badgeClass: 'bg-sky-50 text-sky-800 border-sky-200 font-semibold',
       };
     }
@@ -486,11 +510,11 @@ export default function JadwalShift() {
       if (isTargetGroup) {
         const isShift2 = emp.shiftCode === 'S2' || (emp.baseShift && emp.baseShift.includes('Shift 2'));
         const timeStr = isShift2
-          ? `${activeManual.shift2In}-${activeManual.shift2Out}`
-          : `${activeManual.shift1In}-${activeManual.shift1Out}`;
-        const shiftCodeStr = isShift2 ? `S2 (${timeStr})` : `S1 (${timeStr})`;
+          ? `${activeManual.shift2In} - ${activeManual.shift2Out}`
+          : `${activeManual.shift1In} - ${activeManual.shift1Out}`;
         return {
-          code: shiftCodeStr,
+          code: isShift2 ? 'S2' : 'S1',
+          time: timeStr,
           label: `Penugasan Lembur Libur [${activeHoliday.name}]: ${activeManual.reason}`,
           badgeClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
         };
@@ -499,6 +523,7 @@ export default function JadwalShift() {
       // Jika tidak ada penugasan manual khusus, seluruh regu libur resmi
       return {
         code: 'LIBUR',
+        time: null,
         label: `${activeHoliday.category}: ${activeHoliday.name} - ${activeHoliday.operationalNote}`,
         badgeClass: 'bg-rose-50 text-rose-800 border-rose-200 font-bold',
       };
@@ -512,76 +537,80 @@ export default function JadwalShift() {
       if (isTargetGroup) {
         const isShift2 = emp.shiftCode === 'S2' || (emp.baseShift && emp.baseShift.includes('Shift 2'));
         const timeStr = isShift2
-          ? `${activeManual.shift2In}-${activeManual.shift2Out}`
-          : `${activeManual.shift1In}-${activeManual.shift1Out}`;
-        const shiftCodeStr = isShift2 ? `S2 (${timeStr})` : `S1 (${timeStr})`;
+          ? `${activeManual.shift2In} - ${activeManual.shift2Out}`
+          : `${activeManual.shift1In} - ${activeManual.shift1Out}`;
         const shiftName = isShift2 ? 'Shift 2' : 'Shift 1';
         return {
-          code: shiftCodeStr,
+          code: isShift2 ? 'S2' : 'S1',
+          time: timeStr,
           label: `Jadwal Manual [${activeManual.targetGroup}]: ${shiftName} (${timeStr}) - ${activeManual.reason}`,
           badgeClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
         };
       } else {
         return {
           code: 'OFF',
+          time: null,
           label: `Libur Operasional (Jadwal Manual Khusus ${activeManual.targetGroup})`,
           badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
         };
       }
     }
 
-    // Hari Minggu selalu Libur (OFF) bagi seluruh regu operasional
-    if (day.key === 'd7') {
-      return {
-        code: 'OFF',
-        label: 'Libur Mingguan (OFF)',
-        badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      };
-    }
-
     const isGroupA = emp.group === 'Grup A';
     const isGroupB = emp.group === 'Grup B';
-    const isSec = emp.shiftCode.includes('SEC') || emp.division === 'Security & Safety';
-    const dayNum = parseInt(day.key.replace('d', ''), 10); // 1 = Senin, 2 = Selasa, 3 = Rabu, 4 = Kamis, 5 = Jumat, 6 = Sabtu
+    const dayNum = parseInt(day.key.replace('d', ''), 10); // 1 = Senin, ..., 7 = Minggu
 
-    // Aturan Permanen:
-    // Grup A masuk hari ganjil: 1 (Senin), 3 (Rabu), 5 (Jumat). Selasa, Kamis, Sabtu LIBUR (OFF).
-    // Grup B masuk hari genap: 2 (Selasa), 4 (Kamis), 6 (Sabtu). Senin, Rabu, Jumat LIBUR (OFF).
-    const isOddDay = dayNum % 2 === 1;
-    const isWorkingDay = isGroupA ? isOddDay : isGroupB ? !isOddDay : false;
+    // Aturan Permanen: Operasional 7 Hari Penuh (Senin s/d Minggu), 1 Hari Dinas 1 Hari Libur (Siklus Bergulir 14 Hari)
+    // Hari ke-(selectedWeekIndex * 7 + dayNum):
+    // Ganjil: Giliran Grup A Masuk
+    // Genap: Giliran Grup B Masuk
+    const continuousDayIndex = selectedWeekIndex * 7 + dayNum;
+    const isTurnGroupA = continuousDayIndex % 2 === 1;
+    const isWorkingDay = isGroupA ? isTurnGroupA : isGroupB ? !isTurnGroupA : false;
 
     if (!isWorkingDay) {
       return {
         code: 'OFF',
-        label: 'Libur Roster Bergantian (OFF)',
+        time: null,
+        label: 'Libur Roster Bergulir (OFF)',
         badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
       };
     }
 
-    // Jika hari kerja operasional: Tampilkan shift personil (Pagi atau Sore)
-    if (isSec) {
-      const isSec2 = emp.shiftCode === 'SEC2' || (emp.baseShift && emp.baseShift.includes('Shift 2'));
-      return {
-        code: isSec2 ? 'SEC2' : 'SEC1',
-        label: isSec2 ? 'Security Shift 2 (Sore: 14:30 - 22:30)' : 'Security Shift 1 (Pagi: 06:30 - 14:30)',
-        badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200 font-bold',
-      };
-    }
+    // Jika hari kerja operasional: Hanya ada 2 Shift (Pagi & Malam)
+    const isShiftMalam =
+      emp.shiftCode === 'S2' ||
+      (emp.baseShift && emp.baseShift.toLowerCase().includes('malam')) ||
+      (emp.baseShift && emp.baseShift.includes('Shift 2'));
 
-    const isShift2 = emp.shiftCode === 'S2' || (emp.baseShift && emp.baseShift.includes('Shift 2'));
-    if (isShift2) {
+    if (isShiftMalam) {
       return {
-        code: 'S2 (15-23)',
-        label: 'Shift 2 (Sore: 15:00 - 23:00)',
+        code: 'S2',
+        time: '15:00 - 23:00',
+        label: 'Shift Malam (15:00 - 23:00)',
         badgeClass: 'bg-amber-50 text-amber-800 border-amber-200 font-bold',
       };
     }
 
     return {
-      code: 'S1 (07-15)',
-      label: 'Shift 1 (Pagi: 07:00 - 15:00)',
+      code: 'S1',
+      time: '07:00 - 15:00',
+      label: 'Shift Pagi (07:00 - 15:00)',
       badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold',
     };
+  };
+
+  // Perhitungan Akurat Total Jam Kerja Mingguan per Karyawan (Siklus Bergulir 14 Hari)
+  const getEmployeeWeeklyHours = (emp, week) => {
+    if (emp.group === 'Belum Ditetapkan') return '0 Jam';
+    let count = 0;
+    week.days.forEach((day) => {
+      const shiftInfo = getEmployeeShiftForDay(emp, day);
+      if (shiftInfo.code !== 'OFF' && shiftInfo.code !== 'LIBUR' && shiftInfo.code !== 'UNSET') {
+        count++;
+      }
+    });
+    return `${count * 8} Jam`;
   };
 
   // Ekspor Excel Roster Mingguan
@@ -592,16 +621,17 @@ export default function JadwalShift() {
         NIP: emp.nip,
         'Nama Karyawan': emp.name,
         Divisi: emp.division,
+        'Lokasi Kerja': emp.location,
         Grup: emp.group,
         'Shift Dasar': emp.baseShift,
       };
 
       currentWeek.days.forEach((day) => {
         const shiftInfo = getEmployeeShiftForDay(emp, day);
-        row[`${day.label} (${day.date})`] = shiftInfo.code;
+        row[`${day.label} (${day.date})`] = shiftInfo.time ? `${shiftInfo.code} (${shiftInfo.time})` : shiftInfo.code;
       });
 
-      row['Total Jam Kerja'] = '40 Jam';
+      row['Total Jam Kerja'] = getEmployeeWeeklyHours(emp, currentWeek);
       return row;
     });
 
@@ -637,12 +667,19 @@ export default function JadwalShift() {
   const renderShiftCellBadge = (emp, day) => {
     const shiftInfo = getEmployeeShiftForDay(emp, day);
     return (
-      <span
+      <div
         title={shiftInfo.label}
-        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border ${shiftInfo.badgeClass}`}
+        className={`inline-flex flex-col items-center justify-center min-w-[76px] px-2 py-1 rounded-md text-[10px] border shadow-2xs ${shiftInfo.badgeClass}`}
       >
-        {shiftInfo.code}
-      </span>
+        <span className="font-bold font-mono tracking-tight text-xs leading-none">
+          {shiftInfo.code}
+        </span>
+        {shiftInfo.time && (
+          <span className="font-mono text-[9px] opacity-90 mt-0.5 whitespace-nowrap leading-tight">
+            {shiftInfo.time}
+          </span>
+        )}
+      </div>
     );
   };
 
@@ -763,11 +800,11 @@ export default function JadwalShift() {
         </div>
 
         {/* Tab Switcher Segmented Control */}
-        <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3">
+        <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3 overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab('roster')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'roster'
                 ? 'bg-navy text-white shadow-xs'
                 : 'text-slate-600 hover:text-navy hover:bg-slate-100'
@@ -783,7 +820,7 @@ export default function JadwalShift() {
           <button
             type="button"
             onClick={() => setActiveTab('patterns')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'patterns'
                 ? 'bg-navy text-white shadow-xs'
                 : 'text-slate-600 hover:text-navy hover:bg-slate-100'
@@ -792,14 +829,14 @@ export default function JadwalShift() {
             <Clock className="w-4 h-4" />
             <span>Rotasi Grup & Jadwal Manual</span>
             <Badge className={activeTab === 'patterns' ? 'bg-white/20 text-white font-mono text-[10px]' : 'bg-slate-200 text-slate-700 text-[10px]'}>
-              {employees.length}
+              {siteEmployees.length}
             </Badge>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('exceptions')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'exceptions'
                 ? 'bg-navy text-white shadow-xs'
                 : 'text-slate-600 hover:text-navy hover:bg-slate-100'
@@ -912,39 +949,42 @@ export default function JadwalShift() {
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">
-                      No
+                  <TableRow className="bg-slate-50/90 border-b border-slate-200">
+                    <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">
+                      NO
                     </TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">
-                      Karyawan
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[200px]">
+                      KARYAWAN
                     </TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">
-                      Divisi & Grup
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">
+                      DIVISI
+                    </TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[150px]">
+                      LOKASI / PENUGASAN
                     </TableHead>
 
                     {/* 7 Kolom Hari dalam Minggu Terpilih */}
                     {currentWeek.days.map((day) => (
                       <TableHead
                         key={day.key}
-                        className={`text-center text-xs font-bold w-24 ${
+                        className={`text-center min-w-[105px] py-2.5 ${
                           day.isWeekend ? 'bg-slate-100/70 text-slate-600' : 'text-slate-800'
                         }`}
                       >
-                        <div>{day.label}</div>
-                        <div className="text-[10px] font-normal text-slate-400">{day.date}</div>
+                        <div className="text-[11px] font-bold uppercase tracking-wider">{day.label}</div>
+                        <div className="text-[10px] font-mono font-normal text-slate-400 mt-0.5">{day.date}</div>
                       </TableHead>
                     ))}
 
-                    <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">
-                      Total Jam
+                    <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">
+                      TOTAL JAM
                     </TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {filteredEmployees.length === 0 ? (
-                    <TableEmpty colSpan={11} message="Tidak ada data karyawan yang cocok dengan kriteria filter." />
+                    <TableEmpty colSpan={12} message="Tidak ada data karyawan yang cocok dengan kriteria filter." />
                   ) : (
                     filteredEmployees.map((emp, index) => (
                       <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
@@ -952,26 +992,43 @@ export default function JadwalShift() {
                           {index + 1}
                         </TableCell>
                         <TableCell>
-                          <div>
-                            <p className="font-bold text-navy text-xs">{emp.name}</p>
-                            <p className="text-[11px] text-slate-500">{emp.nip} • {emp.role}</p>
+                          <div className="person">
+                            <div className="avatar small font-bold text-slate-700 bg-slate-100 border border-slate-200 shrink-0">
+                              {emp.name.slice(0, 2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <strong className="block text-xs font-semibold text-navy truncate">
+                                {emp.name}
+                              </strong>
+                              <span className="text-[11px] text-slate-500 block truncate">
+                                {emp.nip} • {emp.role}
+                              </span>
+                            </div>
                           </div>
                         </TableCell>
+                        <TableCell className="text-xs font-medium text-slate-700">
+                          {emp.division}
+                        </TableCell>
                         <TableCell>
-                          <p className="text-xs text-slate-800 font-medium">{emp.division}</p>
-                          <span
-                            className={`inline-block text-[10px] font-bold px-1.5 py-0.2 rounded mt-0.5 ${
-                              emp.group === 'Grup A'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : emp.group === 'Grup B'
-                                ? 'bg-amber-100 text-amber-800'
-                                : emp.group === 'Belum Ditetapkan'
-                                ? 'bg-slate-200 text-slate-700'
-                                : 'bg-sky-100 text-sky-800'
-                            }`}
-                          >
-                            {emp.group}
-                          </span>
+                          <div className="flex items-center gap-1.5 text-slate-600 text-xs font-medium">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span>{emp.location}</span>
+                          </div>
+                          <div className="mt-1">
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                                emp.group === 'Grup A'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : emp.group === 'Grup B'
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : emp.group === 'Belum Ditetapkan'
+                                  ? 'bg-slate-100 text-slate-600 border-slate-200'
+                                  : 'bg-sky-50 text-sky-700 border-sky-200'
+                              }`}
+                            >
+                              {emp.group}
+                            </span>
+                          </div>
                         </TableCell>
 
                         {/* 7 Sel Hari */}
@@ -981,8 +1038,10 @@ export default function JadwalShift() {
                           </TableCell>
                         ))}
 
-                        <TableCell className="text-center font-bold text-xs text-slate-800">
-                          40 Jam
+                        <TableCell className="text-center">
+                          <span className="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 font-mono text-[11px] font-semibold">
+                            {getEmployeeWeeklyHours(emp, currentWeek)}
+                          </span>
                         </TableCell>
                       </TableRow>
                     ))
@@ -998,7 +1057,7 @@ export default function JadwalShift() {
                     <span className="w-2.5 h-2.5 rounded bg-emerald-600 inline-block" /> S1 (Pagi 07-15)
                   </span>
                   <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-amber-600 inline-block" /> S2 (Siang 15-23)
+                    <span className="w-2.5 h-2.5 rounded bg-amber-600 inline-block" /> S2 (Malam 15-23)
                   </span>
                   <span className="inline-flex items-center gap-1 text-[11px]">
                     <span className="w-2.5 h-2.5 rounded bg-sky-600 inline-block" /> NON (Office 08-17)
@@ -1015,7 +1074,7 @@ export default function JadwalShift() {
                 </div>
 
                 <div className="text-[11px] text-slate-400">
-                  Menampilkan <strong>{filteredEmployees.length}</strong> dari total <strong>{employees.length}</strong> karyawan
+                  Menampilkan <strong>{filteredEmployees.length}</strong> dari total <strong>{siteEmployees.length}</strong> karyawan
                 </div>
               </div>
             </CardContent>
@@ -1025,8 +1084,9 @@ export default function JadwalShift() {
         {/* TAMPILAN 2: ROTASI GRUP & PERUBAHAN JADWAL MANUAL */}
         {activeTab === 'patterns' && (
           <PanelRotasiGrup
-            employees={employees}
+            employees={siteEmployees}
             onUpdateEmployeeGroup={handleUpdateEmployeeGroup}
+            onUpdateEmployeeAssignment={handleUpdateEmployeeAssignment}
             onBulkUpdateGroup={handleBulkUpdateGroup}
             onSwapAll={handleSwapAllGroups}
             manualSchedules={manualSchedules}
@@ -1062,15 +1122,15 @@ export default function JadwalShift() {
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600">Tanggal Efektif</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600">Karyawan Pemohon</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600">Shift Semula</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600">Rekan Pengganti / Shift Baru</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600">Alasan Operasional</TableHead>
-                    <TableHead className="text-center text-xs font-semibold text-slate-600">Status</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600">Aksi</TableHead>
+                  <TableRow className="bg-slate-50/90 border-b border-slate-200">
+                    <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">NO</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[130px]">TANGGAL EFEKTIF</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[180px]">KARYAWAN PEMOHON</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">SHIFT SEMULA</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[190px]">REKAN PENGGANTI / SHIFT BARU</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[180px]">ALASAN OPERASIONAL</TableHead>
+                    <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">STATUS</TableHead>
+                    <TableHead className="text-right pr-4 text-[11px] font-bold text-slate-700 tracking-wider w-20">AKSI</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1146,7 +1206,7 @@ export default function JadwalShift() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveException}
-        employees={employees}
+        employees={siteEmployees}
       />
     </>
   );

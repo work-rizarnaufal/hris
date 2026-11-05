@@ -11,6 +11,9 @@ import {
   UserCheck,
   Plus,
   Trash2,
+  MapPin,
+  Pencil,
+  RotateCcw,
 } from 'lucide-react';
 import {
   Card,
@@ -28,12 +31,53 @@ import {
   TableHead,
   TableCell,
   TableSelect,
+  TableToolbar,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from '@/components/ui';
 import { formatDateDMY } from '@/services/systemSettings.js';
+
+// Helper Format Informasi Shift Operasional (2 Baris: Kode & Waktu)
+const getOperationalShiftBadge = (emp) => {
+  if (emp.shiftCode === 'S1') {
+    return {
+      code: 'S1',
+      time: '07:00 - 15:00',
+      label: 'Shift 1: Pagi (07:00 - 15:00)',
+      badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    };
+  }
+  if (emp.shiftCode === 'S2') {
+    return {
+      code: 'S2',
+      time: '15:00 - 23:00',
+      label: 'Shift 2: Malam (15:00 - 23:00)',
+      badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+    };
+  }
+  if (emp.shiftCode === 'NON') {
+    return {
+      code: 'NON',
+      time: '08:00 - 17:00',
+      label: 'Normal Office (08:00 - 17:00)',
+      badgeClass: 'bg-sky-50 text-sky-800 border-sky-200',
+    };
+  }
+  const match = emp.baseShift?.match(/\((.*?)\)/);
+  return {
+    code: emp.shiftCode || 'S1',
+    time: match ? match[1] : '07:00 - 15:00',
+    label: emp.baseShift || `${emp.shiftCode || 'S1'} (07:00 - 15:00)`,
+    badgeClass: 'bg-slate-50 text-slate-700 border-slate-200',
+  };
+};
 
 export default function PanelRotasiGrup({
   employees,
   onUpdateEmployeeGroup,
+  onUpdateEmployeeAssignment,
   onBulkUpdateGroup,
   onSwapAll,
   manualSchedules = [],
@@ -43,6 +87,12 @@ export default function PanelRotasiGrup({
   const [selectedIds, setSelectedIds] = useState([]);
   const [filterGroupTab, setFilterGroupTab] = useState('ALL'); // 'ALL' | 'Grup A' | 'Grup B' | 'Belum Ditetapkan'
   const [bulkTargetGroup, setBulkTargetGroup] = useState('Grup A');
+  const [rotationWeekCycle, setRotationWeekCycle] = useState('odd'); // 'odd' (Minggu 1 & 3) | 'even' (Minggu 2 & 4)
+
+  // State Modal Edit Penugasan Karyawan
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [editGroup, setEditGroup] = useState('Grup A');
+  const [editShiftCode, setEditShiftCode] = useState('S1');
 
   // Form State Perubahan Jadwal Operasional Manual (Sesuai 7 Kriteria Revisi)
   const [startDate, setStartDate] = useState(
@@ -111,6 +161,48 @@ export default function PanelRotasiGrup({
     setSelectedIds([]);
   };
 
+  // Handlers Aksi Roster Personil
+  const handleOpenEditModal = (emp) => {
+    setEditingEmployee(emp);
+    setEditGroup(emp.group);
+    setEditShiftCode(emp.shiftCode || 'S1');
+  };
+
+  const handleSaveEdit = (e) => {
+    e?.preventDefault();
+    if (!editingEmployee) return;
+
+    const baseShiftStr =
+      editShiftCode === 'S2'
+        ? 'Shift 2 (15:00 - 23:00)'
+        : 'Shift 1 (07:00 - 15:00)';
+
+    if (onUpdateEmployeeAssignment) {
+      onUpdateEmployeeAssignment(editingEmployee.id, {
+        group: editGroup,
+        shiftCode: editShiftCode,
+        baseShift: baseShiftStr,
+      });
+    } else if (onUpdateEmployeeGroup) {
+      onUpdateEmployeeGroup(editingEmployee.id, editGroup);
+    }
+
+    setEditingEmployee(null);
+  };
+
+  const handleQuickSwapGroup = (emp) => {
+    const nextGroup = emp.group === 'Grup A' ? 'Grup B' : 'Grup A';
+    if (onUpdateEmployeeGroup) {
+      onUpdateEmployeeGroup(emp.id, nextGroup);
+    }
+  };
+
+  const handleResetGroup = (emp) => {
+    if (onUpdateEmployeeGroup) {
+      onUpdateEmployeeGroup(emp.id, 'Belum Ditetapkan');
+    }
+  };
+
   // Submit Perubahan Manual Operasional
   const handleManualSubmit = (e) => {
     e.preventDefault();
@@ -131,113 +223,79 @@ export default function PanelRotasiGrup({
     setReason('');
   };
 
-  // Matriks Aturan Permanen 7 Hari (Senin s/d Minggu)
-  const permanentScheduleRows = [
-    {
-      day: 'Senin',
-      date: '02/11/2026',
-      grupAStatus: 'MASUK (2 Shift)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A berdinas 2 shift (Pagi & Sore). Grup B libur otomatis.',
-    },
-    {
-      day: 'Selasa',
-      date: '03/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (2 Shift)',
-      grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A otomatis libur paska dinas Senin. Giliran Grup B masuk 2 shift.',
-    },
-    {
-      day: 'Rabu',
-      date: '04/11/2026',
-      grupAStatus: 'MASUK (2 Shift)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A kembali berdinas operasional. Grup B libur.',
-    },
-    {
-      day: 'Kamis',
-      date: '05/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (2 Shift)',
-      grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup B kembali berdinas operasional. Grup A libur.',
-    },
-    {
-      day: 'Jumat',
-      date: '06/11/2026',
-      grupAStatus: 'MASUK (2 Shift)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A berdinas operasional. Grup B libur.',
-    },
-    {
-      day: 'Sabtu',
-      date: '07/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (2 Shift)',
-      grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      officeStatus: 'LIBUR (OFF)',
-      note: 'Grup B berdinas operasional. Grup A & Staf Kantor libur akhir pekan.',
-    },
-    {
-      day: 'Minggu',
-      date: '08/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'LIBUR (OFF)',
-      note: 'Seluruh lini operasional dan kantor libur terjadwal mingguan.',
-    },
-  ];
+  // Matriks Aturan Permanen 7 Hari (Senin s/d Minggu - Siklus Bergulir 14 Hari)
+  const permanentScheduleRows = useMemo(() => {
+    const isOdd = rotationWeekCycle === 'odd';
+    return [
+      {
+        day: 'Senin',
+        date: isOdd ? '02/11/2026' : '09/11/2026',
+        grupAStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupABadge: isOdd ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        grupBStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupBBadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+        officeStatus: 'MASUK (08:00 - 17:00)',
+      },
+      {
+        day: 'Selasa',
+        date: isOdd ? '03/11/2026' : '10/11/2026',
+        grupAStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupABadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
+        grupBStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupBBadge: isOdd ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        officeStatus: 'MASUK (08:00 - 17:00)',
+      },
+      {
+        day: 'Rabu',
+        date: isOdd ? '04/11/2026' : '11/11/2026',
+        grupAStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupABadge: isOdd ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        grupBStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupBBadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+        officeStatus: 'MASUK (08:00 - 17:00)',
+      },
+      {
+        day: 'Kamis',
+        date: isOdd ? '05/11/2026' : '12/11/2026',
+        grupAStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupABadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
+        grupBStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupBBadge: isOdd ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        officeStatus: 'MASUK (08:00 - 17:00)',
+      },
+      {
+        day: 'Jumat',
+        date: isOdd ? '06/11/2026' : '13/11/2026',
+        grupAStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupABadge: isOdd ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        grupBStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupBBadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+        officeStatus: 'MASUK (08:00 - 17:00)',
+      },
+      {
+        day: 'Sabtu',
+        date: isOdd ? '07/11/2026' : '14/11/2026',
+        grupAStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupABadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
+        grupBStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupBBadge: isOdd ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        officeStatus: 'LIBUR (OFF)',
+      },
+      {
+        day: 'Minggu',
+        date: isOdd ? '08/11/2026' : '15/11/2026',
+        grupAStatus: isOdd ? 'MASUK (2 Shift)' : 'LIBUR (OFF)',
+        grupABadge: isOdd ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+        grupBStatus: isOdd ? 'LIBUR (OFF)' : 'MASUK (2 Shift)',
+        grupBBadge: isOdd ? 'bg-slate-100 text-slate-500 border-slate-200 font-semibold' : 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
+        officeStatus: 'LIBUR (OFF)',
+      },
+    ];
+  }, [rotationWeekCycle]);
 
   return (
     <div className="space-y-6">
-      {/* 1. BANNER ATURAN OPERASIONAL PERMANEN & AKSI SIKLUS CEPAT */}
-      <div className="bg-[#10273f] text-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded bg-[#c4a266]/20 border border-[#c4a266]/40 text-[#c4a266] text-[10px] font-bold uppercase tracking-wider">
-              Aturan Operasional Permanen
-            </span>
-            <Badge className="bg-white/10 text-white text-[10px] font-medium border-white/10">
-              1 Hari 2 Shift (Pagi & Sore) • 2 Grup (A & B)
-            </Badge>
-          </div>
-          <h3 className="text-base font-bold font-display mt-2 text-white">
-            Pusat Penugasan & Rotasi Roster Grup A & Grup B
-          </h3>
-          <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            Operasional berjalan <strong>2 shift per hari (Pagi & Sore)</strong>. Grup A dan Grup B bertugas secara selang-seling: jika <strong>Grup A masuk hari Senin</strong>, maka otomatis <strong>hari Selasa libur (OFF)</strong>, demikian sebaliknya untuk <strong>Grup B</strong>. Hari Minggu seluruh personil libur operasional.
-          </p>
-        </div>
-
-        <div className="shrink-0">
-          <Button
-            onClick={onSwapAll}
-            className="gap-2 bg-[#c4a266] hover:bg-[#b08e54] text-navy font-bold text-xs shadow-sm border-0 cursor-pointer"
-          >
-            <ArrowLeftRight className="w-4 h-4 text-navy" />
-            <span>Tukar Siklus Grup A ⇄ Grup B</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* 2. CARD MATRIKS ALUR KERJA BERGANTIAN (SENIN S/D MINGGU) */}
+      {/* 1. CARD MATRIKS ALUR KERJA BERGANTIAN (SENIN S/D MINGGU) */}
       <Card className="border-slate-200 shadow-2xs">
         <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -246,75 +304,205 @@ export default function PanelRotasiGrup({
               Matriks Alur Kerja Bergantian (Senin s/d Minggu)
             </CardTitle>
             <CardDescription className="text-xs mt-0.5">
-              Jadwal permanen 2 shift per hari dengan skema selang-seling 1 hari dinas dan 1 hari libur.
+              Jadwal permanen operasional 7 hari non-stop (2 shift/hari) dengan skema selang-seling 1 hari dinas dan 1 hari libur (Siklus Bergulir 14 Hari).
             </CardDescription>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold text-[11px]">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
-              Grup A: Sen, Rab, Jum ({countA} Personil)
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-semibold text-[11px]">
-              <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" />
-              Grup B: Sel, Kam, Sab ({countB} Personil)
-            </span>
-          </div>
+          {onSwapAll && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onSwapAll}
+              className="gap-1.5 text-xs border-[#c4a266]/50 hover:bg-[#f7f2e8] text-navy font-semibold cursor-pointer shrink-0 self-start sm:self-auto"
+              title="Tukar siklus penugasan seluruh personil Grup A ke Grup B dan sebaliknya"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5 text-[#c4a266]" />
+              <span>Tukar Siklus Grup</span>
+            </Button>
+          )}
         </CardHeader>
 
+        {/* Toolbar Filter Siklus & Indikator Status Roster */}
+        <TableToolbar className="py-2.5 px-4 sm:px-5 bg-slate-50/70 border-b border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          {/* Segmented Control Filter Siklus Minggu */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+              Siklus Roster:
+            </span>
+            <div className="inline-flex items-center p-1 bg-slate-200/70 rounded-xl gap-1">
+              <button
+                type="button"
+                onClick={() => setRotationWeekCycle('odd')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  rotationWeekCycle === 'odd'
+                    ? 'bg-navy text-white shadow-2xs'
+                    : 'text-slate-600 hover:text-navy hover:bg-white/60'
+                }`}
+              >
+                <span>Minggu 1 & 3</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-medium ${
+                    rotationWeekCycle === 'odd'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-300/60 text-slate-600'
+                  }`}
+                >
+                  Ganjil
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRotationWeekCycle('even')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  rotationWeekCycle === 'even'
+                    ? 'bg-navy text-white shadow-2xs'
+                    : 'text-slate-600 hover:text-navy hover:bg-white/60'
+                }`}
+              >
+                <span>Minggu 2 & 4</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-medium ${
+                    rotationWeekCycle === 'even'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-300/60 text-slate-600'
+                  }`}
+                >
+                  Genap
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Badge Ringkasan Distribusi Hari Dinas Aktif */}
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-medium shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block shrink-0" />
+              <strong className="text-emerald-950 font-bold">Grup A:</strong>
+              <span>
+                {rotationWeekCycle === 'odd'
+                  ? '4 Hari (Sen, Rab, Jum, Min)'
+                  : '3 Hari (Sel, Kam, Sab)'}
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-medium shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-amber-600 inline-block shrink-0" />
+              <strong className="text-amber-950 font-bold">Grup B:</strong>
+              <span>
+                {rotationWeekCycle === 'odd'
+                  ? '3 Hari (Sel, Kam, Sab)'
+                  : '4 Hari (Sen, Rab, Jum, Min)'}
+              </span>
+            </div>
+          </div>
+        </TableToolbar>
+
         <CardContent className="p-0">
-          <Table>
+          <Table className="w-full table-fixed min-w-[680px]">
             <TableHeader>
               <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                <TableHead className="w-32 text-xs font-semibold text-slate-600">Hari & Tanggal</TableHead>
-                <TableHead className="text-xs font-semibold text-emerald-900 min-w-[170px]">
-                  Grup A (Hari Ganjil)
+                <TableHead className="w-1/4 text-xs font-bold text-slate-700 tracking-wider pl-4 sm:pl-6">
+                  HARI & TANGGAL
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-amber-900 min-w-[170px]">
-                  Grup B (Hari Genap)
+                <TableHead className="w-1/4 text-center text-xs font-bold text-emerald-900 tracking-wider">
+                  <div className="inline-flex items-center justify-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
+                    <span>{rotationWeekCycle === 'odd' ? 'GRUP A (DINAS 4 HARI)' : 'GRUP A (DINAS 3 HARI)'}</span>
+                  </div>
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">
-                  Staf Kantor (Non-Shift)
+                <TableHead className="w-1/4 text-center text-xs font-bold text-amber-900 tracking-wider">
+                  <div className="inline-flex items-center justify-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />
+                    <span>{rotationWeekCycle === 'odd' ? 'GRUP B (DINAS 3 HARI)' : 'GRUP B (DINAS 4 HARI)'}</span>
+                  </div>
                 </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600">
-                  Keterangan Alur Rotasi
+                <TableHead className="w-1/4 text-center text-xs font-bold text-slate-700 tracking-wider pr-4 sm:pr-6">
+                  <div className="inline-flex items-center justify-center gap-1.5">
+                    <Building className="w-3.5 h-3.5 text-slate-400" />
+                    <span>STAF KANTOR (NON-SHIFT)</span>
+                  </div>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {permanentScheduleRows.map((row, idx) => (
-                <TableRow
-                  key={idx}
-                  className={`text-xs transition-colors ${
-                    row.day === 'Minggu' ? 'bg-slate-50/70' : 'hover:bg-slate-50/60'
-                  }`}
-                >
-                  <TableCell className="font-bold text-navy whitespace-nowrap">
-                    <div>{row.day}</div>
-                    <span className="text-[11px] font-normal text-slate-400">{row.date}</span>
-                  </TableCell>
+              {permanentScheduleRows.map((row, idx) => {
+                const isGrupAWorking = row.grupAStatus.includes('MASUK');
+                const isGrupBWorking = row.grupBStatus.includes('MASUK');
+                const isOfficeWorking = row.officeStatus.includes('MASUK');
 
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] border ${row.grupABadge}`}>
-                      {row.grupAStatus}
-                    </span>
-                  </TableCell>
+                return (
+                  <TableRow
+                    key={idx}
+                    className={`text-xs transition-colors ${
+                      row.day === 'Minggu' ? 'bg-slate-50/70' : 'hover:bg-slate-50/60'
+                    }`}
+                  >
+                    <TableCell className="font-bold text-navy whitespace-nowrap pl-4 sm:pl-6 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <CalendarDays className="w-4 h-4 text-[#c4a266] shrink-0" />
+                        <div>
+                          <div className="text-xs font-bold text-navy">{row.day}</div>
+                          <span className="text-[11px] font-normal font-mono text-slate-400">{row.date}</span>
+                        </div>
+                      </div>
+                    </TableCell>
 
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] border ${row.grupBBadge}`}>
-                      {row.grupBStatus}
-                    </span>
-                  </TableCell>
+                    <TableCell className="text-center py-3">
+                      {isGrupAWorking ? (
+                        <div className="inline-flex flex-col items-center justify-center w-full max-w-[190px] px-3 py-1.5 rounded-lg text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs font-semibold">
+                          <span className="font-bold leading-tight">MASUK (2 Shift)</span>
+                          <span className="text-[10px] font-mono text-emerald-700/80 mt-0.5 leading-tight">
+                            07:00-15:00 • 15:00-23:00
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex flex-col items-center justify-center w-full max-w-[190px] px-3 py-1.5 rounded-lg text-xs bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs font-medium">
+                          <span className="font-bold leading-tight">LIBUR (OFF)</span>
+                          <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                            Istirahat Roster
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
 
-                  <TableCell className="text-slate-700 font-medium text-[11px]">
-                    {row.officeStatus}
-                  </TableCell>
+                    <TableCell className="text-center py-3">
+                      {isGrupBWorking ? (
+                        <div className="inline-flex flex-col items-center justify-center w-full max-w-[190px] px-3 py-1.5 rounded-lg text-xs bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs font-semibold">
+                          <span className="font-bold leading-tight">MASUK (2 Shift)</span>
+                          <span className="text-[10px] font-mono text-amber-700/80 mt-0.5 leading-tight">
+                            07:00-15:00 • 15:00-23:00
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex flex-col items-center justify-center w-full max-w-[190px] px-3 py-1.5 rounded-lg text-xs bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs font-medium">
+                          <span className="font-bold leading-tight">LIBUR (OFF)</span>
+                          <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                            Istirahat Roster
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
 
-                  <TableCell className="text-slate-600 text-[11px]">
-                    {row.note}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell className="text-center pr-4 sm:pr-6 py-3">
+                      {isOfficeWorking ? (
+                        <div className="inline-flex flex-col items-center justify-center w-full max-w-[190px] px-3 py-1.5 rounded-lg text-xs bg-sky-50 text-sky-800 border border-sky-200 shadow-2xs font-medium">
+                          <span className="font-bold leading-tight">MASUK (Reguler)</span>
+                          <span className="text-[10px] font-mono text-sky-700/80 mt-0.5 leading-tight">
+                            08:00 - 17:00 WIB
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex flex-col items-center justify-center w-full max-w-[190px] px-3 py-1.5 rounded-lg text-xs bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs font-medium">
+                          <span className="font-bold leading-tight">LIBUR (OFF)</span>
+                          <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">
+                            Akhir Pekan
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
@@ -432,19 +620,21 @@ export default function PanelRotasiGrup({
                     className="w-4 h-4 rounded text-navy focus:ring-navy border-slate-300 cursor-pointer"
                   />
                 </TableHead>
-                <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">Personil</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[150px]">Divisi & Penugasan</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">Shift Operasional</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Alur Jadwal Masuk</TableHead>
-                <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Grup</TableHead>
+                <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">NO</TableHead>
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[200px]">PERSONIL</TableHead>
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">DIVISI</TableHead>
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[150px]">LOKASI / PENUGASAN</TableHead>
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider min-w-[130px]">SHIFT OPERASIONAL</TableHead>
+                <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider min-w-[150px]">ALUR JADWAL MASUK</TableHead>
+                <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[160px]">GRUP ROSTER</TableHead>
+                <TableHead className="w-24 text-center text-[11px] font-bold text-slate-700 tracking-wider">AKSI</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
               {filteredOperational.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-slate-400 italic text-xs">
+                  <TableCell colSpan={9} className="text-center py-8 text-slate-400 italic text-xs">
                     Tidak ada personil pada kategori ini.
                   </TableCell>
                 </TableRow>
@@ -476,62 +666,79 @@ export default function PanelRotasiGrup({
                       </TableCell>
 
                       <TableCell>
-                        <div className="font-bold text-navy">{emp.name}</div>
-                        <div className="text-[11px] text-slate-500">
-                          {emp.nip} • {emp.role}
+                        <div className="person">
+                          <div className="avatar small font-bold text-slate-700 bg-slate-100 border border-slate-200 shrink-0">
+                            {emp.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <strong className="block text-xs font-semibold text-navy truncate">
+                              {emp.name}
+                            </strong>
+                            <span className="text-[11px] text-slate-500 block truncate">
+                              {emp.nip} • {emp.role}
+                            </span>
+                          </div>
                         </div>
                       </TableCell>
 
                       <TableCell>
-                        <div className="text-slate-800 font-medium">{emp.division}</div>
-                        <div className="text-[10px] text-slate-400">{emp.location}</div>
+                        <div className="text-slate-800 font-medium text-xs">{emp.division}</div>
                       </TableCell>
 
                       <TableCell>
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border font-mono ${
-                            emp.shiftCode === 'S1'
+                        <div className="flex items-center gap-1.5 text-slate-600 text-xs">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>{emp.location}</span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        {(() => {
+                          const shift = getOperationalShiftBadge(emp);
+                          return (
+                            <div
+                              title={shift.label}
+                              className={`inline-flex flex-col items-center justify-center min-w-[76px] px-2 py-1 rounded-md text-[10px] border shadow-2xs ${shift.badgeClass}`}
+                            >
+                              <span className="font-bold font-mono tracking-tight text-xs leading-none">
+                                {shift.code}
+                              </span>
+                              <span className="font-mono text-[9px] opacity-90 mt-0.5 whitespace-nowrap leading-tight">
+                                {shift.time}
+                              </span>
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+
+                      <TableCell className="text-center">
+                        <div
+                          title={
+                            isGroupA
+                              ? 'Jadwal Masuk Grup A: Siklus Bergulir 14 Hari (Minggu Ganjil: 4 Hari [Sen, Rab, Jum, Min], Minggu Genap: 3 Hari [Sel, Kam, Sab])'
+                              : isGroupB
+                              ? 'Jadwal Masuk Grup B: Siklus Bergulir 14 Hari (Minggu Ganjil: 3 Hari [Sel, Kam, Sab], Minggu Genap: 4 Hari [Sen, Rab, Jum, Min])'
+                              : 'Personil belum ditetapkan grup kerja rosternya'
+                          }
+                          className={`inline-flex flex-col items-center justify-center min-w-[125px] px-2.5 py-1 rounded-md text-[10px] border shadow-2xs ${
+                            isGroupA
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                              : emp.shiftCode === 'S2'
+                              : isGroupB
                               ? 'bg-amber-50 text-amber-800 border-amber-200'
-                              : 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                              : 'bg-slate-100 text-slate-500 border-slate-200'
                           }`}
                         >
-                          {emp.shiftCode === 'S1' ? (
-                            <>
-                              <Sun className="w-3 h-3 text-emerald-600" />
-                              Pagi (07-15)
-                            </>
-                          ) : emp.shiftCode === 'S2' ? (
-                            <>
-                              <Moon className="w-3 h-3 text-amber-600" />
-                              Sore (15-23)
-                            </>
-                          ) : (
-                            emp.shiftCode
-                          )}
-                        </span>
-                      </TableCell>
-
-                      <TableCell>
-                        {isGroupA && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            Masuk: Sen, Rab, Jum
+                          <span className="font-bold tracking-tight text-xs leading-none">
+                            {isGroupA || isGroupB ? '1 On • 1 Off (Bergulir)' : 'Belum Terjadwal'}
                           </span>
-                        )}
-                        {isGroupB && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                            <CheckCircle2 className="w-3 h-3 text-amber-600" />
-                            Masuk: Sel, Kam, Sab
+                          <span className="text-[9px] opacity-85 mt-0.5 whitespace-nowrap leading-tight">
+                            {isGroupA
+                              ? 'Mgg Ganjil: 4H • Genap: 3H'
+                              : isGroupB
+                              ? 'Mgg Ganjil: 3H • Genap: 4H'
+                              : 'Pilih Grup Roster'}
                           </span>
-                        )}
-                        {isUnassigned && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
-                            <AlertCircle className="w-3 h-3 text-slate-400" />
-                            Belum Terjadwal
-                          </span>
-                        )}
+                        </div>
                       </TableCell>
 
                       {/* KOLOM DROPDOWN DEFAULT BERSIH */}
@@ -545,6 +752,43 @@ export default function PanelRotasiGrup({
                           <option value="Grup B">Grup B</option>
                           <option value="Belum Ditetapkan">Belum Ditetapkan</option>
                         </TableSelect>
+                      </TableCell>
+
+                      {/* KOLOM AKSI */}
+                      <TableCell className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditModal(emp)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-navy hover:bg-slate-100 transition-colors cursor-pointer"
+                            title={`Atur penugasan shift & grup untuk ${emp.name}`}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleQuickSwapGroup(emp)}
+                            className="p-1.5 rounded-lg text-slate-500 hover:text-amber-700 hover:bg-amber-50 transition-colors cursor-pointer"
+                            title={
+                              emp.group === 'Grup A'
+                                ? 'Pindahkan ke Grup B'
+                                : emp.group === 'Grup B'
+                                ? 'Pindahkan ke Grup A'
+                                : 'Tetapkan ke Grup A'
+                            }
+                          >
+                            <ArrowLeftRight className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleResetGroup(emp)}
+                            disabled={emp.group === 'Belum Ditetapkan'}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
+                            title="Reset grup ke Belum Ditetapkan"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -662,12 +906,12 @@ export default function PanelRotasiGrup({
                 </div>
               </div>
 
-              {/* Blok Shift 2 (Sore) */}
+              {/* Blok Shift 2 (Malam) */}
               <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-2.5">
                 <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
                   <Moon className="w-4 h-4 text-amber-600" />
                   <span className="text-xs font-bold text-slate-800">
-                    Konfigurasi Shift 2 (Sore)
+                    Konfigurasi Shift 2 (Malam)
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -730,14 +974,14 @@ export default function PanelRotasiGrup({
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Tanggal Mulai Shift</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">Grup Yang Bekerja</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[170px]">Jam Shift 1 (Pagi)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[170px]">Jam Shift 2 (Sore)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">Alasan Perubahan</TableHead>
-                    <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">Status</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 w-20">Aksi</TableHead>
+                    <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">NO</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[130px]">TANGGAL MULAI</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">GRUP DINAS</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[170px]">JAM SHIFT 1 (PAGI)</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[170px]">JAM SHIFT 2 (MALAM)</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[200px]">ALASAN PERUBAHAN</TableHead>
+                    <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-24">STATUS</TableHead>
+                    <TableHead className="text-right pr-4 text-[11px] font-bold text-slate-700 tracking-wider w-20">AKSI</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -828,6 +1072,219 @@ export default function PanelRotasiGrup({
           </Badge>
         </CardContent>
       </Card>
+
+      {/* MODAL ATUR PENUGASAN ROSTER PERSONIL */}
+      {editingEmployee && (
+        <Modal
+          isOpen={!!editingEmployee}
+          onClose={() => setEditingEmployee(null)}
+          size="lg"
+        >
+          <ModalHeader
+            icon={<UserCheck className="w-5 h-5 text-[#c4a266]" />}
+            title="Atur Penugasan Roster Personil"
+            description="Konfigurasi grup roster kerja dan jam operasional harian untuk personil terkait."
+            onClose={() => setEditingEmployee(null)}
+          />
+
+          <ModalBody className="space-y-5">
+            {/* 1. Ringkasan Profil Personil */}
+            <div className="p-3.5 bg-slate-50/80 border border-slate-200/90 rounded-xl flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                  {editingEmployee.name.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-navy truncate">{editingEmployee.name}</div>
+                  <div className="text-xs text-slate-500 font-mono mt-0.5">
+                    {editingEmployee.nip} • {editingEmployee.role}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-medium">
+                  <Building className="w-3.5 h-3.5 text-slate-400" />
+                  {editingEmployee.division}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  {editingEmployee.location}
+                </span>
+              </div>
+            </div>
+
+            {/* 2. Pilihan Grup Roster Operasional (Kartu Interaktif) */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                1. Penempatan Grup Roster <span className="text-rose-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {/* Grup A */}
+                <button
+                  type="button"
+                  onClick={() => setEditGroup('Grup A')}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    editGroup === 'Grup A'
+                      ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20 shadow-2xs'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-navy flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
+                      Grup A
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">
+                      Aktif
+                    </span>
+                  </div>
+                  <div className="mt-2 text-[11px] text-slate-600 leading-snug">
+                    <p className="font-semibold text-emerald-900">Mgg 1: Sen, Rab, Jum, Min</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Siklus Bergulir (4H / 3H)</p>
+                  </div>
+                </button>
+
+                {/* Grup B */}
+                <button
+                  type="button"
+                  onClick={() => setEditGroup('Grup B')}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    editGroup === 'Grup B'
+                      ? 'border-amber-600 bg-amber-50/70 ring-2 ring-amber-600/20 shadow-2xs'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-navy flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-600 inline-block" />
+                      Grup B
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">
+                      Aktif
+                    </span>
+                  </div>
+                  <div className="mt-2 text-[11px] text-slate-600 leading-snug">
+                    <p className="font-semibold text-amber-900">Mgg 1: Sel, Kam, Sab</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Siklus Bergulir (3H / 4H)</p>
+                  </div>
+                </button>
+
+                {/* Belum Ditetapkan */}
+                <button
+                  type="button"
+                  onClick={() => setEditGroup('Belum Ditetapkan')}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    editGroup === 'Belum Ditetapkan'
+                      ? 'border-slate-600 bg-slate-100 ring-2 ring-slate-400/30 shadow-2xs'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-slate-700 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block" />
+                      Belum Ditetapkan
+                    </span>
+                  </div>
+                  <div className="mt-2 text-[11px] text-slate-500 leading-snug">
+                    <p className="font-medium text-slate-600">Personil Cadangan</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Tidak dijadwalkan dinas</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* 3. Pilihan Shift Operasional (Kartu Interaktif) */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                2. Shift Jam Operasional <span className="text-rose-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {/* S1 - Shift 1 */}
+                <button
+                  type="button"
+                  onClick={() => setEditShiftCode('S1')}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                    editShiftCode === 'S1'
+                      ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-600/20 shadow-2xs'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <div>
+                    <div className="font-bold text-xs text-navy flex items-center gap-1.5">
+                      <Sun className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Shift 1 (Pagi)</span>
+                    </div>
+                    <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
+                      07:00 - 15:00 WIB
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-emerald-100 text-emerald-800">
+                    S1
+                  </span>
+                </button>
+
+                {/* S2 - Shift 2 */}
+                <button
+                  type="button"
+                  onClick={() => setEditShiftCode('S2')}
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                    editShiftCode === 'S2'
+                      ? 'border-amber-600 bg-amber-50/70 ring-2 ring-amber-600/20 shadow-2xs'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <div>
+                    <div className="font-bold text-xs text-navy flex items-center gap-1.5">
+                      <Moon className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Shift 2 (Malam)</span>
+                    </div>
+                    <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
+                      15:00 - 23:00 WIB
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-amber-100 text-amber-800">
+                    S2
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* 4. Pratinjau Alur Rotasi Efektif */}
+            <div className="p-3 bg-slate-50 border border-slate-200/90 rounded-xl flex items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#c4a266] shrink-0" />
+                <span className="text-slate-600">
+                  Hasil Roster: <strong>{editGroup}</strong> • Kode Shift: <strong className="font-mono">{editShiftCode}</strong>
+                </span>
+              </div>
+              <Badge className="bg-navy/5 text-navy border-navy/20 text-[10px] font-semibold">
+                Siklus 14 Hari (Senin - Minggu)
+              </Badge>
+            </div>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setEditingEmployee(null)}
+              className="cursor-pointer"
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleSaveEdit}
+              className="bg-navy hover:bg-[#193750] text-white font-bold cursor-pointer"
+            >
+              Simpan Penugasan
+            </Button>
+          </ModalFooter>
+        </Modal>
+      )}
     </div>
   );
 }

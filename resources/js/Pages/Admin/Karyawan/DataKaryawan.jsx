@@ -6,28 +6,23 @@ import {
   Plus,
   Upload,
   Download,
-  FileSpreadsheet,
-  Search,
-  Filter,
   Pencil,
   Trash2,
   CheckCircle2,
-  AlertTriangle,
   RotateCcw,
-  Building,
   MapPin,
-  Clock,
-  ShieldAlert,
+  Mail,
+  Phone,
+  Calendar,
+  Briefcase,
+  UserCheck,
+  Building2,
 } from 'lucide-react';
 import {
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
   Button,
   Badge,
-  Input,
   PageHeader,
   Table,
   TableHeader,
@@ -45,172 +40,191 @@ import {
 } from '@/components/ui';
 import ModalFormKaryawan from './Partials/ModalFormKaryawan.jsx';
 import ModalImporKaryawan from './Partials/ModalImporKaryawan.jsx';
+import { useActiveSite, matchesActiveSite } from '@/services/systemSettings.js';
 
-// Data dummy awal 12 karyawan operasional HCGA
+// Data master database karyawan HCGA
 const INITIAL_EMPLOYEES = [
   {
     id: 1,
-    name: 'Budi Santoso',
     nip: 'HC-0101',
+    name: 'Budi Santoso',
     role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '07:00',
-    checkOutTime: '15:00',
+    location: 'SITE A CIMALAKA',
+    employmentType: 'Tetap',
+    email: 'budi.santoso@perusahaan.com',
+    phone: '0812-3456-7801',
+    joinDate: '2021-03-15',
     status: 'Aktif',
   },
   {
     id: 2,
-    name: 'Siti Rahmawati',
     nip: 'HC-0102',
+    name: 'Siti Rahmawati',
     role: 'HCGA Specialist',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
+    location: 'SITE A CIMALAKA',
+    employmentType: 'Tetap',
+    email: 'siti.rahmawati@perusahaan.com',
+    phone: '0812-3456-7802',
+    joinDate: '2020-07-01',
     status: 'Aktif',
   },
   {
     id: 3,
-    name: 'Ahmad Fauzi',
     nip: 'HC-0103',
+    name: 'Ahmad Fauzi',
     role: 'Operator Forklift Utama',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '15:00',
-    checkOutTime: '23:00',
+    location: 'SITE A CIMALAKA',
+    employmentType: 'Kontrak (PKWT)',
+    email: 'ahmad.fauzi@perusahaan.com',
+    phone: '0812-3456-7803',
+    joinDate: '2022-11-10',
     status: 'Aktif',
   },
   {
     id: 4,
-    name: 'Dewi Anggraini',
     nip: 'HC-0104',
+    name: 'Dewi Anggraini',
     role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '07:00',
-    checkOutTime: '15:00',
+    location: 'SITE A CIMALAKA',
+    employmentType: 'Tetap',
+    email: 'dewi.anggraini@perusahaan.com',
+    phone: '0812-3456-7804',
+    joinDate: '2021-09-01',
     status: 'Aktif',
   },
   {
     id: 5,
-    name: 'Hendra Wijaya',
     nip: 'HC-0105',
+    name: 'Hendra Wijaya',
     role: 'Danru Keamanan & K3',
     division: 'Security & Safety',
-    location: 'Site Operasional (Gresik)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '06:30',
-    checkOutTime: '14:30',
+    location: 'SITE A CIMALAKA',
+    employmentType: 'Tetap',
+    email: 'hendra.wijaya@perusahaan.com',
+    phone: '0812-3456-7805',
+    joinDate: '2019-02-18',
     status: 'Aktif',
   },
   {
     id: 6,
-    name: 'Rina Marlina',
     nip: 'HC-0106',
+    name: 'Rina Marlina',
     role: 'Staf Administrasi Payroll',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
+    location: 'SITE A CIMALAKA',
+    employmentType: 'Kontrak (PKWT)',
+    email: 'rina.marlina@perusahaan.com',
+    phone: '0812-3456-7806',
+    joinDate: '2023-05-15',
     status: 'Cuti',
   },
   {
     id: 7,
-    name: 'Eko Prasetyo',
     nip: 'HC-0107',
+    name: 'Eko Prasetyo',
     role: 'Teknisi Maintenance Mesin',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '15:00',
-    checkOutTime: '23:00',
+    location: 'SITE B PASEH',
+    employmentType: 'Tetap',
+    email: 'eko.prasetyo@perusahaan.com',
+    phone: '0813-4567-8901',
+    joinDate: '2020-01-20',
     status: 'Aktif',
   },
   {
     id: 8,
-    name: 'Maya Indah Lestari',
     nip: 'HC-0108',
+    name: 'Maya Indah Lestari',
     role: 'Koordinator Gudang Bahan Baku',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
+    location: 'SITE B PASEH',
+    employmentType: 'Tetap',
+    email: 'maya.indah@perusahaan.com',
+    phone: '0813-4567-8902',
+    joinDate: '2021-06-10',
     status: 'Aktif',
   },
   {
     id: 9,
-    name: 'Joko Susilo',
     nip: 'HC-0109',
+    name: 'Joko Susilo',
     role: 'Anggota Patroli Keamanan',
     division: 'Security & Safety',
-    location: 'Pabrik A (Sidoarjo)',
-    group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '14:30',
-    checkOutTime: '22:30',
+    location: 'SITE B PASEH',
+    employmentType: 'Kontrak (PKWT)',
+    email: 'joko.susilo@perusahaan.com',
+    phone: '0813-4567-8903',
+    joinDate: '2023-02-01',
     status: 'Aktif',
   },
   {
     id: 10,
-    name: 'Dian Kusuma',
     nip: 'HC-0110',
+    name: 'Dian Kusuma',
     role: 'IT Support & Sistem HRIS',
     division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
+    location: 'SITE B PASEH',
+    employmentType: 'Tetap',
+    email: 'dian.kusuma@perusahaan.com',
+    phone: '0813-4567-8904',
+    joinDate: '2022-04-12',
     status: 'Aktif',
   },
   {
     id: 11,
-    name: 'Wahyu Hidayat',
     nip: 'HC-0111',
+    name: 'Wahyu Hidayat',
     role: 'Operator Mesin CNC Milling',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '07:00',
-    checkOutTime: '15:00',
+    location: 'SITE B PASEH',
+    employmentType: 'Kontrak (PKWT)',
+    email: 'wahyu.hidayat@perusahaan.com',
+    phone: '0813-4567-8905',
+    joinDate: '2023-08-01',
     status: 'Non-Aktif',
   },
   {
     id: 12,
-    name: 'Nurul Aini',
     nip: 'HC-0112',
+    name: 'Nurul Aini',
     role: 'Petugas Inventory & Stok',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '07:00',
-    checkOutTime: '15:00',
+    location: 'SITE B PASEH',
+    employmentType: 'Magang',
+    email: 'nurul.aini@perusahaan.com',
+    phone: '0813-4567-8906',
+    joinDate: '2024-01-10',
     status: 'Aktif',
   },
 ];
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-';
+  try {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const year = parts[0];
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const month = monthNames[parseInt(parts[1], 10) - 1] || parts[1];
+      const day = parts[2];
+      return `${day} ${month} ${year}`;
+    }
+    return dateStr;
+  } catch {
+    return dateStr;
+  }
+};
+
 export default function DataKaryawan() {
+  const activeSite = useActiveSite();
   const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterDivision, setFilterDivision] = useState('ALL');
-  const [filterGroup, setFilterGroup] = useState('ALL');
+  const [filterEmployment, setFilterEmployment] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
 
   // Modal States
@@ -223,52 +237,67 @@ export default function DataKaryawan() {
 
   const showAlert = (message, type = 'success') => {
     setAlertInfo({ message, type });
-    setTimeout(() => setAlertInfo(null), 3500);
   };
 
-  // KPI Counts
+  // Karyawan terfilter berdasarkan Site Aktif
+  const siteEmployees = useMemo(() => {
+    return employees.filter((emp) => matchesActiveSite(emp.location, activeSite.id));
+  }, [employees, activeSite]);
+
+  // KPI Counts Personalia
   const stats = useMemo(() => {
-    const total = employees.length;
-    const active = employees.filter((e) => e.status === 'Aktif').length;
-    const onLeave = employees.filter((e) => e.status === 'Cuti').length;
-    const inactive = employees.filter((e) => e.status === 'Non-Aktif').length;
-    return { total, active, onLeave, inactive };
-  }, [employees]);
+    const total = siteEmployees.length;
+    const permanent = siteEmployees.filter((e) => e.employmentType === 'Tetap').length;
+    const contract = siteEmployees.filter(
+      (e) => e.employmentType === 'Kontrak (PKWT)' || e.employmentType === 'Magang'
+    ).length;
+    const active = siteEmployees.filter((e) => e.status === 'Aktif').length;
+    return { total, permanent, contract, active };
+  }, [siteEmployees]);
 
   // Filtered List
   const filteredEmployees = useMemo(() => {
-    return employees.filter((emp) => {
+    return siteEmployees.filter((emp) => {
+      const q = searchQuery.toLowerCase().trim();
       const matchQuery =
-        !searchQuery.trim() ||
-        emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.nip.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.role.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        emp.name.toLowerCase().includes(q) ||
+        emp.nip.toLowerCase().includes(q) ||
+        emp.role.toLowerCase().includes(q) ||
+        (emp.email && emp.email.toLowerCase().includes(q)) ||
+        (emp.phone && emp.phone.includes(q));
 
       const matchDivision = filterDivision === 'ALL' || emp.division === filterDivision;
-      const matchGroup = filterGroup === 'ALL' || emp.group === filterGroup;
+      const matchEmployment = filterEmployment === 'ALL' || emp.employmentType === filterEmployment;
       const matchStatus = filterStatus === 'ALL' || emp.status === filterStatus;
 
-      return matchQuery && matchDivision && matchGroup && matchStatus;
+      return matchQuery && matchDivision && matchEmployment && matchStatus;
     });
-  }, [employees, searchQuery, filterDivision, filterGroup, filterStatus]);
+  }, [siteEmployees, searchQuery, filterDivision, filterEmployment, filterStatus]);
 
   // Reset Filters
   const isFiltered =
     Boolean(searchQuery) ||
     filterDivision !== 'ALL' ||
-    filterGroup !== 'ALL' ||
+    filterEmployment !== 'ALL' ||
     filterStatus !== 'ALL';
 
   const resetFilters = () => {
     setSearchQuery('');
     setFilterDivision('ALL');
-    setFilterGroup('ALL');
+    setFilterEmployment('ALL');
     setFilterStatus('ALL');
   };
 
   // Add / Edit Handlers
   const handleOpenAdd = () => {
-    setFormInitialData(null);
+    setFormInitialData({
+      location: activeSite.id === 'site-b' ? 'SITE B PASEH' : 'SITE A CIMALAKA',
+      employmentType: 'Tetap',
+      status: 'Aktif',
+      division: 'Operasional & Lapangan',
+      joinDate: new Date().toISOString().slice(0, 10),
+    });
     setIsFormOpen(true);
   };
 
@@ -278,17 +307,17 @@ export default function DataKaryawan() {
   };
 
   const handleSaveEmployee = (empData) => {
-    if (formInitialData) {
+    if (formInitialData && formInitialData.id) {
       setEmployees((prev) => prev.map((item) => (item.id === empData.id ? empData : item)));
       showAlert(`Data karyawan "${empData.name}" berhasil diperbarui.`);
     } else {
       setEmployees((prev) => [empData, ...prev]);
-      showAlert(`Karyawan baru "${empData.name}" berhasil ditambahkan.`);
+      showAlert(`Karyawan baru "${empData.name}" berhasil ditambahkan ke database.`);
     }
   };
 
   const handleDelete = (id, name) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus data karyawan "${name}"?`)) {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus data karyawan "${name}" dari database?`)) {
       setEmployees((prev) => prev.filter((item) => item.id !== id));
       showAlert(`Data karyawan "${name}" telah dihapus.`, 'warning');
     }
@@ -297,43 +326,43 @@ export default function DataKaryawan() {
   // Import Handler
   const handleImportSuccess = (importedList) => {
     setEmployees((prev) => [...importedList, ...prev]);
-    showAlert(`Berhasil mengimpor ${importedList.length} data karyawan baru.`);
+    showAlert(`Berhasil mengimpor ${importedList.length} data karyawan ke database.`);
   };
 
   // Export to Excel
   const handleExportExcel = () => {
     const exportData = filteredEmployees.map((emp, index) => ({
       No: index + 1,
-      'Nama Karyawan': emp.name,
       NIP: emp.nip,
+      'Nama Karyawan': emp.name,
       Jabatan: emp.role,
       Divisi: emp.division,
       'Lokasi Kerja': emp.location,
-      Grup: emp.group,
-      'Kategori Jadwal': emp.scheduleCategory,
-      'Jam Masuk': emp.checkInTime,
-      'Jam Pulang': emp.checkOutTime,
-      Status: emp.status,
+      'Status Hubungan Kerja': emp.employmentType,
+      Email: emp.email || '-',
+      'No. Telepon': emp.phone || '-',
+      'Tanggal Bergabung': emp.joinDate || '-',
+      'Status Keaktifan': emp.status,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Karyawan');
-    XLSX.writeFile(workbook, `Data_Karyawan_HCGA_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    showAlert('File Excel berhasil diunduh.');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Database Karyawan');
+    XLSX.writeFile(workbook, `Database_Karyawan_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    showAlert('Database Karyawan berhasil diekspor ke Excel.');
   };
 
   return (
     <>
-      <Head title="Data Karyawan" />
+      <Head title="Database Karyawan" />
 
       <Toast toast={alertInfo} onClose={() => setAlertInfo(null)} />
 
       {/* Page Header dengan Action Toolbar */}
       <PageHeader
-        eyebrow="MODUL MANAJEMEN KARYAWAN (CORE HR)"
-        title="Direktori Data Karyawan"
-        subtitle="Kelola informasi induk, divisi penempatan, roster grup kerja, dan kategori jadwal shift seluruh karyawan."
+        eyebrow="MODUL PERSONEL & MASTER DATA (CORE HR)"
+        title="Direktori Database Karyawan"
+        subtitle="Pusat data induk seluruh karyawan, penempatan lokasi kerja, status hubungan kerja, dan informasi kontak kepegawaian."
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             {/* Tombol Impor */}
@@ -353,7 +382,7 @@ export default function DataKaryawan() {
               variant="outline"
               onClick={handleExportExcel}
               className="text-xs border-slate-300 hover:bg-slate-50"
-              title="Ekspor data karyawan ke format Excel (.xlsx)"
+              title="Ekspor database karyawan ke format Excel (.xlsx)"
             >
               <Download className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               <span>Ekspor Excel</span>
@@ -373,7 +402,7 @@ export default function DataKaryawan() {
         }
       />
 
-      {/* Ringkasan Metrik Singkat (KPI Badges) */}
+      {/* Ringkasan Metrik Personalia (KPI Scorecards) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <Card className="hover:border-slate-300 transition-colors">
           <CardContent className="p-4 flex items-center justify-between">
@@ -395,6 +424,38 @@ export default function DataKaryawan() {
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                Karyawan Tetap
+              </div>
+              <div className="text-2xl font-bold font-display text-blue-700 mt-0.5">
+                {stats.permanent} <span className="text-xs font-normal text-slate-400">orang</span>
+              </div>
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-700 shrink-0">
+              <Building2 className="w-4 h-4" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:border-slate-300 transition-colors">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                PKWT & Magang
+              </div>
+              <div className="text-2xl font-bold font-display text-amber-700 mt-0.5">
+                {stats.contract} <span className="text-xs font-normal text-slate-400">orang</span>
+              </div>
+            </div>
+            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-700 shrink-0">
+              <Briefcase className="w-4 h-4" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:border-slate-300 transition-colors">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div>
+              <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
                 Status Aktif
               </div>
               <div className="text-2xl font-bold font-display text-[#398872] mt-0.5">
@@ -406,38 +467,6 @@ export default function DataKaryawan() {
             </div>
           </CardContent>
         </Card>
-
-        <Card className="hover:border-slate-300 transition-colors">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Sedang Cuti
-              </div>
-              <div className="text-2xl font-bold font-display text-[#8880b1] mt-0.5">
-                {stats.onLeave} <span className="text-xs font-normal text-slate-400">orang</span>
-              </div>
-            </div>
-            <div className="w-9 h-9 rounded-lg bg-[#f1f0f9] flex items-center justify-center text-[#8880b1] shrink-0">
-              <Clock className="w-4 h-4" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:border-slate-300 transition-colors">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Non-Aktif / Resign
-              </div>
-              <div className="text-2xl font-bold font-display text-[#b36a74] mt-0.5">
-                {stats.inactive} <span className="text-xs font-normal text-slate-400">orang</span>
-              </div>
-            </div>
-            <div className="w-9 h-9 rounded-lg bg-[#fbf0f2] flex items-center justify-center text-[#b36a74] shrink-0">
-              <ShieldAlert className="w-4 h-4" />
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Card Kontainer Tabel & Filter */}
@@ -445,7 +474,7 @@ export default function DataKaryawan() {
         {/* Toolbar Pencarian & Filter Terstandarisasi */}
         <TableToolbar>
           <TableSearch
-            placeholder="Cari nama karyawan, NIP, atau jabatan..."
+            placeholder="Cari nama karyawan, NIP, jabatan, atau kontak..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -464,19 +493,19 @@ export default function DataKaryawan() {
               <option value="Security & Safety">Security & Safety</option>
             </TableSelect>
 
-            {/* Filter Grup */}
+            {/* Filter Hubungan Kerja */}
             <TableSelect
-              value={filterGroup}
-              onChange={(e) => setFilterGroup(e.target.value)}
-              title="Filter Grup"
+              value={filterEmployment}
+              onChange={(e) => setFilterEmployment(e.target.value)}
+              title="Filter Hubungan Kerja"
             >
-              <option value="ALL">Semua Grup</option>
-              <option value="Grup A">Grup A</option>
-              <option value="Grup B">Grup B</option>
-              <option value="Non-Shift">Non-Shift</option>
+              <option value="ALL">Semua Status Kerja</option>
+              <option value="Tetap">Karyawan Tetap</option>
+              <option value="Kontrak (PKWT)">Kontrak (PKWT)</option>
+              <option value="Magang">Magang</option>
             </TableSelect>
 
-            {/* Filter Status */}
+            {/* Filter Status Keaktifan */}
             <TableSelect
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -485,7 +514,7 @@ export default function DataKaryawan() {
               <option value="ALL">Semua Status</option>
               <option value="Aktif">Aktif</option>
               <option value="Cuti">Sedang Cuti</option>
-              <option value="Non-Aktif">Non-Aktif</option>
+              <option value="Non-Aktif">Non-Aktif / Keluar</option>
             </TableSelect>
 
             {/* Tombol Reset Filter */}
@@ -505,37 +534,35 @@ export default function DataKaryawan() {
           </TableFilterGroup>
         </TableToolbar>
 
-        {/* Tabel Data Karyawan */}
+        {/* Tabel Database Karyawan */}
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50/90 border-b border-slate-200">
                 <TableHead className="w-12 text-center font-bold text-slate-700">NO</TableHead>
-                <TableHead className="min-w-[200px] font-bold text-slate-700">NAMA KARYAWAN</TableHead>
+                <TableHead className="min-w-[200px] font-bold text-slate-700">NAMA & NIP</TableHead>
                 <TableHead className="min-w-[150px] font-bold text-slate-700">DIVISI</TableHead>
                 <TableHead className="min-w-[150px] font-bold text-slate-700">LOKASI KERJA</TableHead>
-                <TableHead className="w-24 text-center font-bold text-slate-700">GRUP</TableHead>
-                <TableHead className="min-w-[140px] font-bold text-slate-700">KATEGORI JADWAL</TableHead>
-                <TableHead className="w-24 text-center font-bold text-slate-700">JAM MASUK</TableHead>
-                <TableHead className="w-24 text-center font-bold text-slate-700">JAM PULANG</TableHead>
+                <TableHead className="w-32 text-center font-bold text-slate-700">HUBUNGAN KERJA</TableHead>
+                <TableHead className="min-w-[170px] font-bold text-slate-700">KONTAK</TableHead>
+                <TableHead className="w-28 text-center font-bold text-slate-700">TGL BERGABUNG</TableHead>
                 <TableHead className="w-24 text-center font-bold text-slate-700">STATUS</TableHead>
                 <TableHead className="w-20 text-center font-bold text-slate-700">AKSI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEmployees.length === 0 ? (
-                <TableEmpty colSpan={10}>
+                <TableEmpty colSpan={9}>
                   <div className="py-8">
                     <Users className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    <div className="font-semibold text-slate-600 text-sm">Tidak ada karyawan yang sesuai</div>
+                    <div className="font-semibold text-slate-600 text-sm">Tidak ada data karyawan yang sesuai</div>
                     <div className="text-slate-400 text-xs mt-1">
-                      Coba sesuaikan kata kunci pencarian atau ubah filter divisi/grup.
+                      Coba sesuaikan kata kunci pencarian atau ubah filter divisi/status kepegawaian.
                     </div>
                   </div>
                 </TableEmpty>
               ) : (
                 filteredEmployees.map((emp, index) => {
-                  // Badge styling helper
                   const statusClass =
                     emp.status === 'Aktif'
                       ? 'status-aktif'
@@ -543,12 +570,12 @@ export default function DataKaryawan() {
                       ? 'status-cuti'
                       : 'status-alpha';
 
-                  const groupBadgeBg =
-                    emp.group === 'Grup A'
-                      ? 'bg-[#f7f2e8] text-[#ab874b] border-[#c4a266]/30'
-                      : emp.group === 'Grup B'
-                      ? 'bg-[#eef7f1] text-[#398872] border-[#398872]/30'
-                      : 'bg-slate-100 text-slate-600 border-slate-200';
+                  const employmentBadgeBg =
+                    emp.employmentType === 'Tetap'
+                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                      : emp.employmentType === 'Magang'
+                      ? 'bg-purple-50 text-purple-700 border-purple-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200';
 
                   return (
                     <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
@@ -557,7 +584,7 @@ export default function DataKaryawan() {
                         {index + 1}
                       </TableCell>
 
-                      {/* 2. Nama Karyawan */}
+                      {/* 2. Profil Karyawan & NIP */}
                       <TableCell>
                         <div className="person">
                           <div className="avatar small font-bold text-slate-700 bg-slate-100 border border-slate-200">
@@ -575,7 +602,7 @@ export default function DataKaryawan() {
                       </TableCell>
 
                       {/* 3. Divisi */}
-                      <TableCell className="font-medium text-slate-700">
+                      <TableCell className="font-medium text-slate-700 text-xs">
                         {emp.division}
                       </TableCell>
 
@@ -587,35 +614,38 @@ export default function DataKaryawan() {
                         </div>
                       </TableCell>
 
-                      {/* 5. Grup */}
+                      {/* 5. Hubungan Kerja */}
                       <TableCell className="text-center">
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border ${groupBadgeBg}`}
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border ${employmentBadgeBg}`}
                         >
-                          {emp.group}
+                          {emp.employmentType || 'Tetap'}
                         </span>
                       </TableCell>
 
-                      {/* 6. Kategori Jadwal */}
-                      <TableCell className="text-slate-600 text-xs">
-                        {emp.scheduleCategory}
+                      {/* 6. Kontak */}
+                      <TableCell>
+                        <div className="space-y-0.5 text-xs">
+                          <div className="flex items-center gap-1.5 text-slate-600">
+                            <Mail className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span className="truncate max-w-[150px]">{emp.email || '-'}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
+                            <Phone className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span>{emp.phone || '-'}</span>
+                          </div>
+                        </div>
                       </TableCell>
 
-                      {/* 7. Jam Masuk */}
+                      {/* 7. Tanggal Bergabung */}
                       <TableCell className="text-center">
-                        <Text variant="code" className="text-emerald-800 bg-emerald-50 border border-emerald-200/60 font-semibold inline-block">
-                          {emp.checkInTime}
-                        </Text>
+                        <div className="flex items-center justify-center gap-1 text-slate-600 text-xs">
+                          <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>{formatDate(emp.joinDate)}</span>
+                        </div>
                       </TableCell>
 
-                      {/* 8. Jam Pulang */}
-                      <TableCell className="text-center">
-                        <Text variant="code" className="text-slate-700 bg-slate-100 border border-slate-200 font-semibold inline-block">
-                          {emp.checkOutTime}
-                        </Text>
-                      </TableCell>
-
-                      {/* 9. Status */}
+                      {/* 8. Status Keaktifan */}
                       <TableCell className="text-center">
                         <span className={`badge ${statusClass}`}>
                           <i />
@@ -623,7 +653,7 @@ export default function DataKaryawan() {
                         </span>
                       </TableCell>
 
-                      {/* 10. Aksi */}
+                      {/* 9. Aksi */}
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
                           <button
@@ -654,16 +684,16 @@ export default function DataKaryawan() {
           {/* Footer Pagination / Count Info */}
           <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
             <div>
-              Menampilkan <strong>{filteredEmployees.length}</strong> dari total <strong>{employees.length}</strong> karyawan terdaftar
+              Menampilkan <strong>{filteredEmployees.length}</strong> dari total <strong>{siteEmployees.length}</strong> karyawan pada site terpilih ({employees.length} total perusahaan)
             </div>
             <div className="text-[11px] text-slate-400">
-              Pembaruan data tersinkronisasi dengan master roster HCGA
+              Database karyawan tersinkronisasi dengan master data kepegawaian HCGA
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Modal Tambah / Ubah Karyawan */}
+      {/* Modal Tambah / Ubah Data Karyawan */}
       <ModalFormKaryawan
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}

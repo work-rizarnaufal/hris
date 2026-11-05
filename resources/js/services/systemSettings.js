@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 // Layanan penyimpanan dan sinkronisasi konfigurasi sistem lintas halaman HRIS
 const isClient = typeof window !== 'undefined';
 
@@ -164,36 +166,25 @@ export const INITIAL_HOLIDAYS = [
 export const INITIAL_LOCATIONS = [
   {
     id: 1,
-    name: 'Pabrik A (Sidoarjo)',
-    type: 'Lini Manufaktur & Operasional Utama',
-    latitude: -7.447812,
-    longitude: 112.718319,
-    radiusMeters: 120,
-    assignedCount: 28,
+    name: 'SITE A CIMALAKA',
+    type: 'Site Operasional Utama & Manufaktur',
+    latitude: -6.837210,
+    longitude: 107.935120,
+    radiusMeters: 150,
+    assignedCount: 6,
     status: 'Aktif',
-    address: 'Kawasan Industri SIER Blok C-12, Waru, Sidoarjo',
+    address: 'Jl. Raya Cimalaka No. 88, Cimalaka, Sumedang',
   },
   {
     id: 2,
-    name: 'Site Operasional (Gresik)',
-    type: 'Depot Distribusi & Pengolahan Material',
-    latitude: -7.160105,
-    longitude: 112.653421,
-    radiusMeters: 150,
-    assignedCount: 12,
+    name: 'SITE B PASEH',
+    type: 'Site Operasional Tambang & Pengolahan Material',
+    latitude: -6.852410,
+    longitude: 107.982310,
+    radiusMeters: 200,
+    assignedCount: 6,
     status: 'Aktif',
-    address: 'Kawasan Industri Maspion Unit V, Manyar, Gresik',
-  },
-  {
-    id: 3,
-    name: 'Kantor Utama (Surabaya)',
-    type: 'Head Office & Pusat Administrasi HCGA',
-    latitude: -7.257472,
-    longitude: 112.75209,
-    radiusMeters: 80,
-    assignedCount: 8,
-    status: 'Aktif',
-    address: 'Gedung Graha Nusantara Lt. 7, Jl. Pemuda No. 45, Surabaya',
+    address: 'Jl. Raya Paseh No. 12, Paseh, Sumedang',
   },
 ];
 
@@ -256,7 +247,13 @@ export function getLocations() {
   if (!isClient) return INITIAL_LOCATIONS;
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.LOCATIONS);
-    return raw ? JSON.parse(raw) : INITIAL_LOCATIONS;
+    if (!raw) return INITIAL_LOCATIONS;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || !parsed.some((loc) => loc.name && (loc.name.includes('SITE') || loc.name.includes('CIMALAKA') || loc.name.includes('PASEH')))) {
+      saveLocations(INITIAL_LOCATIONS);
+      return INITIAL_LOCATIONS;
+    }
+    return parsed;
   } catch {
     return INITIAL_LOCATIONS;
   }
@@ -302,5 +299,97 @@ export function formatDateDMY(dateStr) {
   const parts = dateStr.split('-');
   return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
 }
+
+export const AVAILABLE_SITES = [
+  {
+    id: 'site-a',
+    code: 'SITE A',
+    name: 'SITE A CIMALAKA',
+    shortName: 'Site A Cimalaka',
+    location: 'Cimalaka, Sumedang',
+    badge: 'Site A',
+  },
+  {
+    id: 'site-b',
+    code: 'SITE B',
+    name: 'SITE B PASEH',
+    shortName: 'Site B Paseh',
+    location: 'Paseh, Sumedang',
+    badge: 'Site B',
+  },
+  {
+    id: 'all',
+    code: 'ALL',
+    name: 'Semua Site (Konsolidasi)',
+    shortName: 'Semua Site',
+    location: 'Seluruh Wilayah Operasional',
+    badge: 'Semua',
+  },
+];
+
+export function getActiveSiteId() {
+  if (!isClient) return 'site-a';
+  try {
+    return localStorage.getItem('hris_active_site') || 'site-a';
+  } catch {
+    return 'site-a';
+  }
+}
+
+export function setActiveSiteId(siteId) {
+  if (isClient) {
+    localStorage.setItem('hris_active_site', siteId);
+    dispatchSyncEvent('ACTIVE_SITE', siteId);
+    window.dispatchEvent(
+      new CustomEvent('hris:site-changed', {
+        detail: { siteId },
+      })
+    );
+  }
+}
+
+export function getActiveSite() {
+  const currentId = getActiveSiteId();
+  return AVAILABLE_SITES.find((s) => s.id === currentId) || AVAILABLE_SITES[0];
+}
+
+export function useActiveSite() {
+  const [activeSite, setActiveSite] = useState(getActiveSite());
+
+  useEffect(() => {
+    const handleSiteChange = (e) => {
+      const siteId = e.detail?.siteId;
+      const found = AVAILABLE_SITES.find((s) => s.id === siteId);
+      if (found) setActiveSite(found);
+      else setActiveSite(getActiveSite());
+    };
+    window.addEventListener('hris:site-changed', handleSiteChange);
+    return () => window.removeEventListener('hris:site-changed', handleSiteChange);
+  }, []);
+
+  return activeSite;
+}
+
+export function matchesActiveSite(itemLocation, activeSiteId) {
+  if (!activeSiteId || activeSiteId === 'all') return true;
+  if (activeSiteId === 'site-a') {
+    return (
+      itemLocation === 'SITE A CIMALAKA' ||
+      itemLocation === 'Site A Cimalaka' ||
+      itemLocation === 'Pabrik A (Sidoarjo)' ||
+      itemLocation === 'site-a'
+    );
+  }
+  if (activeSiteId === 'site-b') {
+    return (
+      itemLocation === 'SITE B PASEH' ||
+      itemLocation === 'Site B Paseh' ||
+      itemLocation === 'Site Operasional (Gresik)' ||
+      itemLocation === 'site-b'
+    );
+  }
+  return true;
+}
+
 
 

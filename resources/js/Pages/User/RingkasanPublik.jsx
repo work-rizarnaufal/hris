@@ -1,16 +1,18 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Eye, ShieldCheck, LogIn } from 'lucide-react';
-import { Card, CardContent, PageHeader } from '@/components/ui';
+import { Card, CardContent, PageHeader, Badge } from '@/components/ui';
+import { useActiveSite } from '@/services/systemSettings.js';
 
 export default function RingkasanPublik() {
+  const activeSite = useActiveSite();
   return (
     <>
       <Head title="Ringkasan Publik" />
       <PageHeader
-        eyebrow="PORTAL TERBUKA"
+        eyebrow={`PORTAL TERBUKA ${activeSite.id !== 'all' ? `· ${activeSite.code}` : ''}`}
         title="Ringkasan Kehadiran Publik"
-        subtitle="Portal statistik agregat kehadiran tanpa menampilkan data pribadi karyawan."
+        subtitle={`Portal statistik agregat kehadiran tanpa menampilkan data pribadi karyawan area operasional ${activeSite.name}.`}
         actions={
           <Link href="/beranda" className="button primary">
             <LogIn className="w-4 h-4" />
@@ -24,6 +26,10 @@ export default function RingkasanPublik() {
             <Eye className="w-6 h-6" />
           </div>
           <h3 className="text-base font-semibold text-navy mb-1">Portal Ringkasan Publik</h3>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#f7f2e8] text-[#ab874b] border border-[#c4a266]/30 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c4a266] animate-pulse" />
+            <span>Site Operasional: {activeSite.name}</span>
+          </div>
           <p className="text-xs text-slate-500 max-w-md mx-auto mb-6">
             Portal publik menyajikan metriks agregat kehadiran harian yang aman dan anonim.
           </p>
@@ -36,4 +42,3 @@ export default function RingkasanPublik() {
     </>
   );
 }
-

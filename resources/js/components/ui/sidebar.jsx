@@ -1,18 +1,9 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { Building2 } from 'lucide-react';
-import { navigationConfig } from '@/config/navigation.js';
+import { navigationConfig, IMPLEMENTED_ROUTES } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
-
-// Daftar rute modul yang sudah memiliki implementasi halaman penuh
-const IMPLEMENTED_ROUTES = new Set([
-  '/beranda',
-  '/karyawan',
-  '/kehadiran',
-  '/jadwal',
-  '/laporan',
-  '/pengaturan',
-]);
+import { useActiveSite } from '@/services/systemSettings.js';
 
 export function Sidebar({
   open = false,
@@ -21,6 +12,8 @@ export function Sidebar({
   actorName = siteConfig.defaultActor,
   currentUrl = '',
 }) {
+  const activeSite = useActiveSite();
+
   const isItemActive = (href) => {
     const cleanUrl = (typeof currentUrl === 'string' ? currentUrl : '').split('?')[0];
     if (href === '/beranda') return cleanUrl === '/beranda' || cleanUrl === '/' || cleanUrl === '';
@@ -56,8 +49,8 @@ export function Sidebar({
           {/* Workspace label */}
           <div className="workspace-label">
             <span className="workspace-dot animate-pulse" />
-            <span className="truncate" title={companyName}>
-              {companyName}
+            <span className="truncate" title={`${companyName} · ${activeSite.name}`}>
+              {companyName} · {activeSite.code || activeSite.shortName}
             </span>
           </div>
 

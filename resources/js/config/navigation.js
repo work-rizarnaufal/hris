@@ -15,6 +15,65 @@ import {
   Eye,
 } from 'lucide-react';
 
+export const IMPLEMENTED_ROUTES = new Set([
+  '/beranda',
+  '/karyawan',
+  '/kehadiran',
+  '/jadwal',
+  '/laporan',
+  '/pengaturan',
+]);
+
+export const CORE_MODULES = [
+  {
+    title: 'Beranda',
+    subtitle: 'Dashboard KPI & Ringkasan HR',
+    href: '/beranda',
+    icon: LayoutDashboard,
+  },
+  {
+    title: 'Data Karyawan',
+    subtitle: 'Master Data & Kontrak Kerja',
+    href: '/karyawan',
+    icon: Users,
+  },
+  {
+    title: 'Catatan Kehadiran',
+    subtitle: 'Log Presensi & Absensi Harian',
+    href: '/kehadiran',
+    icon: CalendarCheck,
+  },
+  {
+    title: 'Jadwal & Shift',
+    subtitle: 'Roster & Pola Rotasi Shift',
+    href: '/jadwal',
+    icon: CalendarDays,
+  },
+  {
+    title: 'Laporan & Rekap',
+    subtitle: 'Rekapitulasi Kehadiran & Ekspor',
+    href: '/laporan',
+    icon: FileSpreadsheet,
+  },
+  {
+    title: 'Pengaturan Sistem',
+    subtitle: 'Kalender Kerja & Parameter HR',
+    href: '/pengaturan',
+    icon: Settings,
+  },
+];
+
+export const UPCOMING_MODULES = [
+  { title: 'Organisasi & Jabatan', href: '/organisasi' },
+  { title: 'Lembur (SPL)', href: '/lembur' },
+  { title: 'Pengajuan Cuti', href: '/cuti' },
+  { title: 'Saldo Cuti', href: '/saldo-cuti' },
+  { title: 'Penggajian', href: '/payroll' },
+  { title: 'Slip Gaji', href: '/slip-gaji' },
+  { title: 'Log Audit', href: '/audit' },
+  { title: 'Portal Publik', href: '/ringkasan-publik' },
+];
+
 export const navigationConfig = [
   {
     group: 'UTAMA',

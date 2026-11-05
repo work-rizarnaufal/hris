@@ -59,9 +59,11 @@ import {
   formatDateDMY,
   DEFAULT_ATTENDANCE_SETTINGS,
   DEFAULT_COMPANY_PROFILE,
+  useActiveSite,
 } from '@/services/systemSettings.js';
 
 export default function PengaturanSistem() {
+  const activeSite = useActiveSite();
   const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'calendar' | 'location' | 'maintenance'
   const [alertInfo, setAlertInfo] = useState(null);
 
@@ -286,9 +288,9 @@ export default function PengaturanSistem() {
 
       {/* Header Halaman */}
       <PageHeader
-        eyebrow="SISTEM & ADMINISTRASI HCGA"
+        eyebrow={`SISTEM & ADMINISTRASI HCGA ${activeSite.id !== 'all' ? `· ${activeSite.code}` : ''}`}
         title="Pengaturan Sistem & Kebijakan HR"
-        subtitle="Konfigurasi kebijakan kehadiran, kalender kerja & hari libur nasional, validasi geofencing GPS, dan pemeliharaan pencadangan data."
+        subtitle={`Konfigurasi parameter kehadiran, validasi geofencing GPS, dan kalender operasional area ${activeSite.name}.`}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
@@ -839,13 +841,13 @@ export default function PengaturanSistem() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Tanggal & Hari</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[220px]">Nama Hari Libur</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">Kategori</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Potong Hak Cuti?</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[240px]">Keterangan Operasional</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 w-24">Aksi</TableHead>
+                    <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">NO</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[130px]">TANGGAL & HARI</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[220px]">NAMA HARI LIBUR</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[140px]">KATEGORI</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[160px]">POTONG HAK CUTI?</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[240px]">KETERANGAN OPERASIONAL</TableHead>
+                    <TableHead className="text-right pr-4 text-[11px] font-bold text-slate-700 tracking-wider w-24">AKSI</TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -953,13 +955,13 @@ export default function PengaturanSistem() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">Nama Lokasi Operasional</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[180px]">Koordinat GPS (Lat, Long)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Radius Valid (Meter)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Personil Terdaftar</TableHead>
-                    <TableHead className="text-center text-xs font-semibold text-slate-600 w-28">Status Geofence</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 w-28">Aksi</TableHead>
+                    <TableHead className="w-12 text-center text-[11px] font-bold text-slate-700 tracking-wider">NO</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[200px]">NAMA LOKASI OPERASIONAL</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[180px]">KOORDINAT GPS (LAT, LONG)</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[160px]">RADIUS VALID (METER)</TableHead>
+                    <TableHead className="text-[11px] font-bold text-slate-700 tracking-wider min-w-[130px]">PERSONIL TERDAFTAR</TableHead>
+                    <TableHead className="text-center text-[11px] font-bold text-slate-700 tracking-wider w-28">STATUS GEOFENCE</TableHead>
+                    <TableHead className="text-right pr-4 text-[11px] font-bold text-slate-700 tracking-wider w-28">AKSI</TableHead>
                   </TableRow>
                 </TableHeader>
 

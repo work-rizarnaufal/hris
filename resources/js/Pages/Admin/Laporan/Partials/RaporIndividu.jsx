@@ -40,33 +40,75 @@ import {
   Button,
   Badge,
   TableSelect,
+  PrintButton,
 } from '@/components/ui';
 
-// Helper membuat 30 hari kalender November 2026 berdasarkan data insiden karyawan
+// Helper membuat 30 hari kalender November 2026 yang 100% sinkron dengan aturan JadwalShift.jsx
+// Catatan Operasional: Shift Operasional (Grup A & Grup B) TIDAK memiliki libur Sabtu & Minggu tetap.
+// Operasional berjalan 7 hari penuh dengan sistem rotasi bergulir (1 Hari Dinas, 1 Hari Libur Roster OFF).
+// Staf Non-Shift (Kantor Reguler) bekerja Senin s/d Jumat dengan Libur Akhir Pekan Sabtu & Minggu.
 function generateCalendarDays(employee) {
-  const days = [];
-  const daysInMonth = 30; // November
+  const daysInMonth = 30; // November 2026
+  const isNonShift = employee.group === 'Non-Shift' || employee.shiftCode === 'NON';
+  const isGroupA = employee.group === 'Grup A';
+  const isGroupB = employee.group === 'Grup B';
   const incidents = employee.incidents || [];
+
+  const days = [];
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dayStr = d < 10 ? `0${d}` : `${d}`;
     const dateFormatted = `${dayStr} Nov 2026`;
-    // Hari dalam seminggu untuk Nov 2026: 1 Nov 2026 adalah Hari Minggu (0)
     const dateObj = new Date(2026, 10, d);
-    const dayOfWeek = dateObj.getDay(); // 0 = Minggu, 6 = Sabtu
+    const dayOfWeek = dateObj.getDay(); // 0 = Min, 1 = Sen, ..., 6 = Sab
+    const dayName = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][dayOfWeek];
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-    // Cek apakah tanggal ini ada insiden khusus
+    let isScheduledWorkDay = false;
+    let defaultStatus = 'Libur';
+    let defaultDetail = 'Libur Roster Bergulir (OFF)';
+    let defaultClass = 'status-libur';
+
+    if (isNonShift) {
+      if (isWeekend) {
+        isScheduledWorkDay = false;
+        defaultStatus = 'Libur';
+        defaultDetail = 'Libur Akhir Pekan (OFF)';
+        defaultClass = 'status-libur';
+      } else {
+        isScheduledWorkDay = true;
+        defaultStatus = 'Hadir';
+        defaultDetail = '08:00 - 17:00 WIB (Normal Office)';
+        defaultClass = 'status-hadir';
+      }
+    } else {
+      // Siklus 14 Hari Roster Operasional (Ganjil d-1 = Grup A Masuk, Genap d-1 = Grup B Masuk)
+      const dayIndex = d - 1;
+      const isTurnA = dayIndex % 2 === 1;
+      const isTurnB = dayIndex % 2 === 0;
+
+      if (isGroupA && isTurnA) {
+        isScheduledWorkDay = true;
+        defaultStatus = 'Hadir';
+        defaultDetail = '07:00 - 15:00 WIB (Shift 1 Pagi)';
+        defaultClass = 'status-hadir';
+      } else if (isGroupB && isTurnB) {
+        isScheduledWorkDay = true;
+        defaultStatus = 'Hadir';
+        const timeStr = d === 5 ? '14:00 - 22:00 WIB' : '15:00 - 23:00 WIB';
+        defaultDetail = `${timeStr} (Shift 2 Malam)`;
+        defaultClass = 'status-hadir';
+      }
+    }
+
+    // Periksa apakah ada insiden atau catatan kehadiran spesifik pada hari ini
     const incident = incidents.find((inc) => inc.date && inc.date.includes(`${dayStr} Nov`));
 
-    let status = 'Hadir';
-    let detail = '07:00 - 15:00 (Tepat Waktu)';
-    let typeClass = 'status-hadir';
+    let status = defaultStatus;
+    let detail = defaultDetail;
+    let typeClass = defaultClass;
 
-    if (dayOfWeek === 0) {
-      status = 'Libur';
-      detail = 'Hari Libur Mingguan';
-      typeClass = 'status-libur';
-    } else if (incident) {
+    if (incident) {
       if (incident.type.includes('Terlambat')) {
         status = 'Terlambat';
         detail = incident.detail;
@@ -87,13 +129,20 @@ function generateCalendarDays(employee) {
         status = 'Izin';
         detail = incident.detail;
         typeClass = 'status-izin';
+      } else if (incident.type.includes('Tepat Waktu')) {
+        status = 'Hadir';
+        detail = incident.detail;
+        typeClass = 'status-hadir';
       }
     }
 
     days.push({
       day: d,
       dateFormatted,
-      dayName: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][dayOfWeek],
+      dayName,
+      dayOfWeek,
+      isWeekend,
+      isScheduledWorkDay,
       status,
       detail,
       typeClass,
@@ -109,6 +158,7 @@ export default function RaporIndividu({
   onSelectEmployee,
   selectedPeriod,
   onBackToOrganization,
+  onOpenPrintModal,
 }) {
   const [selectedDay, setSelectedDay] = useState(null);
   const [newNote, setNewNote] = useState('');
@@ -260,7 +310,7 @@ export default function RaporIndividu({
   return (
     <div className="space-y-6">
       {/* Bar Navigasi & Pemilihan Karyawan */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -269,7 +319,7 @@ export default function RaporIndividu({
             className="text-xs text-slate-600 hover:text-navy gap-1"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Kembali ke Rekap Organisasi</span>
+            <span>Kembali ke Rekap Kehadiran</span>
           </Button>
 
           <div className="h-5 w-px bg-slate-200 hidden md:block" />
@@ -294,15 +344,10 @@ export default function RaporIndividu({
 
         {/* Tombol Ekspor Rapor */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.print()}
-            className="text-xs gap-1.5 text-navy border-slate-200 hover:bg-slate-50"
-          >
-            <Printer className="w-3.5 h-3.5 text-slate-500" />
-            <span>Cetak Rapor</span>
-          </Button>
+          <PrintButton
+            label="Cetak Rapor"
+            onClick={onOpenPrintModal}
+          />
 
           <Button
             variant="outline"
@@ -348,6 +393,10 @@ export default function RaporIndividu({
                 <span className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#c4a266]" />
                   {employee.location}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#c4a266]" />
+                  {employee.group || 'Non-Shift'} • {employee.baseShift || 'Reguler'}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CalendarCheck className="w-3.5 h-3.5 text-[#c4a266]" />
@@ -569,7 +618,9 @@ export default function RaporIndividu({
                   Matriks Presensi 30 Hari (November 2026)
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Klik tanggal untuk melihat catatan absensi spesifik pada hari tersebut
+                  {employee.group === 'Non-Shift'
+                    ? 'Jadwal Kantor Reguler (Senin s/d Jumat) • Libur Akhir Pekan Sabtu & Minggu'
+                    : `Pola Roster Operasional 7 Hari Non-Stop • 1 Hari Dinas 1 Hari Libur Bergulir (${employee.group || 'Shift Operasional'})`}
                 </CardDescription>
               </div>
 
@@ -673,7 +724,7 @@ export default function RaporIndividu({
                 </Button>
               </div>
             ) : (
-              <p className="text-center text-xs text-slate-400 mt-4 italic">
+              <p className="text-center text-xs text-slate-400 mt-4 italic print:hidden">
                 Klik salah satu kotak tanggal di atas untuk melihat detail presensi.
               </p>
             )}
@@ -764,7 +815,7 @@ export default function RaporIndividu({
 
         <CardContent className="p-4 sm:p-6 space-y-6">
           {/* Form Input Catatan Baru */}
-          <form onSubmit={handleAddCoachingLog} className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 space-y-3">
+          <form onSubmit={handleAddCoachingLog} className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 space-y-3 print:hidden">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
               <Plus className="w-3.5 h-3.5 text-navy" />
               Tambah Catatan Pembinaan Baru
