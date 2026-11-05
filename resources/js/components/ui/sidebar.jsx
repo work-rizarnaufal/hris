@@ -4,6 +4,16 @@ import { Building2 } from 'lucide-react';
 import { navigationConfig } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
 
+// Daftar rute modul yang sudah memiliki implementasi halaman penuh
+const IMPLEMENTED_ROUTES = new Set([
+  '/beranda',
+  '/karyawan',
+  '/kehadiran',
+  '/jadwal',
+  '/laporan',
+  '/pengaturan',
+]);
+
 export function Sidebar({
   open = false,
   onClose,
@@ -60,7 +70,26 @@ export function Sidebar({
               <nav className="flex flex-col gap-1">
                 {group.items.map((item) => {
                   const Icon = item.icon;
-                  const active = isItemActive(item.href);
+                  const isDisabled = item.disabled ?? !IMPLEMENTED_ROUTES.has(item.href);
+                  const active = !isDisabled && isItemActive(item.href);
+
+                  if (isDisabled) {
+                    return (
+                      <div
+                        key={item.href}
+                        className="nav-item opacity-45 cursor-not-allowed select-none hover:bg-transparent hover:text-[#a8b9cc] transition-none"
+                        title={`${item.title} (Dalam Pengembangan / TBA)`}
+                        aria-disabled="true"
+                      >
+                        {Icon && <Icon className="w-4 h-4 shrink-0 text-slate-500" />}
+                        <span className="flex-1 text-slate-400">{item.title}</span>
+                        <small className="text-[10px] font-mono font-bold tracking-wider bg-slate-800 text-amber-300/90 border border-amber-400/20 px-2 py-0.5 rounded shadow-2xs">
+                          TBA
+                        </small>
+                      </div>
+                    );
+                  }
+
                   return (
                     <Link
                       key={item.href}

@@ -63,31 +63,31 @@ Navigasi sidebar telah dirombak mengikuti 7 domain standar HRIS enterprise:
 
 ```
 ├── 1. UTAMA
-│   └── Beranda                     (/beranda)       -> Dashboard KPI, Metrik Kehadiran, Presensi Hari ini
+│   └── Beranda                     (/beranda)       [AKTIF] -> Dashboard KPI, Metrik Kehadiran, Presensi Hari ini
 │
 ├── 2. MANAJEMEN KARYAWAN (Core HR)
-│   ├── Data Karyawan               (/karyawan)      -> Master Data Induk, Profil Karyawan, Status PKWT/PKWTT
-│   └── Organisasi & Jabatan        (/organisasi)    -> Departemen, Divisi, Level Jabatan, Garis Pelaporan
+│   ├── Data Karyawan               (/karyawan)      [AKTIF] -> Master Data Induk, Profil Karyawan, Status PKWT/PKWTT
+│   └── Organisasi & Jabatan        (/organisasi)    [TBA]   -> Departemen, Divisi, Level Jabatan, Garis Pelaporan
 │
 ├── 3. WAKTU & KEHADIRAN (Time & Attendance)
-│   ├── Catatan Kehadiran           (/kehadiran)     -> Log Presensi Harian, Jam Masuk/Pulang, Terlambat
-│   ├── Jadwal & Shift              (/jadwal)        -> Roster Shift 2-Grup (A/B), Pola Rotasi, Kalender Shift
-│   └── Lembur (Overtime)           (/lembur)        -> Surat Perintah Lembur (SPL), Akumulasi Jam Lembur
+│   ├── Catatan Kehadiran           (/kehadiran)     [AKTIF] -> Log Presensi Harian, Jam Masuk/Pulang, Terlambat
+│   ├── Jadwal & Shift              (/jadwal)        [AKTIF] -> Roster Shift 2-Grup (A/B), Pola Rotasi, Kalender Shift
+│   └── Lembur (Overtime)           (/lembur)        [TBA]   -> Surat Perintah Lembur (SPL), Akumulasi Jam Lembur
 │
 ├── 4. CUTI & PERIZINAN (Leave Management)
-│   ├── Pengajuan Cuti & Izin       (/cuti)          -> Permohonan Cuti Tahunan, Izin, Sakit, Alur Approval
-│   └── Saldo & Kuota Cuti          (/saldo-cuti)    -> Plafon Cuti 12 Hari, Sisa Kuota, Potongan Cuti Bersama
+│   ├── Pengajuan Cuti & Izin       (/cuti)          [TBA]   -> Permohonan Cuti Tahunan, Izin, Sakit, Alur Approval
+│   └── Saldo & Kuota Cuti          (/saldo-cuti)    [TBA]   -> Plafon Cuti 12 Hari, Sisa Kuota, Potongan Cuti Bersama
 │
 ├── 5. PENGGAJIAN (PAYROLL)
-│   ├── Penggajian & Periode        (/payroll)       -> Kalkulasi Gaji, Tunjangan Kehadiran, Potongan BPJS/PPh 21
-│   └── Slip Gaji                   (/slip-gaji)     -> Distribusi & Arsip Dokumen Slip Gaji Karyawan
+│   ├── Penggajian & Periode        (/payroll)       [TBA]   -> Kalkulasi Gaji, Tunjangan Kehadiran, Potongan BPJS/PPh 21
+│   └── Slip Gaji                   (/slip-gaji)     [TBA]   -> Distribusi & Arsip Dokumen Slip Gaji Karyawan
 │
 ├── 6. LAPORAN & ANALITIK (Reports & Analytics)
-│   └── Laporan & Rekap             (/laporan)       -> Rekapitulasi Performa, Evaluasi Kehadiran, Ekspor PDF/Excel
+│   └── Laporan & Rekap             (/laporan)       [AKTIF] -> Rekapitulasi Performa, Evaluasi Kehadiran, Ekspor PDF/Excel
 │
 └── 7. PENGATURAN & AUDIT (Administration)
-    ├── Pengaturan Sistem           (/pengaturan)    -> Kalender Kerja Perusahaan, Libur Nasional, Parameter HR
-    └── Log Audit                   (/audit)         -> Jejak Rekam Perubahan Data Sistem & Keamanan
+    ├── Pengaturan Sistem           (/pengaturan)    [AKTIF] -> Kalender Kerja Perusahaan, Libur Nasional, Parameter HR
+    └── Log Audit                   (/audit)         [TBA]   -> Jejak Rekam Perubahan Data Sistem & Keamanan
 ```
 
 ### Pemetaan Direktori di `resources/js/Pages/Admin/`:
@@ -190,13 +190,17 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
   - Profil korporat lengkap (Avatar inisial, NIP, Jabatan, Divisi, Lokasi Pabrik/Kantor, Pola Shift, Tanggal Bergabung).
   - Skor Disiplin Rapor (0–100%) dan Badge Status Evaluasi resmi.
   - Kotak rekomendasi tindakan operasional HCGA.
-- **4 Scorecard KPI Individu**:
-  - Hadir Efektif (Hari & Persentase).
-  - Frekuensi & Akumulasi Menit Terlambat.
-  - Total Cuti / Izin Sakit.
-  - Total Alpa / Mangkir.
+- **8 Scorecard KPI Terperinci**:
+  1. *Total Kehadiran*: Akumulasi hari hadir fisik dan rasio terhadap total hari kerja efektif.
+  2. *Tepat Waktu*: Presensi tepat waktu tanpa insiden keterlambatan.
+  3. *Terlambat*: Frekuensi insiden kedatangan melewati batas jadwal.
+  4. *Menit Terlambat*: Akumulasi durasi menit keterlambatan dan rata-rata per kejadian.
+  5. *Izin*: Hari izin pribadi resmi yang telah disetujui.
+  6. *Sakit*: Ketidakhadiran karena kondisi medis dengan surat dokter.
+  7. *Cuti*: Penggunaan hak cuti tahunan resmi karyawan.
+  8. *Alpha*: Ketidakhadiran tanpa keterangan / mangkir indisipliner.
 - **Kalender Visual Presensi 30 Hari (Heatmap Grid)**:
-  - Kotak visual per tanggal (1 s/d 30 November) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin/Cuti (Biru), Alpa (Merah), Libur (Abu-abu), lengkap dengan jam check-in dan tooltip catatan.
+  - Kotak visual per tanggal (1 s/d 30 November) berkode warna interaktif: Hadir/Tepat Waktu (Hijau), Terlambat (Kuning), Izin (Biru/Sky), Sakit (Ungu), Cuti (Teal), Alpha (Merah/Rose), Libur (Abu-abu), lengkap dengan jam check-in dan tooltip catatan.
 - **Grafik Tren Kedisiplinan 6 Bulan**:
   - `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang (Juni - November 2026).
 - **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**:

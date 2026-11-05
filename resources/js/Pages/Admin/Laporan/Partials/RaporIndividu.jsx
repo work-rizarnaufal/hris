@@ -19,6 +19,7 @@ import {
   MapPin,
   Building,
   RotateCcw,
+  HeartPulse,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -70,12 +71,20 @@ function generateCalendarDays(employee) {
         status = 'Terlambat';
         detail = incident.detail;
         typeClass = 'status-terlambat';
-      } else if (incident.type.includes('Alpa')) {
-        status = 'Alpa';
+      } else if (incident.type.includes('Alpa') || incident.type.includes('Alpha')) {
+        status = 'Alpha';
         detail = incident.detail;
-        typeClass = 'status-alpa';
-      } else if (incident.type.includes('Cuti') || incident.type.includes('Sakit') || incident.type.includes('Izin')) {
-        status = 'Izin / Cuti';
+        typeClass = 'status-alpha';
+      } else if (incident.type.includes('Cuti')) {
+        status = 'Cuti';
+        detail = incident.detail;
+        typeClass = 'status-cuti';
+      } else if (incident.type.includes('Sakit')) {
+        status = 'Sakit';
+        detail = incident.detail;
+        typeClass = 'status-sakit';
+      } else if (incident.type.includes('Izin')) {
+        status = 'Izin';
         detail = incident.detail;
         typeClass = 'status-izin';
       }
@@ -158,6 +167,17 @@ export default function RaporIndividu({
     setNewNote('');
   };
 
+  // 8 Metrik KPI Rapor Individu
+  const presentDays = employee.presentDays || 0;
+  const workDays = employee.workDays || 22;
+  const lateCount = employee.lateCount || 0;
+  const totalLateMinutes = employee.totalLateMinutes || 0;
+  const onTimeDays = employee.onTimeDays ?? Math.max(0, presentDays - lateCount);
+  const izinDays = employee.izinDays ?? 0;
+  const sakitDays = employee.sakitDays ?? 0;
+  const cutiDays = employee.cutiDays ?? Math.max(0, (employee.leaveDays || 0) - izinDays - sakitDays);
+  const alpaDays = employee.alpaDays || 0;
+
   // Ekspor Rapor Karyawan ke Excel
   const handleExportIndividualReport = () => {
     const profileData = [
@@ -167,11 +187,15 @@ export default function RaporIndividu({
       { Properti: 'Divisi', Nilai: employee.division },
       { Properti: 'Lokasi Kerja', Nilai: employee.location },
       { Properti: 'Periode Evaluasi', Nilai: selectedPeriod },
-      { Properti: 'Hari Kerja Efektif', Nilai: `${employee.workDays} Hari` },
-      { Properti: 'Total Kehadiran', Nilai: `${employee.presentDays} Hari (${((employee.presentDays / employee.workDays) * 100).toFixed(1)}%)` },
-      { Properti: 'Frekuensi Terlambat', Nilai: `${employee.lateCount} kali (${employee.totalLateMinutes} menit)` },
-      { Properti: 'Izin / Cuti / Sakit', Nilai: `${employee.leaveDays} Hari` },
-      { Properti: 'Mangkir / Alpa', Nilai: `${employee.alpaDays} Hari` },
+      { Properti: 'Hari Kerja Efektif', Nilai: `${workDays} Hari` },
+      { Properti: 'Total Kehadiran', Nilai: `${presentDays} Hari (${((presentDays / workDays) * 100).toFixed(1)}%)` },
+      { Properti: 'Tepat Waktu', Nilai: `${onTimeDays} Hari (${presentDays > 0 ? ((onTimeDays / presentDays) * 100).toFixed(1) : 0}%)` },
+      { Properti: 'Terlambat', Nilai: `${lateCount} kali` },
+      { Properti: 'Menit Terlambat', Nilai: `${totalLateMinutes} menit` },
+      { Properti: 'Izin', Nilai: `${izinDays} Hari` },
+      { Properti: 'Sakit', Nilai: `${sakitDays} Hari` },
+      { Properti: 'Cuti', Nilai: `${cutiDays} Hari` },
+      { Properti: 'Alpha', Nilai: `${alpaDays} Hari` },
       { Properti: 'Skor Kedisiplinan', Nilai: `${employee.score}%` },
       { Properti: 'Status Evaluasi', Nilai: employee.status },
       { Properti: 'Rekomendasi HCGA', Nilai: employee.actionRecommendation },
@@ -370,79 +394,163 @@ export default function RaporIndividu({
         </div>
       </Card>
 
-      {/* 4 Scorecards KPI Khusus Karyawan */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-slate-200 shadow-2xs">
+      {/* 8 Scorecards KPI Khusus Karyawan */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        {/* 1. Total Kehadiran */}
+        <Card className="border-slate-200 shadow-2xs hover:border-slate-300 transition-colors">
           <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Hari Hadir Efektif
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Total Kehadiran
               </p>
               <p className="text-2xl font-bold font-display text-navy mt-1">
-                {employee.presentDays} <span className="text-sm font-normal text-slate-400">/ {employee.workDays} Hari</span>
+                {presentDays} <span className="text-xs font-normal text-slate-400">/ {workDays} Hari</span>
               </p>
-              <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
-                {((employee.presentDays / employee.workDays) * 100).toFixed(1)}% Rasio Kehadiran
+              <p className="text-[11px] text-slate-600 font-medium mt-0.5 truncate">
+                {((presentDays / workDays) * 100).toFixed(1)}% Rasio Kehadiran
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 text-navy flex items-center justify-center shrink-0 ml-2">
+              <UserCheck className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 2. Tepat Waktu */}
+        <Card className="border-slate-200 shadow-2xs hover:border-emerald-200 transition-colors">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Tepat Waktu
+              </p>
+              <p className="text-2xl font-bold font-display text-[#398872] mt-1">
+                {onTimeDays} <span className="text-xs font-normal text-slate-400">Hari</span>
+              </p>
+              <p className="text-[11px] text-emerald-700 font-medium mt-0.5 truncate">
+                {presentDays > 0 ? ((onTimeDays / presentDays) * 100).toFixed(0) : 0}% Presensi Tepat
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-[#eef7f1] text-[#398872] flex items-center justify-center shrink-0 ml-2">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-2xs">
+        {/* 3. Terlambat */}
+        <Card className="border-slate-200 shadow-2xs hover:border-amber-200 transition-colors">
           <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Frekuensi Terlambat
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Terlambat
               </p>
-              <p className="text-2xl font-bold font-display text-amber-600 mt-1">
-                {employee.lateCount}x
+              <p className="text-2xl font-bold font-display text-[#ac8848] mt-1">
+                {lateCount} <span className="text-xs font-normal text-slate-400">Kali</span>
               </p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                Total durasi {employee.totalLateMinutes} menit
+              <p className="text-[11px] text-amber-700 font-medium mt-0.5 truncate">
+                {lateCount > 0 ? `${lateCount}x keterlambatan` : 'Disiplin sempurna'}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#fcf6e9] text-[#ac8848] flex items-center justify-center shrink-0 ml-2">
               <Clock className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-2xs">
+        {/* 4. Menit Terlambat */}
+        <Card className="border-slate-200 shadow-2xs hover:border-amber-300 transition-colors">
           <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Izin Resmi & Cuti
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Menit Terlambat
               </p>
-              <p className="text-2xl font-bold font-display text-sky-600 mt-1">
-                {employee.leaveDays} Hari
+              <p className="text-2xl font-bold font-display text-amber-600 mt-1">
+                {totalLateMinutes} <span className="text-xs font-normal text-slate-400">Mnt</span>
               </p>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                Surat keterangan terlampir
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">
+                {lateCount > 0 ? `Rata-rata ${Math.round(totalLateMinutes / lateCount)} mnt/telat` : '0 mnt akumulasi'}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 ml-2">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 5. Izin */}
+        <Card className="border-slate-200 shadow-2xs hover:border-sky-200 transition-colors">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Izin
+              </p>
+              <p className="text-2xl font-bold font-display text-[#698eb0] mt-1">
+                {izinDays} <span className="text-xs font-normal text-slate-400">Hari</span>
+              </p>
+              <p className="text-[11px] text-sky-700 font-medium mt-0.5 truncate">
+                {izinDays > 0 ? 'Izin resmi disetujui' : 'Nihil izin pribadi'}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-[#eff5fa] text-[#698eb0] flex items-center justify-center shrink-0 ml-2">
               <Calendar className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-2xs">
+        {/* 6. Sakit */}
+        <Card className="border-slate-200 shadow-2xs hover:border-purple-200 transition-colors">
           <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Mangkir / Alpa
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Sakit
               </p>
-              <p className="text-2xl font-bold font-display text-rose-600 mt-1">
-                {employee.alpaDays} Hari
+              <p className="text-2xl font-bold font-display text-[#ab7b9b] mt-1">
+                {sakitDays} <span className="text-xs font-normal text-slate-400">Hari</span>
               </p>
-              <p className="text-[11px] text-rose-600 font-medium mt-0.5">
-                {employee.alpaDays > 0 ? 'Pelanggaran Kedisiplinan' : 'Nihil Alpa'}
+              <p className="text-[11px] text-purple-700 font-medium mt-0.5 truncate">
+                {sakitDays > 0 ? 'Surat dokter terlampir' : 'Kondisi fisik prima'}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#f7f0f7] text-[#ab7b9b] flex items-center justify-center shrink-0 ml-2">
+              <HeartPulse className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 7. Cuti */}
+        <Card className="border-slate-200 shadow-2xs hover:border-teal-200 transition-colors">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Cuti
+              </p>
+              <p className="text-2xl font-bold font-display text-[#489490] mt-1">
+                {cutiDays} <span className="text-xs font-normal text-slate-400">Hari</span>
+              </p>
+              <p className="text-[11px] text-teal-700 font-medium mt-0.5 truncate">
+                {cutiDays > 0 ? 'Potong cuti tahunan' : 'Saldo cuti utuh'}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-[#edf6f6] text-[#489490] flex items-center justify-center shrink-0 ml-2">
+              <CalendarCheck className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 8. Alpha */}
+        <Card className="border-slate-200 shadow-2xs hover:border-rose-200 transition-colors">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider truncate">
+                Alpha
+              </p>
+              <p className="text-2xl font-bold font-display text-[#b36a74] mt-1">
+                {alpaDays} <span className="text-xs font-normal text-slate-400">Hari</span>
+              </p>
+              <p className="text-[11px] text-rose-700 font-medium mt-0.5 truncate">
+                {alpaDays > 0 ? 'Mangkir tanpa izin' : 'Nihil pelanggaran'}
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-[#fbf0f2] text-[#b36a74] flex items-center justify-center shrink-0 ml-2">
               <ShieldAlert className="w-5 h-5" />
             </div>
           </CardContent>
@@ -474,10 +582,16 @@ export default function RaporIndividu({
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Terlambat
                 </span>
                 <span className="flex items-center gap-1 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" /> Cuti/Izin
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" /> Izin
                 </span>
                 <span className="flex items-center gap-1 text-slate-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Alpa
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block" /> Sakit
+                </span>
+                <span className="flex items-center gap-1 text-slate-600">
+                  <span className="w-2.5 h-2.5 rounded-full bg-teal-500 inline-block" /> Cuti
+                </span>
+                <span className="flex items-center gap-1 text-slate-600">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Alpha
                 </span>
                 <span className="flex items-center gap-1 text-slate-600">
                   <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" /> Libur
@@ -497,12 +611,18 @@ export default function RaporIndividu({
                 if (dayItem.status === 'Terlambat') {
                   bgStyle = 'bg-amber-50 border-amber-300 text-amber-900 font-semibold';
                   dotStyle = 'bg-amber-500';
-                } else if (dayItem.status === 'Alpa') {
+                } else if (dayItem.status === 'Alpha' || dayItem.status === 'Alpa') {
                   bgStyle = 'bg-rose-50 border-rose-300 text-rose-900 font-bold';
                   dotStyle = 'bg-rose-500';
-                } else if (dayItem.status === 'Izin / Cuti') {
+                } else if (dayItem.status === 'Izin') {
                   bgStyle = 'bg-sky-50 border-sky-300 text-sky-900';
                   dotStyle = 'bg-sky-500';
+                } else if (dayItem.status === 'Sakit') {
+                  bgStyle = 'bg-purple-50 border-purple-300 text-purple-900';
+                  dotStyle = 'bg-purple-500';
+                } else if (dayItem.status === 'Cuti') {
+                  bgStyle = 'bg-teal-50 border-teal-300 text-teal-900';
+                  dotStyle = 'bg-teal-500';
                 } else if (dayItem.status === 'Libur') {
                   bgStyle = 'bg-slate-50 border-slate-200 text-slate-400';
                   dotStyle = 'bg-slate-300';
