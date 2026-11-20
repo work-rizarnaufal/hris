@@ -354,16 +354,22 @@ Pembersihan menyeluruh telah dieksekusi dengan hasil:
    - Deteksi dinamis status rotasi shift hari ini (Grup A dinas pada Senin/Rabu/Jumat, Grup B dinas pada Selasa/Kamis/Sabtu, dan Libur reguler pada Minggu).
    - Menambahkan 4 baris pintasan cepat alur kerja (*Quick Nav Cards*) ke Log Kehadiran, Jadwal & Shift, Data Karyawan, dan Laporan Rekap.
    - Merapikan visualisasi grafik Recharts dan tabel log presensi terkini lengkap dengan kolom Lokasi Kerja, Waktu Check-In monospace, dan badge status atomik.
-2. **Pembersihan Berkas Usang (`app/public-summary.tsx`)**:
+3. **Penyempurnaan Menyeluruh Seluruh Halaman Staging / Roadmap**:
+   - Seluruh 7 modul staging/TBA ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx), [`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx), [`SaldoKuotaCuti.jsx`](resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx), [`PenggajianPeriode.jsx`](resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx), [`SlipGaji.jsx`](resources/js/Pages/Admin/SlipGaji/SlipGaji.jsx), [`OrganisasiJabatan.jsx`](resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx), [`LogAudit.jsx`](resources/js/Pages/Admin/Audit/LogAudit.jsx)) serta Portal Publik ([`RingkasanPublik.jsx`](resources/js/Pages/User/RingkasanPublik.jsx)) dirombak total dari placeholder polos menjadi antarmuka eksekutif lengkap dengan:
+     - 4 Kartu KPI Metrik per domain bisnis HCGA.
+     - Banner status pengembangan terstandarisasi dengan token tema Deep Navy `#10273f` dan Gold `#c4a266`.
+     - 3 Pilar fitur operasional yang terstruktur menggunakan komponen atomik `<Card>`, `<CardHeader>`, `<CardTitle>`, `<CardDescription>`, `<CardContent>`, `<PageHeader>`.
+     - Penghapusan seluruh class lama `button primary` / `button secondary` menjadi tombol atomik terstandarisasi.
+4. **Pembersihan Berkas Usang (`app/public-summary.tsx`)**:
    - Dihapus berkas mati sisa implementasi lama Next.js yang mengimpor pustaka non-eksisten (`lib/model`).
-3. **Pembersihan Berkas Mati (`resources/js/lib/`)**:
+5. **Pembersihan Berkas Mati (`resources/js/lib/`)**:
    - Dihapus 5 berkas yang tidak pernah diimpor: `employee-import.js`, `export.js`, `model.js`, `public-summary.js`, `rotation.js`.
    - Dipertahankan satu berkas inti yang aktif digunakan: [`resources/js/lib/utils.js`](resources/js/lib/utils.js) (`cn`).
-4. **Pembersihan Dependensi NPM (YAGNI)**:
+6. **Pembersihan Dependensi NPM (YAGNI)**:
    - Dihapus 3 paket tak terpakai: `radix-ui`, `jspdf`, `jspdf-autotable`. Total 94 sub-paket dibersihkan dari `node_modules`.
-5. **Pembersihan Komentar Banner**:
+7. **Pembersihan Komentar Banner**:
    - File [`routes/web.php`](routes/web.php) dibersihkan dari banner separator dekoratif `// ==========================`.
-6. **Standarisasi Notifikasi Atomik**:
+8. **Standarisasi Notifikasi Atomik**:
    - Komponen [`toast.jsx`](resources/js/components/ui/toast.jsx) diperluas untuk mendukung varian `warning` selain `success` dan `error`.
    - Kode alert inline custom di [`DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx) dan [`CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx) direfaktor menggunakan atomik `<Toast />`.
 
