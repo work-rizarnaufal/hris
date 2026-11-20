@@ -349,20 +349,27 @@ Halaman ini menyediakan pusat konfigurasi operasional, kebijakan kehadiran, dan 
 ## 9. Hasil Audit Rekayasa (Anti-Slop & Ponytail Cleanup)
 
 Pembersihan menyeluruh telah dieksekusi dengan hasil:
-1. **Pembersihan Berkas Mati (`resources/js/lib/`)**:
+1. **Penyempurnaan & Sinkronisasi Halaman Beranda (`Beranda.jsx`)**:
+   - Menghapus angka hardcoded fiktif (48 orang) menjadi basis **12 Personel Aktif** yang 100% selaras dengan Master Karyawan, Roster Shift 2-Grup, dan Log Kehadiran.
+   - Deteksi dinamis status rotasi shift hari ini (Grup A dinas pada Senin/Rabu/Jumat, Grup B dinas pada Selasa/Kamis/Sabtu, dan Libur reguler pada Minggu).
+   - Menambahkan 4 baris pintasan cepat alur kerja (*Quick Nav Cards*) ke Log Kehadiran, Jadwal & Shift, Data Karyawan, dan Laporan Rekap.
+   - Merapikan visualisasi grafik Recharts dan tabel log presensi terkini lengkap dengan kolom Lokasi Kerja, Waktu Check-In monospace, dan badge status atomik.
+2. **Pembersihan Berkas Usang (`app/public-summary.tsx`)**:
+   - Dihapus berkas mati sisa implementasi lama Next.js yang mengimpor pustaka non-eksisten (`lib/model`).
+3. **Pembersihan Berkas Mati (`resources/js/lib/`)**:
    - Dihapus 5 berkas yang tidak pernah diimpor: `employee-import.js`, `export.js`, `model.js`, `public-summary.js`, `rotation.js`.
    - Dipertahankan satu berkas inti yang aktif digunakan: [`resources/js/lib/utils.js`](resources/js/lib/utils.js) (`cn`).
-2. **Pembersihan Dependensi NPM (YAGNI)**:
+4. **Pembersihan Dependensi NPM (YAGNI)**:
    - Dihapus 3 paket tak terpakai: `radix-ui`, `jspdf`, `jspdf-autotable`. Total 94 sub-paket dibersihkan dari `node_modules`.
-3. **Pembersihan Komentar Banner**:
+5. **Pembersihan Komentar Banner**:
    - File [`routes/web.php`](routes/web.php) dibersihkan dari banner separator dekoratif `// ==========================`.
-4. **Standarisasi Notifikasi Atomik**:
+6. **Standarisasi Notifikasi Atomik**:
    - Komponen [`toast.jsx`](resources/js/components/ui/toast.jsx) diperluas untuk mendukung varian `warning` selain `success` dan `error`.
    - Kode alert inline custom di [`DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx) dan [`CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx) direfaktor menggunakan atomik `<Toast />`.
 
 ---
 
-## 9. Rencana Aksi untuk Sesi Selanjutnya (Next Steps)
+## 10. Rencana Aksi untuk Sesi Selanjutnya (Next Steps)
 
 1. **Modul Lembur & Surat Perintah Lembur (`Admin/Lembur/LemburOvertime.jsx`)**:
    - Formulir pengajuan dan persetujuan lembur terintegrasi dengan kehadiran.

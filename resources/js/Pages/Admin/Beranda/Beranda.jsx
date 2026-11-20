@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import {
   Users,
   CheckCircle2,
   Clock,
   AlertTriangle,
-  Calendar,
+  CalendarDays,
   Layers,
   ArrowUpRight,
   Plus,
   FileSpreadsheet,
   Building,
   UserCheck,
+  ShieldCheck,
+  MapPin,
+  CalendarCheck,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -21,7 +26,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
 } from 'recharts';
 import {
   Card,
@@ -39,61 +43,28 @@ import {
   TableCell,
   Text,
 } from '@/components/ui';
-import { colors } from '@/config/theme.js';
 
-// Dummy data kehadiran mingguan
+// Data tren kehadiran 6 hari kerja terakhir (sinkron dengan basis 12 personel operasional)
 const weeklyTrendData = [
-  { day: 'Sen', hadir: 46, terlambat: 2, absen: 0 },
-  { day: 'Sel', hadir: 45, terlambat: 3, absen: 0 },
-  { day: 'Rab', hadir: 47, terlambat: 1, absen: 0 },
-  { day: 'Kam', hadir: 48, terlambat: 0, absen: 0 },
-  { day: 'Jum', hadir: 44, terlambat: 4, absen: 0 },
-  { day: 'Sab', hadir: 46, terlambat: 2, absen: 0 },
+  { day: 'Senin', hadir: 11, terlambat: 1, izin: 0 },
+  { day: 'Selasa', hadir: 12, terlambat: 0, izin: 0 },
+  { day: 'Rabu', hadir: 11, terlambat: 1, izin: 0 },
+  { day: 'Kamis', hadir: 12, terlambat: 0, izin: 0 },
+  { day: 'Jumat', hadir: 10, terlambat: 1, izin: 1 },
+  { day: 'Sabtu', hadir: 11, terlambat: 1, izin: 0 },
 ];
 
-// Dummy data presensi terkini (hari ini)
+// Data log presensi terkini hari ini (sinkron dengan master 12 karyawan HCGA)
 const recentAttendance = [
   {
     id: 1,
     nip: 'HC-0101',
     name: 'Budi Santoso',
-    role: 'Staf Operasional',
+    role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
+    location: 'Pabrik A (Sidoarjo)',
     shift: 'Shift 1 (07:00 - 15:00)',
-    time: '06:51 WIB',
-    status: 'Hadir',
-    statusClass: 'status-hadir',
-  },
-  {
-    id: 2,
-    nip: 'HC-0102',
-    name: 'Siti Rahmawati',
-    role: 'HCGA Officer',
-    division: 'Human Capital & GA',
-    shift: 'General (08:00 - 17:00)',
-    time: '07:48 WIB',
-    status: 'Hadir',
-    statusClass: 'status-hadir',
-  },
-  {
-    id: 3,
-    nip: 'HC-0103',
-    name: 'Ahmad Fauzi',
-    role: 'Operator Forklift',
-    division: 'Logistik & Gudang',
-    shift: 'Shift 1 (07:00 - 15:00)',
-    time: '07:18 WIB',
-    status: 'Terlambat (18m)',
-    statusClass: 'status-terlambat',
-  },
-  {
-    id: 4,
-    nip: 'HC-0104',
-    name: 'Dewi Anggraini',
-    role: 'Quality Assurance',
-    division: 'Operasional & Lapangan',
-    shift: 'Shift 1 (07:00 - 15:00)',
-    time: '06:58 WIB',
+    time: '06:48 WIB',
     status: 'Hadir',
     statusClass: 'status-hadir',
   },
@@ -101,67 +72,149 @@ const recentAttendance = [
     id: 5,
     nip: 'HC-0105',
     name: 'Hendra Wijaya',
-    role: 'Koordinator Keamanan',
+    role: 'Koordinator Keamanan Pabrik',
     division: 'Security & Safety',
+    location: 'Pabrik A (Sidoarjo)',
     shift: 'Shift 1 (07:00 - 15:00)',
-    time: '06:40 WIB',
+    time: '06:38 WIB',
     status: 'Hadir',
     statusClass: 'status-hadir',
+  },
+  {
+    id: 2,
+    nip: 'HC-0102',
+    name: 'Siti Rahmawati',
+    role: 'HCGA Specialist',
+    division: 'Human Capital & GA',
+    location: 'Kantor Utama (Surabaya)',
+    shift: 'Office (08:00 - 17:00)',
+    time: '07:42 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 4,
+    nip: 'HC-0104',
+    name: 'Dewi Anggraini',
+    role: 'Quality Assurance Inspector',
+    division: 'Operasional & Lapangan',
+    location: 'Pabrik A (Sidoarjo)',
+    shift: 'Shift 1 (07:00 - 15:00)',
+    time: '06:55 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 3,
+    nip: 'HC-0103',
+    name: 'Ahmad Fauzi',
+    role: 'Operator Forklift Utama',
+    division: 'Logistik & Gudang',
+    location: 'Gudang B (Rungkut)',
+    shift: 'Shift 2 (15:00 - 23:00)',
+    time: '07:18 WIB',
+    status: 'Terlambat (18m)',
+    statusClass: 'status-terlambat',
   },
   {
     id: 6,
     nip: 'HC-0106',
     name: 'Rina Marlina',
-    role: 'Administrasi Payroll',
+    role: 'Staf Administrasi Payroll',
     division: 'Human Capital & GA',
-    shift: 'General (08:00 - 17:00)',
-    time: '-',
+    location: 'Kantor Utama (Surabaya)',
+    shift: 'Office (08:00 - 17:00)',
+    time: '—',
     status: 'Izin Resmi',
     statusClass: 'status-izin',
   },
 ];
 
-// Ringkasan per divisi
+// Ringkasan performa divisi (berdasarkan pembagian 12 personel aktif)
 const divisionSummary = [
-  { name: 'Operasional & Lapangan', total: 24, present: 24, percent: 100 },
-  { name: 'Human Capital & GA', total: 8, present: 7, percent: 87.5 },
-  { name: 'Logistik & Gudang', total: 10, present: 9, percent: 90 },
-  { name: 'Security & Safety', total: 6, present: 6, percent: 100 },
+  { name: 'Operasional & Lapangan', total: 4, present: 4, late: 0, percent: 100 },
+  { name: 'Security & Safety', total: 3, present: 3, late: 0, percent: 100 },
+  { name: 'Logistik & Gudang', total: 3, present: 3, late: 1, percent: 100 },
+  { name: 'Human Capital & GA', total: 2, present: 1, late: 0, percent: 50 },
 ];
 
 export default function Beranda() {
-  const currentDateFormatted = new Intl.DateTimeFormat('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Asia/Jakarta',
-  }).format(new Date());
+  const now = new Date();
+
+  // Format tanggal formal Indonesia
+  const currentDateFormatted = useMemo(() => {
+    return new Intl.DateTimeFormat('id-ID', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'Asia/Jakarta',
+    }).format(now);
+  }, []);
+
+  // Deteksi status jadwal shift rotasi 2-grup hari ini
+  const shiftStatusToday = useMemo(() => {
+    const day = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 5 = Jumat, 6 = Sabtu
+    if (day === 0) {
+      return {
+        label: 'Hari Minggu — Libur Bersama Operasional',
+        desc: 'Seluruh lini operasional pabrik dan staf kantor libur reguler (OFF).',
+        activeGroup: 'Semua Lini Libur',
+        badgeVariant: 'secondary',
+        badgeText: 'Reguler OFF',
+      };
+    }
+
+    // Pola Baku HRIS: Senin, Rabu, Jumat = Grup A dinas | Selasa, Kamis, Sabtu = Grup B dinas
+    if (day === 1 || day === 3 || day === 5) {
+      return {
+        label: 'Grup Operasional A (Dinas Aktif)',
+        desc: 'Shift 1 (07:00 - 15:00 WIB) & Shift 2 (15:00 - 23:00 WIB) • Grup B Libur Pasca-Dinas (OFF) • Kantor Normal Office (08:00 - 17:00 WIB)',
+        activeGroup: 'Grup A',
+        badgeVariant: 'default',
+        badgeText: 'Pola Roster Grup A',
+      };
+    }
+
+    return {
+      label: 'Grup Operasional B (Dinas Aktif)',
+      desc: 'Shift 1 (07:00 - 15:00 WIB) & Shift 2 (15:00 - 23:00 WIB) • Grup A Libur Pasca-Dinas (OFF) • Kantor Normal Office (08:00 - 17:00 WIB)',
+      activeGroup: 'Grup B',
+      badgeVariant: 'default',
+      badgeText: 'Pola Roster Grup B',
+    };
+  }, []);
 
   return (
     <>
-      <Head title="Beranda" />
+      <Head title="Beranda Eksekutif HRIS" />
 
-      {/* Page Header dengan Quick Actions */}
+      {/* Header Utama dengan Tanggal & Akses Cepat */}
       <PageHeader
-        eyebrow="PORTAL HCGA ATTENDANCE SYSTEM"
+        eyebrow="PORTAL HCGA WORKFORCE ATTENDANCE"
         title="Ringkasan Operasional & Kehadiran"
         subtitle={`Monitoring kedisiplinan dan absensi harian area kerja operasional — ${currentDateFormatted}.`}
         actions={
           <div className="flex items-center gap-2">
-            <Link href="/kehadiran" className="button primary">
-              <Plus className="w-4 h-4" />
+            <Link
+              href="/kehadiran"
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-md text-xs font-semibold bg-[#10273f] text-white hover:bg-[#1a3a5c] shadow-xs transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5 text-[#c4a266]" />
               <span>Input Kehadiran</span>
             </Link>
-            <Link href="/laporan" className="button secondary">
-              <FileSpreadsheet className="w-4 h-4" />
+            <Link
+              href="/laporan"
+              className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-md text-xs font-semibold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-navy shadow-xs transition-colors"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500" />
               <span>Ekspor Laporan</span>
             </Link>
           </div>
         }
       />
 
-      {/* KPI Stat Cards Grid */}
+      {/* 4 Kartu KPI Kehadiran Real-Time */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Card 1: Total Karyawan Aktif */}
         <Card className="hover:border-slate-300 transition-colors">
@@ -171,15 +224,15 @@ export default function Beranda() {
                 Total Personel Aktif
               </div>
               <div className="text-3xl font-bold font-display text-navy">
-                48 <span className="text-sm font-normal text-slate-400">orang</span>
+                12 <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                <span>100% terdaftar dalam roster</span>
+                <span>100% terdata PKWT/PKWTT</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-navy shrink-0">
-              <Users className="w-5 h-5" />
+              <Users className="w-5 h-5 text-navy" />
             </div>
           </CardContent>
         </Card>
@@ -192,15 +245,15 @@ export default function Beranda() {
                 Tingkat Kehadiran
               </div>
               <div className="text-3xl font-bold font-display text-[#398872]">
-                95.8%
+                91.7%
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#398872]" />
-                <span>46 dari 48 personel telah hadir</span>
+                <span>11 dari 12 personel hadir dinas</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#eef7f1] flex items-center justify-center text-[#398872] shrink-0">
-              <UserCheck className="w-5 h-5" />
+              <UserCheck className="w-5 h-5 text-[#398872]" />
             </div>
           </CardContent>
         </Card>
@@ -213,20 +266,20 @@ export default function Beranda() {
                 Terlambat Masuk
               </div>
               <div className="text-3xl font-bold font-display text-[#ac8848]">
-                2 <span className="text-sm font-normal text-slate-400">orang</span>
+                1 <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-[#ac8848]" />
-                <span>Akumulasi: 28 menit</span>
+                <span>Ahmad Fauzi (18m terlambat)</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#fcf6e9] flex items-center justify-center text-[#ac8848] shrink-0">
-              <Clock className="w-5 h-5" />
+              <Clock className="w-5 h-5 text-[#ac8848]" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Card 4: Izin / Sakit / Alpha */}
+        {/* Card 4: Izin / Legalitas Ketidakhadiran */}
         <Card className="hover:border-slate-300 transition-colors">
           <CardContent className="p-5 flex items-start justify-between">
             <div>
@@ -234,47 +287,122 @@ export default function Beranda() {
                 Tidak Hadir (Legalitas)
               </div>
               <div className="text-3xl font-bold font-display text-[#1d3046]">
-                2 <span className="text-sm font-normal text-slate-400">orang</span>
+                1 <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-sky-500 inline-block" />
-                <span>1 Izin, 1 Sakit, 0 Alpha</span>
+                <span>1 Izin Resmi, 0 Sakit, 0 Alpha</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#eff5fa] flex items-center justify-center text-[#698eb0] shrink-0">
-              <AlertTriangle className="w-5 h-5" />
+              <AlertTriangle className="w-5 h-5 text-[#698eb0]" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Baris Informasi Shift Operasional Hari Ini */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      {/* Banner Informasi Shift Operasional Hari Ini */}
+      <div className="bg-white border border-slate-200/90 rounded-xl p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-3.5">
           <div className="w-10 h-10 rounded-lg bg-[#f7f2e8] border border-[#c4a266]/30 flex items-center justify-center text-[#c4a266] shrink-0">
             <Layers className="w-5 h-5" />
           </div>
           <div>
             <div className="font-semibold text-sm text-navy flex items-center gap-2">
-              <span>Rotasi Shift Aktif: <strong>Grup A (Shift Pagi)</strong></span>
-              <Badge variant="outline" className="border-[#c4a266]/40 text-[#ab874b] bg-[#f7f2e8]">
-                Roster 2-Grup
-              </Badge>
+              <span>Rotasi Shift Hari Ini: <strong>{shiftStatusToday.label}</strong></span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-[#f7f2e8] text-[#ab874b] border border-[#c4a266]/40">
+                {shiftStatusToday.badgeText}
+              </span>
             </div>
             <div className="text-xs text-slate-500 mt-0.5">
-              Jam Kerja: 07:00 - 15:00 WIB • Grup B bertugas pada Shift Siang (15:00 - 23:00 WIB)
+              {shiftStatusToday.desc}
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 self-start md:self-auto">
+        <div className="flex items-center gap-2 self-start md:self-auto shrink-0">
           <Link
             href="/jadwal"
-            className="text-xs font-medium text-navy hover:text-[#c4a266] flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-50"
+            className="text-xs font-semibold text-navy hover:text-[#c4a266] flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg border border-slate-200 hover:border-[#c4a266]/50 bg-slate-50/70 hover:bg-white"
           >
-            <span>Lihat Roster Lengkap</span>
+            <span>Matriks Roster Lengkap</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </div>
+      </div>
+
+      {/* Baris Pintasan Cepat Alur Kerja (Quick Nav) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <Link
+          href="/kehadiran"
+          className="group p-3.5 bg-white border border-slate-200/90 rounded-xl hover:border-[#c4a266]/60 hover:shadow-sm transition-all flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+              <CalendarCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-navy group-hover:text-[#c4a266] transition-colors">
+                Log Kehadiran
+              </div>
+              <div className="text-[10px] text-slate-400">Input & cek presensi</div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#c4a266] transition-colors" />
+        </Link>
+
+        <Link
+          href="/jadwal"
+          className="group p-3.5 bg-white border border-slate-200/90 rounded-xl hover:border-[#c4a266]/60 hover:shadow-sm transition-all flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#f7f2e8] text-[#ab874b] flex items-center justify-center shrink-0">
+              <CalendarDays className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-navy group-hover:text-[#c4a266] transition-colors">
+                Jadwal & Shift
+              </div>
+              <div className="text-[10px] text-slate-400">Roster rotasi 2-grup</div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#c4a266] transition-colors" />
+        </Link>
+
+        <Link
+          href="/karyawan"
+          className="group p-3.5 bg-white border border-slate-200/90 rounded-xl hover:border-[#c4a266]/60 hover:shadow-sm transition-all flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 text-navy flex items-center justify-center shrink-0">
+              <Users className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-navy group-hover:text-[#c4a266] transition-colors">
+                Data Karyawan
+              </div>
+              <div className="text-[10px] text-slate-400">Master 12 personel</div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#c4a266] transition-colors" />
+        </Link>
+
+        <Link
+          href="/laporan"
+          className="group p-3.5 bg-white border border-slate-200/90 rounded-xl hover:border-[#c4a266]/60 hover:shadow-sm transition-all flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center shrink-0">
+              <FileSpreadsheet className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-navy group-hover:text-[#c4a266] transition-colors">
+                Laporan & Rekap
+              </div>
+              <div className="text-[10px] text-slate-400">Evaluasi & dossier</div>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#c4a266] transition-colors" />
+        </Link>
       </div>
 
       {/* Grid Grafik Tren Mingguan & Rekap Divisi */}
@@ -282,17 +410,17 @@ export default function Beranda() {
         {/* Kolom 1 & 2: Grafik Kehadiran Mingguan */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-base text-navy">Tren Kehadiran Mingguan</CardTitle>
                 <CardDescription className="text-xs">
-                  Statistik komparasi personel hadir, terlambat, dan absen selama 6 hari kerja terakhir
+                  Statistik komparasi personel hadir tepat waktu vs terlambat (basis 12 personel)
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-3 text-xs text-slate-500">
+              <div className="flex items-center gap-3 text-xs text-slate-500 self-start sm:self-auto">
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-xs bg-[#398872] inline-block" />
-                  Hadir
+                  Hadir Tepat Waktu
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded-xs bg-[#c4a266] inline-block" />
@@ -307,19 +435,22 @@ export default function Beranda() {
                 <BarChart data={weeklyTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#edf2f7" />
                   <XAxis dataKey="day" tickLine={false} axisLine={{ stroke: '#e2e8f0' }} tick={{ fontSize: 12, fill: '#718096' }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#718096' }} domain={[0, 50]} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#718096' }} domain={[0, 14]} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#10273f',
-                      border: 'none',
+                      borderColor: '#193750',
                       borderRadius: '8px',
-                      color: '#fff',
+                      color: '#ffffff',
                       fontSize: '12px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     }}
-                    cursor={{ fill: '#f7fafc' }}
+                    itemStyle={{ color: '#ffffff' }}
+                    labelStyle={{ color: '#c4a266', fontWeight: 'bold', marginBottom: '4px' }}
+                    cursor={{ fill: '#f8fafc' }}
                   />
-                  <Bar dataKey="hadir" fill="#398872" radius={[4, 4, 0, 0]} maxBarSize={40} name="Hadir Tepat Waktu" />
-                  <Bar dataKey="terlambat" fill="#c4a266" radius={[4, 4, 0, 0]} maxBarSize={40} name="Terlambat Masuk" />
+                  <Bar dataKey="hadir" fill="#398872" radius={[4, 4, 0, 0]} maxBarSize={32} name="Hadir Tepat Waktu" />
+                  <Bar dataKey="terlambat" fill="#c4a266" radius={[4, 4, 0, 0]} maxBarSize={32} name="Terlambat Masuk" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -329,8 +460,8 @@ export default function Beranda() {
         {/* Kolom 3: Performa Kehadiran per Divisi */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base text-navy">Performa Divisi</CardTitle>
-            <CardDescription className="text-xs">Tingkat kehadiran hari ini per unit</CardDescription>
+            <CardTitle className="text-base text-navy">Performa Kehadiran Divisi</CardTitle>
+            <CardDescription className="text-xs">Rasio kehadiran harian per unit kerja</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {divisionSummary.map((div) => (
@@ -346,7 +477,7 @@ export default function Beranda() {
                     className="h-full rounded-full transition-all duration-500"
                     style={{
                       width: `${div.percent}%`,
-                      backgroundColor: div.percent === 100 ? '#398872' : '#c4a266',
+                      backgroundColor: div.percent === 100 ? '#398872' : div.percent >= 75 ? '#c4a266' : '#698eb0',
                     }}
                   />
                 </div>
@@ -354,29 +485,29 @@ export default function Beranda() {
             ))}
 
             <div className="pt-3 border-t border-slate-100 mt-4">
-              <div className="rounded-lg bg-slate-50 p-3 text-[11px] text-slate-500 flex items-center justify-between">
-                <span>Total Jadwal Shift Hari Ini</span>
-                <span className="font-semibold text-navy">48 Sesi</span>
+              <div className="rounded-lg bg-slate-50 p-3 text-[11px] text-slate-600 flex items-center justify-between">
+                <span>Total Jadwal Operasional Hari Ini</span>
+                <span className="font-bold text-navy">12 Personel Terjadwal</span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Tabel Aktivitas Presensi Hari Ini */}
+      {/* Tabel Aktivitas Presensi Terkini Hari Ini */}
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <CardTitle className="text-base text-navy">Aktivitas Presensi Hari Ini</CardTitle>
+            <CardTitle className="text-base text-navy">Log Presensi Terkini Hari Ini</CardTitle>
             <CardDescription className="text-xs">
-              Log check-in terkini karyawan beserta waktu dan status verifikasi sistem
+              Check-in real-time karyawan beserta verifikasi shift dan status keterlambatan
             </CardDescription>
           </div>
           <Link
             href="/kehadiran"
-            className="text-xs font-medium text-navy hover:text-[#c4a266] inline-flex items-center gap-1 transition-colors self-start sm:self-auto"
+            className="text-xs font-semibold text-navy hover:text-[#c4a266] inline-flex items-center gap-1 transition-colors self-start sm:self-auto"
           >
-            <span>Buka Semua Catatan</span>
+            <span>Buka Seluruh Catatan</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </CardHeader>
@@ -386,31 +517,40 @@ export default function Beranda() {
               <TableRow>
                 <TableHead>KARYAWAN</TableHead>
                 <TableHead>DIVISI</TableHead>
-                <TableHead>SHIFT KERJA</TableHead>
-                <TableHead>WAKTU MASUK</TableHead>
-                <TableHead>STATUS</TableHead>
+                <TableHead>LOKASI KERJA</TableHead>
+                <TableHead>SHIFT TERJADWAL</TableHead>
+                <TableHead className="text-center">WAKTU CHECK-IN</TableHead>
+                <TableHead className="text-center">STATUS PRESENSI</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recentAttendance.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    <div className="person">
-                      <div className="avatar small font-bold text-slate-700">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 text-navy font-bold text-xs flex items-center justify-center shrink-0">
                         {item.name.slice(0, 2).toUpperCase()}
                       </div>
                       <div>
                         <strong className="block text-xs font-semibold text-slate-900">{item.name}</strong>
-                        <Text variant="caption" color="muted">{item.nip} • {item.role}</Text>
+                        <span className="text-[11px] text-slate-500">{item.nip} • {item.role}</span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium text-slate-700">{item.division}</TableCell>
-                  <TableCell className="text-slate-500">{item.shift}</TableCell>
-                  <TableCell>
-                    <Text variant="code">{item.time}</Text>
+                  <TableCell className="font-medium text-slate-700 text-xs">{item.division}</TableCell>
+                  <TableCell className="text-xs text-slate-500">
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-slate-400" />
+                      {item.location}
+                    </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-xs text-slate-600">{item.shift}</TableCell>
+                  <TableCell className="text-center">
+                    <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200/80">
+                      {item.time}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
                     <span className={`badge ${item.statusClass}`}>
                       <i />
                       {item.status}
@@ -425,4 +565,3 @@ export default function Beranda() {
     </>
   );
 }
-
