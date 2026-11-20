@@ -22,7 +22,18 @@ export default {
     },
   },
   plugins: [
-    function ({ addUtilities }) {
+    function ({ addUtilities, addBase }) {
+      addBase({
+        'html, body': {
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+            width: '0px',
+            height: '0px',
+          },
+        },
+      });
       addUtilities({
         '.no-scrollbar': {
           '-ms-overflow-style': 'none',

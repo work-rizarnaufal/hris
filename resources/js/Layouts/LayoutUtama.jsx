@@ -41,7 +41,7 @@ export default function LayoutUtama({
   }, [props.flash]);
 
   return (
-    <div className="app-shell min-h-screen bg-slate-50 flex">
+    <div className="app-shell min-h-screen bg-slate-50 flex no-scrollbar">
       {/* Sidebar Navigation */}
       <Sidebar
         open={sidebarOpen}
@@ -52,7 +52,7 @@ export default function LayoutUtama({
       />
 
       {/* Main Shell */}
-      <div className="main-shell flex-1 flex flex-col min-w-0 min-h-screen">
+      <div className="main-shell flex-1 flex flex-col min-w-0 min-h-screen no-scrollbar">
         <Topbar
           title={pageTitle}
           actorName={actorName}
