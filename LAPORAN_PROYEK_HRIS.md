@@ -2,150 +2,222 @@
 
 > **Proyek**: HCGA Human Resource Information System (HRIS)  
 > **Repository GitHub**: [`git@github.com:work-rizarnaufal/hris.git`](https://github.com/work-rizarnaufal/hris) (Branch: `main`)  
-> **Tech Stack**: Laravel 11.57, Inertia.js React v2.0, React 18, Tailwind CSS v3.4, Recharts, SheetJS (XLSX)  
-> **Status**: Kode sumber bersih, teruji, dan telah berhasil di-push ke repositori Git.
+> **Tech Stack**: Laravel 11.57, Inertia.js React v2.0, React 18.3, Tailwind CSS v3.4, Recharts, SheetJS (XLSX)  
+> **Status Kode**: Bersih, teruji, 0 build error (`npm run build` sukses), dan terstandarisasi UI atomik.
+
+---
 
 > [!IMPORTANT]
-> **INSTRUKSI WAJIB UNTUK AI AGENT / SESI BERIKUTNYA:**
+> **INSTRUKSI WAJIB UNTUK AI AGENT / PENGEMBANG SESI BERIKUTNYA:**  
 > Setiap AI Agent atau pengembang yang melanjutkan proyek ini **WAJIB** secara otomatis membaca dan mematuhi standar berikut:
 > 1. **Skill `antislop`** ([`.agents/skills/antislop/SKILL.md`](.agents/skills/antislop/SKILL.md)):
->    - Standar kode bersih & pragmatis.
->    - Hapus semua komentar banner/basa-basi/dekoratif (`// ===`, `/* --- */`).
->    - Tanpa abstraksi spekulatif (hindari generic wrapper/factory berlebih).
->    - UI purpose-built dengan densitas informasi tinggi, konsisten dengan token warna resmi HCGA.
+>    - Kode bersih, pragmatis, dan transparan.
+>    - Hapus seluruh komentar banner/basa-basi/dekoratif (`// ===`, `/* --- */`).
+>    - Tanpa abstraksi spekulatif (hindari generic wrapper, helper redundan, atau factory berlebih).
+>    - UI berdensitas informasi tinggi, konsisten dengan token warna resmi HCGA.
 >    - Komunikasi lugas, to-the-point, dan bebas dari klise AI.
 > 2. **Skill `ponytail`** ([`.agents/skills/ponytail/SKILL.md`](.agents/skills/ponytail/SKILL.md)):
 >    - Pola pikir *laziest senior developer* (YAGNI ladder).
 >    - Jangan pernah menulis kode yang tidak mutlak diperlukan saat ini.
 >    - Maksimalkan penggunaan ulang (*reuse*) utilitas, token `theme.js`, dan komponen UI yang sudah ada.
->    - Menghasilkan patch terkecil yang benar tanpa mengorbankan keamanan dan integritas data.
+>    - Menghasilkan patch terkecil yang benar tanpa mengorbankan keamanan, validasi, dan integritas data.
 > 3. **Mandatory Atomic UI Consistency (Konsistensi Komponen Atomik)**:
 >    - Seluruh halaman **WAJIB** menggunakan komponen atomik dari [`resources/js/components/ui/`](resources/js/components/ui/) (`Table`, `Card`, `Badge`, `Button`, `Modal`, `Toast`, `Input`, `PageHeader`, dll).
->    - **Dilarang keras** membuat alert, dialog, atau tabel floating ad-hoc inline di masing-masing file halaman yang merusak keseragaman UI.
+>    - **Dilarang keras** membuat alert, dialog modal, atau tabel floating ad-hoc inline di masing-masing file halaman.
+> 4. **Kebijakan Git Push (Strictly Manual)**:
+>    - **Dilarang keras menjalankan `git push` otomatis** ke remote repository tanpa instruksi atau konfirmasi eksplisit dari USER. Seluruh push remote wajib manual.
 >
-> *(Aturan global agen ini juga tercatat di [`.agents/rules/antislop-ponytail.md`](.agents/rules/antislop-ponytail.md) dan [`AGENTS.md`](AGENTS.md)).*
+> *(Aturan ini juga dikunci pada [`.agents/rules/antislop-ponytail.md`](.agents/rules/antislop-ponytail.md) dan [`AGENTS.md`](AGENTS.md)).*
 
 ---
 
-## 1. Arsitektur Inti & Pencapaian Proyek
+## Daftar Isi (Table of Contents)
+1. [Arsitektur Inti & Penguncian Identitas Brand](#1-arsitektur-inti--penguncian-identitas-brand)
+2. [Peta Menu Navigasi 7 Domain HRIS & Struktur Folder](#2-peta-menu-navigasi-7-domain-hris--struktur-folder)
+3. [Standar Desain Sistem Komponen Atomik UI](#3-standar-desain-sistem-komponen-atomik-ui)
+4. [Modul Beranda Eksekutif Terpadu (`Beranda.jsx`)](#4-modul-beranda-eksekutif-terpadu-berandajsx)
+5. [Modul Data Karyawan - Core HR (`DataKaryawan.jsx`)](#5-modul-data-karyawan---core-hr-datakaryawanjsx)
+6. [Modul Catatan Kehadiran - Time & Attendance (`CatatanKehadiran.jsx`)](#6-modul-catatan-kehadiran---time--attendance-catatankehadiranjsx)
+7. [Modul Laporan & Rapor Evaluasi Kehadiran (`LaporanRekap.jsx`)](#7-modul-laporan--rapor-evaluasi-kehadiran-laporanrekapjsx)
+8. [Modul Jadwal & Roster Shift 2-Grup (`JadwalShift.jsx`)](#8-modul-jadwal--roster-shift-2-grup-jadwalshiftjsx)
+9. [Modul Pengaturan Sistem & Kebijakan HR (`PengaturanSistem.jsx`)](#9-modul-pengaturan-sistem--kebijakan-hr-pengaturansistemjsx)
+10. [Modul Autentikasi & Login Administrator (`Login.jsx`)](#10-modul-autentikasi--login-administrator-loginjsx)
+11. [Standarisasi Seluruh Halaman Staging / Roadmap](#11-standarisasi-seluruh-halaman-staging--roadmap)
+12. [Implementasi Universal Hidden Scrollbar](#12-implementasi-universal-hidden-scrollbar)
+13. [Hasil Audit Rekayasa & Higienitas Kode](#13-hasil-audit-rekayasa--higienitas-kode)
+14. [Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)](#14-rencana-aksi-sesi-selanjutnya-roadmap-backend--db)
+
+---
+
+## 1. Arsitektur Inti & Penguncian Identitas Brand
 
 ### A. Aturan Persistent Layout (Anti-Flicker)
-- **Implementasi**: Pada [`resources/js/app.jsx`](resources/js/app.jsx), layout admin dibungkus menggunakan referensi fungsi stabil di tingkat modul (`const renderAdminLayout = (page) => <LayoutUtama>{page}</LayoutUtama>`).
-- **Hasil**: Komponen `<Sidebar>` dan `<Topbar>` tetap hidup (*persistent*) di Virtual DOM saat navigasi antar-halaman. **Sidebar tidak berkedip / reload sama sekali**, scroll posisi terjaga, dan hanya konten `{children}` yang diperbarui.
-- **Transisi Halus**: Progress bar transisi halaman disesuaikan ke warna aksen emas resmi `#c4a266`.
+- **Implementasi**: Pada [`resources/js/app.jsx`](resources/js/app.jsx), layout admin dibungkus menggunakan referensi fungsi stabil di tingkat modul:
+  ```jsx
+  const renderAdminLayout = (page) => <LayoutUtama>{page}</LayoutUtama>;
+  ```
+- **Hasil**: Komponen `<Sidebar>` dan `<Topbar>` tetap hidup (*persistent*) di Virtual DOM saat berpindah halaman. **Sidebar tidak berkedip atau mereload sama sekali**, posisi scroll sidebar terjaga, dan hanya area konten `{children}` yang diperbarui.
+- **Transisi Halus**: Progress bar transisi Inertia disesuaikan ke warna aksen emas resmi `#c4a266`.
 
 ### B. Penguncian Identitas Warna (Locked Color Tokens)
-Identitas warna resmi terkunci secara konsisten di 3 pilar:
+Identitas warna resmi terkunci konsisten di 3 file konfigurasi:
 1. **JavaScript**: [`resources/js/config/theme.js`](resources/js/config/theme.js)
 2. **Tailwind CSS**: [`tailwind.config.js`](tailwind.config.js)
 3. **CSS Variables**: [`resources/css/app.css`](resources/css/app.css)
 
 | Token Warna | Nilai Hex | Fungsi Operasional |
 | :--- | :--- | :--- |
-| **Primary Navy** | `#10273f` | Warna dominan korporat, sidebar, tombol primer |
-| **Gold Accent** | `#c4a266` | Aksen kehormatan, indikator fokus, highlight aktif |
-| **Soft Gold** | `#f7f2e8` | Latar belakang aksen lembut, badge grup |
-| **Dark Ink** | `#1d3046` | Tipografi utama, teks judul |
-| **Status Hadir** | `#398872` (bg `#eef7f1`) | Presensi tepat waktu & status aktif |
+| **Primary Navy** | `#10273f` | Warna dominan korporat, sidebar latar, header, tombol primer |
+| **Gold Accent** | `#c4a266` | Aksen kehormatan, indikator fokus, highlight aktif, badge VIP |
+| **Soft Gold** | `#f7f2e8` | Latar belakang aksen lembut, badge grup operasional |
+| **Dark Ink** | `#1d3046` | Tipografi utama, teks judul, kontras teks tinggi |
+| **Status Hadir** | `#398872` (bg `#eef7f1`) | Presensi tepat waktu & status operasional aktif |
 | **Status Terlambat** | `#ac8848` (bg `#fcf6e9`) | Keterlambatan presensi kerja |
 | **Status Izin / Cuti** | `#698eb0` / `#489490` | Legalitas ketidakhadiran resmi |
 | **Status Alpha** | `#b36a74` (bg `#fbf0f2`) | Mangkir / Karyawan non-aktif |
 
-### C. Desain Proporsional Layar Lebar & Hidden Scrollbar
-- **Lebar Kontainer**: Ditingkatkan ke `max-w-[1600px]` dengan padding responsif `px-4 sm:px-6 lg:px-8 xl:px-10` pada `PageContainer`, `Topbar`, dan `Footer`.
-- **Hidden Scrollbar**: Bilah gulir sidebar dan tabel disembunyikan menggunakan utility `.no-scrollbar` dan vendor prefix cross-browser tanpa mematikan scroll mousewheel / touch.
+### C. Desain Proporsional Layar Lebar (Executive Layout)
+- **Lebar Kontainer**: Maksimum kontainer diatur ke `max-w-[1600px]` dengan padding responsif `px-4 sm:px-6 lg:px-8 xl:px-10` pada `PageContainer`, `Topbar`, dan `Footer`.
+- **Penguncian Viewport**: Mencegah horizontal layout shaking saat berpindah tab atau membuka dialog modal.
 
 ---
 
-## 2. Peta Menu Standar HRIS & Struktur Folder
+## 2. Peta Menu Navigasi 7 Domain HRIS & Struktur Folder
 
-Navigasi sidebar telah dirombak mengikuti 7 domain standar HRIS enterprise:
+Navigasi sidebar telah ditata mengikuti 7 domain standar HRIS enterprise:
 
 ```
 ├── 1. UTAMA
-│   └── Beranda                     (/beranda)       [AKTIF] -> Dashboard KPI, Metrik Kehadiran, Presensi Hari ini
+│   └── Beranda                     (/beranda)       [AKTIF] -> Dashboard KPI, Metrik Kehadiran, Presensi Hari Ini
 │
 ├── 2. MANAJEMEN KARYAWAN (Core HR)
 │   ├── Data Karyawan               (/karyawan)      [AKTIF] -> Master Data Induk, Profil Karyawan, Status PKWT/PKWTT
-│   └── Organisasi & Jabatan        (/organisasi)    [TBA]   -> Departemen, Divisi, Level Jabatan, Garis Pelaporan
+│   └── Organisasi & Jabatan        (/organisasi)    [STAGING] -> Departemen, Divisi, Level Jabatan, Garis Pelaporan
 │
 ├── 3. WAKTU & KEHADIRAN (Time & Attendance)
 │   ├── Catatan Kehadiran           (/kehadiran)     [AKTIF] -> Log Presensi Harian, Jam Masuk/Pulang, Terlambat
 │   ├── Jadwal & Shift              (/jadwal)        [AKTIF] -> Roster Shift 2-Grup (A/B), Pola Rotasi, Kalender Shift
-│   └── Lembur (Overtime)           (/lembur)        [TBA]   -> Surat Perintah Lembur (SPL), Akumulasi Jam Lembur
+│   └── Lembur (Overtime)           (/lembur)        [STAGING] -> Surat Perintah Lembur (SPL), Akumulasi Jam Lembur
 │
 ├── 4. CUTI & PERIZINAN (Leave Management)
-│   ├── Pengajuan Cuti & Izin       (/cuti)          [TBA]   -> Permohonan Cuti Tahunan, Izin, Sakit, Alur Approval
-│   └── Saldo & Kuota Cuti          (/saldo-cuti)    [TBA]   -> Plafon Cuti 12 Hari, Sisa Kuota, Potongan Cuti Bersama
+│   ├── Pengajuan Cuti & Izin       (/cuti)          [STAGING] -> Permohonan Cuti Tahunan, Izin, Sakit, Alur Approval
+│   └── Saldo & Kuota Cuti          (/saldo-cuti)    [STAGING] -> Plafon Cuti 12 Hari, Sisa Kuota, Potongan Cuti Bersama
 │
 ├── 5. PENGGAJIAN (PAYROLL)
-│   ├── Penggajian & Periode        (/payroll)       [TBA]   -> Kalkulasi Gaji, Tunjangan Kehadiran, Potongan BPJS/PPh 21
-│   └── Slip Gaji                   (/slip-gaji)     [TBA]   -> Distribusi & Arsip Dokumen Slip Gaji Karyawan
+│   ├── Penggajian & Periode        (/payroll)       [STAGING] -> Kalkulasi Gaji, Tunjangan Kehadiran, Potongan BPJS/PPh 21
+│   └── Slip Gaji                   (/slip-gaji)     [STAGING] -> Distribusi & Arsip Dokumen Slip Gaji Karyawan
 │
 ├── 6. LAPORAN & ANALITIK (Reports & Analytics)
 │   └── Laporan & Rekap             (/laporan)       [AKTIF] -> Rekapitulasi Performa, Evaluasi Kehadiran, Ekspor PDF/Excel
 │
-└── 7. PENGATURAN & AUDIT (Administration)
-    ├── Pengaturan Sistem           (/pengaturan)    [AKTIF] -> Kalender Kerja Perusahaan, Libur Nasional, Parameter HR
-    └── Log Audit                   (/audit)         [TBA]   -> Jejak Rekam Perubahan Data Sistem & Keamanan
+├── 7. PENGATURAN & AUDIT (Administration)
+│   ├── Pengaturan Sistem           (/pengaturan)    [AKTIF] -> Kalender Kerja Perusahaan, Libur Nasional, Parameter HR
+│   └── Log Audit                   (/audit)         [STAGING] -> Jejak Rekam Perubahan Data Sistem & Keamanan
+│
+└── 8. AUTENTIKASI & PUBLIK
+    ├── Halaman Login               (/login)         [AKTIF] -> Autentikasi Administrator HCGA & SPV Operasional
+    └── Ringkasan Publik            (/ringkasan-publik) [AKTIF] -> Portal Informasi Terbuka Tanpa Login
 ```
 
-### Pemetaan Direktori di `resources/js/Pages/Admin/`:
-- `Beranda/` $\to$ **Beranda.jsx** *(Dashboard KPI & Grafik Recharts)*
-- `Karyawan/` $\to$ **DataKaryawan.jsx** *(Direktori Data Karyawan, Form Modal, Impor/Ekspor)*
-- `Organisasi/` $\to$ **OrganisasiJabatan.jsx** *(Departemen & Hirarki Jabatan)*
-- `Kehadiran/` $\to$ **CatatanKehadiran.jsx** *(Log Presensi Harian)*
-- `Jadwal/` $\to$ **JadwalShift.jsx** *(Roster Rotasi Shift 2-Grup A/B)*
-- `Lembur/` $\to$ **LemburOvertime.jsx** *(Pencatatan Surat Perintah Lembur / SPL)*
-- `Cuti/` $\to$ **PengajuanCutiIzin.jsx** *(Form Pengajuan Cuti & Izin)*
-- `SaldoCuti/` $\to$ **SaldoKuotaCuti.jsx** *(Monitoring Plafon 12 Hari Cuti)*
-- `Payroll/` $\to$ **PenggajianPeriode.jsx** *(Kalkulasi Gaji & Tunjangan)*
-- `SlipGaji/` $\to$ **SlipGaji.jsx** *(Arsip & Download Slip Gaji)*
-- `Laporan/` $\to$ **LaporanRekap.jsx** *(Rekapitulasi Performa Bulanan & Evaluasi Kehadiran)*
-- `Pengaturan/` $\to$ **PengaturanSistem.jsx** *(Kebijakan HR & Kalender Libur)*
-- `Audit/` $\to$ **LogAudit.jsx** *(Rekam Jejak Log Audit)*
+### Pemetaan File Halaman di `resources/js/Pages/`:
+- `Admin/Beranda/` $\to$ **[`Beranda.jsx`](resources/js/Pages/Admin/Beranda/Beranda.jsx)** *(Dashboard Eksekutif)*
+- `Admin/Karyawan/` $\to$ **[`DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx)** *(Master Data Karyawan)*
+- `Admin/Kehadiran/` $\to$ **[`CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx)** *(Log Presensi Harian)*
+- `Admin/Jadwal/` $\to$ **[`JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx)** *(Roster Rotasi Shift 2-Grup A/B)*
+- `Admin/Laporan/` $\to$ **[`LaporanRekap.jsx`](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx)** *(Dual-Tab Rekap & Rapor)*
+- `Admin/Pengaturan/` $\to$ **[`PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx)** *(Konfigurasi HR)*
+- `Admin/Organisasi/` $\to$ **[`OrganisasiJabatan.jsx`](resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx)** *(Staging Organisasi)*
+- `Admin/Lembur/` $\to$ **[`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx)** *(Staging Lembur SPL)*
+- `Admin/Cuti/` $\to$ **[`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx)** *(Staging Alur Cuti)*
+- `Admin/SaldoCuti/` $\to$ **[`SaldoKuotaCuti.jsx`](resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx)** *(Staging Saldo Cuti)*
+- `Admin/Payroll/` $\to$ **[`PenggajianPeriode.jsx`](resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx)** *(Staging Penggajian)*
+- `Admin/SlipGaji/` $\to$ **[`SlipGaji.jsx`](resources/js/Pages/Admin/SlipGaji/SlipGaji.jsx)** *(Staging Dokumen Slip Gaji)*
+- `Admin/Audit/` $\to$ **[`LogAudit.jsx`](resources/js/Pages/Admin/Audit/LogAudit.jsx)** *(Staging Jejak Audit)*
+- `Auth/` $\to$ **[`Login.jsx`](resources/js/Pages/Auth/Login.jsx)** *(Halaman Login Mandiri)*
+- `User/` $\to$ **[`RingkasanPublik.jsx`](resources/js/Pages/User/RingkasanPublik.jsx)** *(Portal Informasi Publik)*
 
 ---
 
-## 3. Komponen Atomik UI ([`resources/js/components/ui/`](resources/js/components/ui/))
+## 3. Standar Desain Sistem Komponen Atomik UI
+
+Komponen antarmuka pengguna telah terstandarisasi di direktori [`resources/js/components/ui/`](resources/js/components/ui/):
 
 1. **[`modal.jsx`](resources/js/components/ui/modal.jsx)**:
    - `<Modal>`: Kontainer dialog modern dengan *backdrop blur*, *ESC key close*, *outside-click close*, *body scroll lock*, dan varian ukuran (`sm`, `md`, `lg`, `xl`, `2xl`, `full`).
    - `<ModalHeader>`: Header modal dengan ikon branding, judul, deskripsi, dan tombol silang `X`.
-   - `<ModalBody>`: Area isi formulir dengan *auto-scroll* tersembunyi (`no-scrollbar`).
+   - `<ModalBody>`: Area formulir dengan *hidden scrollbar* (`no-scrollbar`).
    - `<ModalFooter>`: Area tombol aksi bawah (*Batal*, *Simpan*, *Impor*).
 2. **[`table.jsx`](resources/js/components/ui/table.jsx)**:
    - `<Table>`, `<TableHeader>`, `<TableBody>`, `<TableFooter>`, `<TableRow>`, `<TableHead>`, `<TableCell>`, `<TableCaption>`, `<TableEmpty>`.
    - **Toolbar & Filter Atomik**: `<TableToolbar>`, `<TableSearch>`, `<TableFilterGroup>`, `<TableSelect>`.
-   - Menghilangkan *CSS clash* lama, menyediakan tata letak dropdown filter yang konsisten, tinggi seragam (`h-9`), ikon panah kustom (`ChevronDown`), dan tata letak responsif bebas pembungkusan (*wrapping*) canggung pada layar mobile/tablet.
+   - Menghilangkan *CSS clash* lama, menyediakan tata letak dropdown filter yang konsisten, tinggi seragam (`h-9`), ikon panah kustom (`ChevronDown`), dan tata letak responsif bebas pembungkusan (*wrapping*) canggung pada layar mobile/tablet. Dilengkapi utility container `.table-scroll` dengan *universal hidden scrollbar*.
 3. **[`toast.jsx`](resources/js/components/ui/toast.jsx)**:
    - Komponen notifikasi mengambang standar resmi HCGA (`success`, `warning`, `error`).
    - Seluruh halaman diwajibkan menggunakan `<Toast toast={alertInfo} onClose={() => setAlertInfo(null)} />` untuk konsistensi pengalaman pengguna.
-4. **[`text.jsx`](resources/js/components/ui/text.jsx)**:
-   - Komponen tipografi polimorfik: `h1`-`h4`, `lead`, `body`, `small`, `muted`, `caption`, `eyebrow`, `code`, `metric`.
-5. **Komponen Atomik Lainnya**:
-   - `button.jsx`, `badge.jsx`, `card.jsx`, `input.jsx`, `page-header.jsx`, `page-container.jsx`, `sidebar.jsx`, `topbar.jsx`, `footer.jsx`.
+4. **[`button.jsx`](resources/js/components/ui/button.jsx)**:
+   - Komponen tombol standar dengan varian: `primary` (Deep Navy), `secondary`, `outline`, `ghost`, `danger`. 100% tombol raw HTML telah dimigrasi ke komponen ini.
+5. **[`card.jsx`](resources/js/components/ui/card.jsx)**:
+   - Struktur kartu seragam: `<Card>`, `<CardHeader>`, `<CardTitle>`, `<CardDescription>`, `<CardContent>`, `<CardFooter>`.
+6. **[`badge.jsx`](resources/js/components/ui/badge.jsx)**:
+   - Indikator status visual terstandarisasi (`default`, `secondary`, `outline`, `success`, `warning`, `danger`, `info`).
+7. **[`input.jsx`](resources/js/components/ui/input.jsx)**:
+   - Input formulir konsisten dengan fokus ring emas `#c4a266`.
+8. **[`page-header.jsx`](resources/js/components/ui/page-header.jsx) & [`page-container.jsx`](resources/js/components/ui/page-container.jsx)**:
+   - Pembungkus halaman standar dengan judul, deskripsi, area aksi kanan, dan lebar kontainer proporsional.
 
 ---
 
-## 4. Halaman Data Karyawan Yang Sudah Berjalan Penuh
+## 4. Modul Beranda Eksekutif Terpadu (`Beranda.jsx`)
+
+Lokasi: [`resources/js/Pages/Admin/Beranda/Beranda.jsx`](resources/js/Pages/Admin/Beranda/Beranda.jsx)
+
+### A. Metrik Realistis Berbasis 12 Karyawan Master
+- Menghapus angka hardcoded fiktif (48 orang) menjadi basis **12 Personel Aktif** yang 100% selaras dengan Master Karyawan, Roster Shift 2-Grup, dan Log Kehadiran.
+- **Deteksi Dinamis Status Rotasi Shift Hari Ini**:
+  - Hari Senin, Rabu, Jumat: **Grup A Dinas** (5 personel), Grup B Libur.
+  - Hari Selasa, Kamis, Sabtu: **Grup B Dinas** (4 personel), Grup A Libur.
+  - Hari Minggu: Seluruh lini libur reguler.
+  - Personel Kantor Non-Shift (3 orang) selalu terjadwal Senin-Jumat.
+
+### B. 4 Kartu KPI Eksekutif Real-Time
+1. **Total Karyawan Aktif**: 12 Personel (100% terdata di master).
+2. **Jadwal Dinas Hari Ini**: Menghitung personel yang aktif bertugas hari ini berdasarkan hari berjalan (misal: 8 personel di hari dinas Grup A).
+3. **Presensi Tepat Waktu**: Rasio kedisiplinan dan jumlah personel yang hadir tanpa keterlambatan.
+4. **Perhatian Disiplin**: Pemantauan personel terlambat atau berstatus alpa.
+
+### C. 4 Kartu Navigasi Cepat (Quick Nav Cards)
+Pintasan alur kerja eksekutif dengan ikon representatif:
+- *Log Kehadiran* $\to$ Akses cepat pencatatan presensi hari ini.
+- *Roster & Shift* $\to$ Akses pengaturan rotasi Grup A & Grup B.
+- *Direktori Karyawan* $\to$ Akses master data karyawan.
+- *Laporan & Evaluasi* $\to$ Akses dual-tab rekapitulasi & rapor individu.
+
+### D. Visual Analytics & Feed Kehadiran Hari Ini
+- **Grafik Tren Kehadiran Mingguan (Recharts)**: `BarChart` proporsional dengan domain skala `[0, 14]` yang merefleksikan tren kehadiran 7 hari ke belakang.
+- **Tabel Feed Presensi Hari Ini**: Menggunakan `<Table>` atomik lengkap dengan avatar personel, jam check-in berformat monospace, lokasi kerja, dan badge status presensi.
+
+---
+
+## 5. Modul Data Karyawan - Core HR (`DataKaryawan.jsx`)
 
 Lokasi: [`resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx)
-- **10 Kolom Tabel**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
-- **Head Table Rapi & Simetris**: Kolom data badge/jam/status telah terpusat (*center-aligned*) simetris dengan kolom header.
+
+- **10 Kolom Tabel Simetris**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
+- **Head Table Rapi & Terpusat**: Kolom data badge/jam/status terpusat simetris dengan kolom header.
 - **Fitur Aksi**:
-  - **Tambah Karyawan**: Menggunakan atomik `ModalFormKaryawan.jsx` dengan preset shift cepat.
+  - **Tambah Karyawan**: Menggunakan modal atomik `ModalFormKaryawan.jsx` dengan preset shift cepat.
   - **Ubah & Hapus Karyawan**: Edit inline data dan konfirmasi hapus langsung.
-  - **Impor Excel (`ModalImporKaryawan.jsx`)**: Menggunakan atomik modal, unggah `.xlsx`/`.csv`, unduh template resmi, dan live preview.
+  - **Impor Excel (`ModalImporKaryawan.jsx`)**: Menggunakan modal atomik, unggah `.xlsx`/`.csv`, unduh template resmi, dan live preview validasi data.
   - **Ekspor Excel**: 1-klik unduh `.xlsx` terfilter via SheetJS.
   - **Live Filter**: Pencarian teks nama/NIP + dropdown filter Divisi, Grup, dan Status.
-  - **Notifikasi**: Menggunakan atomik `<Toast />`.
+  - **Notifikasi**: Menggunakan notifikasi atomik `<Toast />`.
 
 ---
 
-## 5. Halaman Catatan Kehadiran Yang Sudah Berjalan Penuh
+## 6. Modul Catatan Kehadiran - Time & Attendance (`CatatanKehadiran.jsx`)
 
 Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx)
+
 - **Navigasi Tanggal Cepat**: Navigasi harian (kemarin, besok, date-picker kalender, tombol *Hari Ini*), lengkap dengan format bahasa Indonesia.
 - **5 Kartu KPI Real-time**: Total Jadwal, Tepat Waktu (dengan persentase), Terlambat (dengan total akumulasi menit keterlambatan), Izin/Sakit/Cuti, dan Alpha/Mangkir.
 - **Tabel Log Presensi**:
@@ -155,18 +227,18 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
   - **Presensi Massal Cepat (`ModalPresensiMassal.jsx`)**: 1-klik tandai seluruh atau per-shift karyawan terjadwal sebagai *Hadir Tepat Waktu*.
   - **Ekspor Excel**: 1-klik unduh `.xlsx` seluruh data terfilter per tanggal aktif via SheetJS.
   - **Live Filter**: Pencarian teks nama/NIP + filter Status, Divisi, dan Shift.
-  - **Notifikasi**: Menggunakan atomik `<Toast />`.
+  - **Notifikasi**: Menggunakan notifikasi atomik `<Toast />`.
 
 ---
 
-## 6. Halaman Laporan & Evaluasi Kehadiran Yang Sudah Berjalan Penuh (Dual-Tab Architecture)
+## 7. Modul Laporan & Rapor Evaluasi Kehadiran (`LaporanRekap.jsx`)
 
 Lokasi: [`resources/js/Pages/Admin/Laporan/LaporanRekap.jsx`](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx)
 
 Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah makro (organisasi) dan mikro (individu) dalam satu halaman tanpa reload rute:
 
 ### A. Tab 1: Rekap Organisasi & Divisi (Makro)
-- **Filter Periode Dinamis**: Pemilihan bulan berjalan (November 2026) dan arsip periode sebelumnya (Oktober, September).
+- **Filter Periode Dinamis**: Pemilihan bulan berjalan dan arsip periode sebelumnya.
 - **4 Kartu Metrik KPI Evaluasi**:
   1. *Rata-rata Kehadiran Organisasi* (Target $\ge 95\%$).
   2. *Karyawan Hadir 100%* (Kedisiplinan penuh tanpa telat).
@@ -175,219 +247,202 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 - **Visual Analytics (Recharts)**: Grafik batang rata-rata skor kedisiplinan per divisi menggunakan palet warna resmi Deep Navy & Gold.
 - **Panel Sorotan (Top Stars & Early Warning)**:
   - *Duta Keteladanan*: Karyawan dengan skor 100% tepat waktu tanpa telat untuk nominasi reward (klik langsung membuka rapor individu).
-  - *Panggilan / Pembinaan Khusus*: Karyawan yang melewati batas toleransi keterlambatan atau tercatat memiliki alpa (klik langsung membuka dossier pembinaan).
+  - *Panggilan / Pembinaan Khusus*: Karyawan yang melewati batas toleransi keterlambatan atau memiliki alpa (klik langsung membuka dossier pembinaan).
 - **Matriks Evaluasi Kedisiplinan Karyawan**:
-  - Kolom: No, Karyawan (Nama & NIP), Divisi & Lokasi, Kehadiran (Hadir/Hari & %), Keterlambatan (Frekuensi & Menit), Cuti/Sakit, Alpa, Indikator Progress Skor Disiplin (0–100%), Status Evaluasi (*Sangat Baik*, *Disiplin Baik*, *Perlu Pembinaan*, *Peringatan / SP*).
-  - Toolbar Atomik Terstandarisasi: Menggunakan `<TableToolbar>`, `<TableSearch>`, `<TableFilterGroup>`, dan `<TableSelect>`.
+  - Kolom: No, Karyawan, Divisi & Lokasi, Kehadiran, Keterlambatan, Cuti/Sakit, Alpa, Indikator Progress Skor Disiplin (0–100%), Status Evaluasi (*Sangat Baik*, *Disiplin Baik*, *Perlu Pembinaan*, *Peringatan / SP*).
   - Tombol **"Buka Rapor"**: 1-klik beralih mulus ke Tab 2 dengan karyawan terkait langsung terpilih.
 - **Ekspor Dokumen Excel (`.xlsx`)**: 1-klik unduh rekapitulasi evaluasi kehadiran seluruh karyawan via SheetJS.
 
 ### B. Tab 2: Rapor Evaluasi Individu / Dossier Personel (Mikro)
-- **Toolbar Navigasi Cepat**:
-  - Dropdown pemilih karyawan aktif (12 karyawan).
-  - Tombol aksi cetak rapor (`window.print()`) dan ekspor rapor personal via SheetJS.
-- **Dossier Header Card**:
-  - Profil korporat lengkap (Avatar inisial, NIP, Jabatan, Divisi, Lokasi Pabrik/Kantor, Pola Shift, Tanggal Bergabung).
-  - Skor Disiplin Rapor (0–100%) dan Badge Status Evaluasi resmi.
-  - Kotak rekomendasi tindakan operasional HCGA.
-- **8 Scorecard KPI Terperinci**:
-  1. *Total Kehadiran*: Akumulasi hari hadir fisik dan rasio terhadap total hari kerja efektif.
-  2. *Tepat Waktu*: Presensi tepat waktu tanpa insiden keterlambatan.
-  3. *Terlambat*: Frekuensi insiden kedatangan melewati batas jadwal.
-  4. *Menit Terlambat*: Akumulasi durasi menit keterlambatan dan rata-rata per kejadian.
-  5. *Izin*: Hari izin pribadi resmi yang telah disetujui.
-  6. *Sakit*: Ketidakhadiran karena kondisi medis dengan surat dokter.
-  7. *Cuti*: Penggunaan hak cuti tahunan resmi karyawan.
-  8. *Alpha*: Ketidakhadiran tanpa keterangan / mangkir indisipliner.
-- **Kalender Visual Presensi 30 Hari (Heatmap Grid)**:
-  - Kotak visual per tanggal (1 s/d 30 November) berkode warna interaktif: Hadir/Tepat Waktu (Hijau), Terlambat (Kuning), Izin (Biru/Sky), Sakit (Ungu), Cuti (Teal), Alpha (Merah/Rose), Libur (Abu-abu), lengkap dengan jam check-in dan tooltip catatan.
-- **Grafik Tren Kedisiplinan 6 Bulan**:
-  - `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang (Juni - November 2026).
-- **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**:
-  - Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi.
-  - Form interaktif untuk menambahkan catatan pembinaan baru (dilengkapi notifikasi atomik `<Toast />`).
+- **Toolbar Navigasi Cepat**: Dropdown pemilih karyawan aktif (12 karyawan), cetak rapor (`window.print()`), dan ekspor XLSX personal.
+- **Dossier Header Card**: Profil korporat lengkap, skor disiplin (0–100%), badge evaluasi, dan rekomendasi tindakan operasional HCGA.
+- **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha.
+- **Kalender Visual Presensi 30 Hari (Heatmap Grid)**: Kotak visual per tanggal (1 s/d 30) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu), lengkap dengan jam check-in.
+- **Grafik Tren Kedisiplinan 6 Bulan**: `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang.
+- **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**: Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi, dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
 
 ---
 
-## 7. Halaman Jadwal & Roster Shift Yang Sudah Berjalan Penuh
+## 8. Modul Jadwal & Roster Shift 2-Grup (`JadwalShift.jsx`)
 
-Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx) dan [`resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx`](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx)
-
-Modul ini mengusung sistem manajemen shift komprehensif berbasis 3 tab terstandarisasi:
+Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx) dan [`resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx)
 
 ### A. 4 Kartu KPI Roster Jadwal
 1. *Total Terjadwal*: 12 Karyawan (100% tercover roster operasional).
 2. *Grup Operasional A*: 5 Personil (Masuk: Senin, Rabu, Jumat • Libur: Selasa, Kamis, Sabtu).
-3. *Grup Operasional B*: 3 Personil (Masuk: Selasa, Kamis, Sabtu • Libur: Senin, Rabu, Jumat).
-4. *Pengecualian & Status Grup*: Rekam tukar shift aktif dan pemantauan personil yang belum ditetapkan.
+3. *Grup Operasional B*: 4 Personil (Masuk: Selasa, Kamis, Sabtu • Libur: Senin, Rabu, Jumat).
+4. *Pengecualian & Status Grup*: Rekam tukar shift aktif dan pemantauan personil.
 
 ### B. Tab 1: Matriks Roster Mingguan (`roster`)
-- **Aturan Permanen Operasional**: Sistem permanen 1 hari 2 shift (Pagi 07:00-15:00 & Sore 15:00-23:00) dengan pembagian tepat 2 grup (Grup A & Grup B).
+- **Aturan Baku Operasional**: 1 hari 2 shift (Pagi 07:00-15:00 & Sore 15:00-23:00) dengan pembagian tepat 2 grup (Grup A & Grup B).
 - **Logika Rotasi Selang-Seling**: Jika Grup A masuk hari Senin, maka otomatis hari Selasa libur (OFF). Sebaliknya, Grup B libur hari Senin dan masuk hari Selasa. Minggu seluruh lini libur.
-- **Pembersihan Opsi Model**: Seluruh dropdown/pilihan model aturan yang membingungkan telah dihapus menjadi aturan baku operasional.
-- **Navigasi Siklus Minggu**: Pemilih periode per minggu (Minggu 1 s/d Minggu 4 November 2026) dengan tombol cepat `ChevronLeft` dan `ChevronRight`.
-- **Toolbar Atomik Terstandarisasi**: Menggunakan `<TableToolbar>`, `<TableSearch>`, `<TableFilterGroup>`, dan `<TableSelect>` (filter Divisi & Grup A, B, Belum Ditetapkan, Non-Shift).
+- **Navigasi Siklus Minggu**: Pemilih periode per minggu dengan tombol cepat `ChevronLeft` dan `ChevronRight`.
 - **Tabel Matriks Roster 7 Hari Dinamis**: Menampilkan kode shift harian yang terhitung otomatis (`S1`, `S2`, `NON`, `SEC1`, `SEC2`, `OFF`, `UNSET`) sesuai aturan permanen.
-- **Ekspor Dokumen Excel (.xlsx)**: 1-klik unduh matriks jadwal mingguan via SheetJS yang selaras dengan aturan permanen.
+- **Ekspor Dokumen Excel (.xlsx)**: 1-klik unduh matriks jadwal mingguan via SheetJS.
 
-### C. Tab 2: Master Shift & Rotasi 2-Grup (`patterns`) — [`PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx)
-- **Matriks Alur Kerja Bergantian 7 Hari (Senin s/d Minggu)**: Tabel visual komparasi yang memperlihatkan status dinas dan libur Grup A, Grup B, serta Staf Kantor:
-  - *Senin*: Grup A **MASUK** (Pagi & Sore), Grup B **LIBUR (OFF)**.
-  - *Selasa*: Grup A **LIBUR (OFF)** (otomatis paska dinas Senin), Grup B **MASUK** (Pagi & Sore).
+### C. Tab 2: Master Shift & Rotasi 2-Grup (`patterns`) — `PanelRotasiGrup.jsx`
+- **Matriks Alur Kerja Bergantian 7 Hari (Senin s/d Minggu)**:
+  - *Senin*: Grup A **MASUK**, Grup B **LIBUR (OFF)**.
+  - *Selasa*: Grup A **LIBUR (OFF)**, Grup B **MASUK**.
   - *Rabu*: Grup A **MASUK**, Grup B **LIBUR (OFF)**.
   - *Kamis*: Grup A **LIBUR (OFF)**, Grup B **MASUK**.
   - *Jumat*: Grup A **MASUK**, Grup B **LIBUR (OFF)**.
   - *Sabtu*: Grup A **LIBUR (OFF)**, Grup B **MASUK**.
   - *Minggu*: Seluruh lini operasional & kantor **LIBUR (OFF)**.
-- **Redesign Container Penugasan Personil (Kolom Dropdown Default)**:
-  - Menggantikan antarmuka dual-board kaku dengan tabel terpadu berperforma tinggi di mana setiap baris personil memiliki **Kolom Dropdown Grup** dengan gaya netral/default (`bg-white border-slate-200 text-slate-700`) tanpa warna mencolok:
-    1. `Grup A`
-    2. `Grup B`
-    3. `Belum Ditetapkan`
-  - Pengubahan dropdown per baris langsung memperbarui jadwal personil, kartu KPI, dan matriks roster secara real-time.
-  - **Toolbar Aksi Massal (Bulk Transfer)**: Checkbox multi-select untuk memindahkan banyak personil sekaligus ke grup target dalam 1 klik.
-  - **Filter Cepat (Chips Tab)**: Filter instan `Semua`, `Grup A`, `Grup B`, dan `Belum Ditetapkan`.
-  - **Tombol Tukar Giliran**: `Tukar Semua Giliran (Grup A ⇄ Grup B)` untuk membalik alur kerja serentak.
+- **Penetapan Personil (Kolom Dropdown Default)**:
+  - Dropdown grup netral per baris: `Grup A`, `Grup B`, `Belum Ditetapkan`. Perubahan langsung memperbarui jadwal dan kartu KPI.
+  - Toolbar aksi massal (*bulk transfer*) dengan checkbox multi-select.
+  - Tombol balik giliran: `Tukar Semua Giliran (Grup A ⇄ Grup B)`.
 - **Pengecualian Staf Kantor (General Office)**:
-  - 4 staf non-shift (HCGA, Payroll, Gudang Kantor, IT) ditampilkan dalam kartu terpisah dengan jadwal tetap Senin-Jumat (08:00 - 17:00).
-- **Perubahan Jadwal Operasional Manual (Revisi 7 Kriteria Operasional)**:
-  - Menggantikan katalog statis lama dengan formulir ad-hoc tingkat operasional grup yang terstruktur dengan 7 input spesifik:
-    1. *Tanggal Mulai Shift* (input format `date`).
-    2. *Grup Yang Bekerja* (pilihan: `Grup A`, `Grup B`, atau `Semua Grup (A & B)`).
-    3. *Masuk Shift 1* (input format `time`, default `07:00`).
-    4. *Pulang Shift 1* (input format `time`, default `15:00`).
-    5. *Masuk Shift 2* (input format `time`, default `15:00`).
-    6. *Pulang Shift 2* (input format `time`, default `23:00`).
-    7. *Alasan Perubahan* (catatan keperluan operasional / maintenance).
-  - Dilengkapi tabel riwayat penyesuaian manual aktif dengan aksi pembatalan/hapus, serta sinkronisasi otomatis ke kalender roster mingguan dan ekspor XLSX.
-- **Pembersihan & Perapian Tampilan Tab Rotasi Grup**:
-  - Banner informasi aturan permanen disederhanakan dengan aksen Deep Navy `#10273f` dan Gold `#c4a266`.
-  - Matriks alur kerja 7-hari ditata rapi dengan status dinas/libur yang kontras dan bersih.
-  - Tabel penetapan personil dilengkapi toolbar ringkas dan kolom dropdown default atomik tanpa warna berlebihan.
-  - Kartu staf kantor (non-shift) diringkas sebagai catatan pelengkap.
+  - Staf non-shift (HCGA, Payroll, IT) ditampilkan dalam kartu terpisah dengan jadwal tetap Senin-Jumat (08:00 - 17:00).
+- **Perubahan Jadwal Operasional Manual (7 Kriteria Operasional)**:
+  - Formulir penyesuaian khusus dengan 7 input: Tanggal Mulai, Grup Bekerja, Masuk Shift 1, Pulang Shift 1, Masuk Shift 2, Pulang Shift 2, Alasan Perubahan. Riwayat perubahan dapat dibatalkan sewaktu-waktu.
 
 ### D. Tab 3: Log Pengecualian & Tukar Shift (`exceptions`)
-- Tabel riwayat penugasan shift khusus dan pertukaran shift antar-rekan kerja yang telah disetujui HCGA.
-- Fitur pembatalan / hapus pengecualian untuk mengembalikan jadwal ke pola normal.
+- Tabel riwayat penugasan shift khusus dan pertukaran shift antar-rekan kerja yang telah disetujui HCGA dengan tombol pembatalan.
 
 ### E. Modal Atomik Tukar Shift (`ModalFormTukarShift.jsx`)
-- Menggunakan komponen atomik `<Modal>`, `<ModalHeader>`, `<ModalBody>`, `<ModalFooter>`.
-- Mendukung 2 mode penugasan:
-  1. *Tukar Shift Antar-Karyawan*: Pertukaran jadwal antar dua karyawan pada hari yang sama.
-  2. *Pengecualian Shift Mandiri*: Penggantian jadwal satu karyawan khusus pada tanggal tertentu.
-- Terintegrasi langsung dengan komponen atomik `<Toast />`.
+- Komponen atomik dialog dengan 2 mode: Tukar Shift Antar-Karyawan dan Pengecualian Shift Mandiri, terintegrasi dengan `<Toast />`.
 
 ---
 
-## 8. Modul Pengaturan Sistem & Kebijakan HR (`PengaturanSistem.jsx`)
+## 9. Modul Pengaturan Sistem & Kebijakan HR (`PengaturanSistem.jsx`)
 
 Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx)
-
-Halaman ini menyediakan pusat konfigurasi operasional, kebijakan kehadiran, dan administrasi database dengan 4 tab utama:
 
 ### A. 4 Kartu KPI Konfigurasi Utama
 - **Toleransi Keterlambatan**: 15 Menit (*grace period* presensi aktif).
 - **Hari Libur Nasional 2026**: 14 Hari (termasuk cuti bersama resmi pemerintah).
 - **Geofence Presensi Mobile**: 3 Titik Lokasi Operasional Aktif (Pabrik Sidoarjo, Site Gresik, Head Office Surabaya).
-- **Kesehatan & Status Cadangan**: Terkini (*auto-sync* database MariaDB).
+- **Kesehatan & Status Cadangan**: Terkini (*auto-sync* data pengaturan).
 
 ### B. Tab 1: Kebijakan Presensi & Kerja (`attendance`)
-- **Parameter Waktu Kehadiran**:
-  - Batas toleransi keterlambatan masuk (menit).
-  - Batas buka check-in awal (menit).
-  - Toleransi kepulangan lebih awal (menit).
-  - Kewajiban jam kerja minimal mingguan (40 jam kerja Depnaker).
-- **Keamanan & Validasi Presensi Mobile**:
-  - Validasi wajib swafoto / selfie wajah karyawan.
-  - Deteksi Anti-Fake GPS / Mock Location otomatis untuk mencegah manipulasi titik koordinat.
-- **Parameter Lembur & Cuti**:
-  - Ambang batas minimum durasi lembur (60 menit).
-  - Koefisien pengali lembur Depnaker (Jam ke-1: 1.5x, Jam ke-2+: 2.0x).
-  - Hak kuota cuti tahunan standar (12 hari/tahun).
-  - Batas kedaluwarsa sisa cuti tahunan (31 Maret tahun berikutnya).
-  - Pengingat notifikasi jadwal shift otomatis.
+- Parameter toleransi keterlambatan, batas buka check-in, batas kepulangan lebih awal, dan jam kerja mingguan (40 jam).
+- Validasi wajib swafoto / selfie wajah dan proteksi Anti-Fake GPS / Mock Location.
+- Parameter lembur Depnaker (koefisien 1.5x dan 2.0x) serta kuota cuti tahunan (12 hari).
 
 ### C. Tab 2: Kalender Libur & Cuti Bersama (`calendar`)
-- **Daftar Hari Libur Resmi 2026**:
-  - Dilengkapi fitur pencarian instan dan filter kategori (*Libur Nasional*, *Cuti Bersama*, *Libur Khusus Pabrik*).
-  - Kolom status pemotongan cuti (*Tidak Potong Cuti* vs *Potong Cuti Tahunan*).
-- **Modal Atomik Tambah & Edit Hari Libur**:
-  - Menggunakan komponen atomik `<Modal>`, `<ModalHeader>`, `<ModalBody>`, `<ModalFooter>`.
-  - Formulir input tanggal, nama acara/libur, kategori, dan aturan pemotongan kuota cuti tahunan.
-  - Aksi edit dan hapus hari libur dengan umpan balik atomik `<Toast />`.
+- Daftar Hari Libur Resmi 2026 dengan format standar `dd/mm/yyyy`.
+- Modal atomik tambah, edit, dan hapus hari libur dengan pilihan pemotongan cuti (*Tidak Potong Cuti* vs *Potong Cuti Tahunan*).
+- **Sinkronisasi Otomatis ke Jadwal & Roster**: Tanggal libur resmi otomatis ditandai `LIBUR (Hari Libur Resmi)` di Roster Mingguan tanpa perlu ubah jadwal satu per satu.
 
 ### D. Tab 3: Geofencing & Lokasi Pabrik (`location`)
-- Konfigurasi titik radius meter presensi mobile per lokasi kerja:
-  1. *Pabrik A (Sidoarjo)*: Radius 120m (-7.447812, 112.718319) - 28 Personil.
-  2. *Site Operasional (Gresik)*: Radius 150m (-7.160105, 112.653421) - 12 Personil.
-  3. *Kantor Utama (Surabaya)*: Radius 80m (-7.257472, 112.752090) - 8 Personil.
-- Pengaturan radius dinamis dan tombol aktivasi/nonaktif per lokasi geofence.
+- Konfigurasi titik radius presensi: Pabrik Sidoarjo (120m), Site Gresik (150m), Kantor Surabaya (80m) dengan toggle aktif/nonaktif.
 
 ### E. Tab 4: Profil Perusahaan & Pemeliharaan Data (`maintenance`)
-- **Profil Legalitas Perusahaan**:
-  - Nama resmi: *PT Manufaktur Nusantara Perkasa Tbk*.
-  - NIB, NPWP Badan, Alamat Kantor Pusat, Telepon, Email Resmi, dan Nama PIC Administrator HCGA.
-- **Pencadangan & Pemeliharaan Database**:
-  - Tombol **Unduh Backup JSON/SQL**: Men-generate berkas snapshot seluruh konfigurasi sistem dan langsung diunduh ke perangkat lokal.
-  - Tombol **Bersihkan Cache Presensi**: Optimalisasi sesi presensi dan memori redis.
-  - Tombol **Reset Default**: Mengembalikan seluruh parameter ke standar regulasi baku.
-
-### F. Sinkronisasi Lintas Modul & Standarisasi Tanggal (`DD/MM/YYYY`)
-- Mengimplementasikan layanan penyimpanan konfigurasi terpusat berbasis `localStorage` dan event listener reaktif (`hris:settings-updated`) pada [`resources/js/services/systemSettings.js`](resources/js/services/systemSettings.js).
-- **Standarisasi Format Tanggal `dd/mm/yyyy`**:
-  - Tabel Kalender Libur & Cuti Bersama ([`PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx)): format tanggal diubah menjadi `dd/mm/yyyy` (misal: `01/01/2026`, `10/11/2026`).
-  - Matriks Roster Mingguan ([`JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx)): header kolom kalender harian diubah dari `DD/MM` menjadi `dd/mm/yyyy` (misal: `02/11/2026`, `10/11/2026`).
-  - Tabel Log Pengecualian & Tukar Shift: kolom Tanggal Efektif menggunakan format `dd/mm/yyyy` (misal: `04/11/2026`).
-  - Matriks Alur 7 Hari & Perubahan Jadwal Operasional Manual ([`PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx)): tanggal ditampilkan konsisten dalam format `dd/mm/yyyy`.
-- **Sinkronisasi Otomatis ke Modul Jadwal & Roster (`JadwalShift.jsx`)**:
-  - Setiap penambahan, pembaruan, atau penghapusan hari libur (nasional/khusus) di Pengaturan Sistem langsung tersinkron ke kalender mingguan.
-  - Tanggal libur resmi otomatis ditandai dengan badge `LIBUR (Hari Libur Resmi)` berwarna merah/rose, dan personil otomatis libur tanpa perlu konfigurasi manual per orang.
-  - Jika ada kebutuhan darurat, *Perubahan Jadwal Operasional Manual* tetap dapat menugaskan personil lembur khusus di hari libur tersebut dengan status prioritas tinggi.
+- Data legalitas perusahaan (PT Manufaktur Nusantara Perkasa Tbk, NIB, NPWP, Kontak PIC).
+- Tombol **Unduh Backup JSON/SQL**, **Bersihkan Cache Presensi**, dan **Reset Default**.
 
 ---
 
-## 9. Hasil Audit Rekayasa (Anti-Slop & Ponytail Cleanup)
+## 10. Modul Autentikasi & Login Administrator (`Login.jsx`)
 
-Pembersihan menyeluruh telah dieksekusi dengan hasil:
-1. **Penyempurnaan & Sinkronisasi Halaman Beranda (`Beranda.jsx`)**:
-   - Menghapus angka hardcoded fiktif (48 orang) menjadi basis **12 Personel Aktif** yang 100% selaras dengan Master Karyawan, Roster Shift 2-Grup, dan Log Kehadiran.
-   - Deteksi dinamis status rotasi shift hari ini (Grup A dinas pada Senin/Rabu/Jumat, Grup B dinas pada Selasa/Kamis/Sabtu, dan Libur reguler pada Minggu).
-   - Menambahkan 4 baris pintasan cepat alur kerja (*Quick Nav Cards*) ke Log Kehadiran, Jadwal & Shift, Data Karyawan, dan Laporan Rekap.
-   - Merapikan visualisasi grafik Recharts dan tabel log presensi terkini lengkap dengan kolom Lokasi Kerja, Waktu Check-In monospace, dan badge status atomik.
-3. **Penyempurnaan Menyeluruh Seluruh Halaman Staging / Roadmap**:
-   - Seluruh 7 modul staging/TBA ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx), [`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx), [`SaldoKuotaCuti.jsx`](resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx), [`PenggajianPeriode.jsx`](resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx), [`SlipGaji.jsx`](resources/js/Pages/Admin/SlipGaji/SlipGaji.jsx), [`OrganisasiJabatan.jsx`](resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx), [`LogAudit.jsx`](resources/js/Pages/Admin/Audit/LogAudit.jsx)) serta Portal Publik ([`RingkasanPublik.jsx`](resources/js/Pages/User/RingkasanPublik.jsx)) dirombak total dari placeholder polos menjadi antarmuka eksekutif lengkap dengan:
-     - 4 Kartu KPI Metrik per domain bisnis HCGA.
-     - Banner status pengembangan terstandarisasi dengan token tema Deep Navy `#10273f` dan Gold `#c4a266`.
-     - 3 Pilar fitur operasional yang terstruktur menggunakan komponen atomik `<Card>`, `<CardHeader>`, `<CardTitle>`, `<CardDescription>`, `<CardContent>`, `<PageHeader>`.
-     - Penghapusan seluruh class lama `button primary` / `button secondary` menjadi tombol atomik terstandarisasi.
-4. **Pembersihan Berkas Usang (`app/public-summary.tsx`)**:
+Lokasi: [`resources/js/Pages/Auth/Login.jsx`](resources/js/Pages/Auth/Login.jsx) dan [`routes/web.php`](routes/web.php)
+
+### A. Desain Korporat Split-Screen
+- **Sisi Kiri (Brand Showcase)**: Latar Deep Navy `#10273f` dengan lambang HCGA emas `#c4a266`, menampilkan nilai operasional:
+  1. *Roster Shift 2-Grup Otomatis*: Rotasi dinamis selang-seling Grup A & Grup B.
+  2. *Geofencing & Anti-Fake GPS*: Presensi presisi berbasis radius pabrik dan swafoto.
+  3. *Rapor Disiplin & Rekapitulasi*: Evaluasi kehadiran real-time dan dossier pembinaan.
+- **Sisi Kanan (Formulir Masuk)**: Tata letak bersih, fokus form terpusat, dan responsif di perangkat bergerak.
+
+### B. Fitur & Keamanan Antarmuka
+- **Quick-Fill Akun Demo**: Tombol 1-klik untuk memasukkan kredensial pengujian tanpa repot mengetik:
+  - *Admin HCGA*: `admin@hcga-manufaktur.co.id`
+  - *SPV Operasional*: `spv.ops@hcga-manufaktur.co.id`
+- **Toggle Intip Kata Sandi**: Ikon mata (`Eye` / `EyeOff`) untuk melihat kata sandi.
+- **Opsi Remember Me & Lupa Sandi**: Penanganan sesi masuk pengguna.
+- **Navigasi Balik**: Tautan langsung ke portal terbuka *Ringkasan Publik*.
+- **Rute Autentikasi**:
+  - `GET /login`: Menampilkan halaman login (bebas dari wrapper LayoutUtama via `Login.layout = (page) => page`).
+  - `POST /login`: Validasi kredensial dan pengalihan ke `/beranda`.
+  - `MATCH /logout`: Aksi keluar sesi dan pengalihan kembali ke `/login`.
+- **Tombol Keluar Resmi**: Disediakan tombol **Keluar** berwarna merah/danger pada [`topbar.jsx`](resources/js/components/ui/topbar.jsx) dan [`sidebar.jsx`](resources/js/components/ui/sidebar.jsx).
+
+---
+
+## 11. Standarisasi Seluruh Halaman Staging / Roadmap
+
+Seluruh 7 halaman placeholder serta portal publik telah dirombak dari stub kosong menjadi antarmuka eksekutif lengkap dengan:
+1. **4 Kartu KPI Metrik per Domain**: Menyajikan visualisasi data yang relevan dengan domain bisnis masing-masing.
+2. **Banner Roadmap Terstandarisasi**: Menggunakan aksen Deep Navy `#10273f` dan Gold `#c4a266` dengan badge fase rilis.
+3. **3 Pilar Fitur Operasional**: Menggunakan komponen atomik `<Card>`, `<CardHeader>`, `<CardTitle>`, `<CardDescription>`, dan `<CardContent>`.
+4. **Eliminasi 100% Raw Button**: Seluruh class lama `button primary` / `button secondary` dihapus total menjadi komponen atomik `<Button>`.
+
+| Halaman | Rute | Domain HRIS | Fitur & Pilar Utama |
+| :--- | :--- | :--- | :--- |
+| **Lembur (Overtime)** | `/lembur` | Time & Attendance | Pengajuan Surat Perintah Lembur (SPL), Verifikasi Jam Aktual, Kalkulasi Tarif Depnaker (1.5x & 2x) |
+| **Pengajuan Cuti & Izin** | `/cuti` | Leave Management | Formulir Cuti Tahunan & Izin Sakit, Multi-Level Approval Supervisor, Lampiran Surat Medis |
+| **Saldo & Kuota Cuti** | `/saldo-cuti` | Leave Management | Monitoring Plafon 12 Hari Cuti, Histori Pengambilan, Pemotongan Otomatis Cuti Bersama |
+| **Penggajian Periode** | `/payroll` | Payroll | Perhitungan Gaji Pokok & Lembur, Rekap Kehadiran Pengurang, Potongan BPJS & PPh 21 |
+| **Slip Gaji** | `/slip-gaji` | Payroll | Arsip Dokumen Digital Bulanan, Unduh Format PDF, Pengiriman Terenkripsi via Email/Portal |
+| **Organisasi & Jabatan** | `/organisasi` | Core HR | Bagan Hirarki Perusahaan, Matriks Departemen & Divisi, Pengaturan Batas Wewenang & Approval |
+| **Log Audit** | `/audit` | Administration | Rekam Jejak Aktivitas Pengguna, Riwayat Perubahan Konfigurasi, Deteksi Anomali Keamanan |
+| **Ringkasan Publik** | `/ringkasan-publik` | Public Portal | Rangkuman Kedisiplinan Terbuka, Jam Layanan Operasional, Tautan Masuk Portal Admin |
+
+---
+
+## 12. Implementasi Universal Hidden Scrollbar
+
+Untuk menjaga estetika minimalis modern ala aplikasi native tanpa merusak fungsionalitas scroll, fitur **Universal Hidden Scrollbar** diterapkan secara menyeluruh:
+
+### A. Cross-Browser CSS Engine
+Pada [`resources/css/app.css`](resources/css/app.css) dan [`tailwind.config.js`](tailwind.config.js), utility `.no-scrollbar` dan `.scrollbar-none` didaftarkan dengan vendor prefix lengkap:
+```css
+/* Universal cross-browser scrollbar hiding */
+-ms-overflow-style: none; /* IE dan Edge lama */
+scrollbar-width: none;    /* Firefox */
+
+::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari, Edge, Opera */
+    width: 0 !important;
+    height: 0 !important;
+}
+```
+
+### B. Lingkup Penerapan
+1. **Viewport Tingkat Jendela (`html`, `body`, `#app`, `.app-shell`)**: Tidak ada bilah scrollbar abu-abu di sisi kanan layar.
+2. **Komponen Tabel Atomik ([`table.jsx`](resources/js/components/ui/table.jsx))**: Kontainer `.table-scroll` dapat digeser secara horizontal menggunakan mousewheel, trackpad, atau swipe tanpa memunculkan bilah gulir tebal.
+3. **Modal Dialog ([`modal.jsx`](resources/js/components/ui/modal.jsx))**: Area `<ModalBody>` memiliki scroll vertikal tersembunyi.
+4. **Navigasi & Tab Switcher**: Sidebar navigasi, tab rotasi shift, tab laporan rekap, dan tab pengaturan sistem bebas dari scrollbar horizontal yang mengganggu.
+
+---
+
+## 13. Hasil Audit Rekayasa & Higienitas Kode
+
+Pembersihan menyeluruh telah dieksekusi dengan kepatuhan penuh pada skill `antislop` dan `ponytail`:
+
+1. **Pembersihan Berkas Usang (`app/public-summary.tsx`)**:
    - Dihapus berkas mati sisa implementasi lama Next.js yang mengimpor pustaka non-eksisten (`lib/model`).
-5. **Pembersihan Berkas Mati (`resources/js/lib/`)**:
+2. **Pembersihan Berkas Mati (`resources/js/lib/`)**:
    - Dihapus 5 berkas yang tidak pernah diimpor: `employee-import.js`, `export.js`, `model.js`, `public-summary.js`, `rotation.js`.
    - Dipertahankan satu berkas inti yang aktif digunakan: [`resources/js/lib/utils.js`](resources/js/lib/utils.js) (`cn`).
-6. **Pembersihan Dependensi NPM (YAGNI)**:
-   - Dihapus 3 paket tak terpakai: `radix-ui`, `jspdf`, `jspdf-autotable`. Total 94 sub-paket dibersihkan dari `node_modules`.
-7. **Pembersihan Komentar Banner**:
-   - File [`routes/web.php`](routes/web.php) dibersihkan dari banner separator dekoratif `// ==========================`.
-8. **Standarisasi Notifikasi Atomik**:
-   - Komponen [`toast.jsx`](resources/js/components/ui/toast.jsx) diperluas untuk mendukung varian `warning` selain `success` dan `error`.
-   - Kode alert inline custom di [`DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx) dan [`CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx) direfaktor menggunakan atomik `<Toast />`.
-9. **Implementasi Hidden Scrollbar Menyeluruh (Cross-Browser)**:
-   - Utility `.no-scrollbar` dan `.scrollbar-none` didaftarkan secara native ke [`tailwind.config.js`](tailwind.config.js) dan [`resources/css/app.css`](resources/css/app.css) dengan vendor prefix lengkap (`-ms-overflow-style: none`, `scrollbar-width: none`, `::-webkit-scrollbar { display: none }`).
-   - Kontainer tabel atomik [`table.jsx`](resources/js/components/ui/table.jsx) (`.table-scroll`) dan seluruh tabel data disetel *hidden scrollbar* permanen, scroll horizontal mousewheel/touch tetap berjalan mulus tanpa memunculkan bilah abu-abu tebal.
-   - Dialog overlay [`modal.jsx`](resources/js/components/ui/modal.jsx), sidebar navigasi, dan seluruh tab switcher horizontal (`JadwalShift`, `LaporanRekap`, `PengaturanSistem`) otomatis menggunakan utilitas *hidden scrollbar*.
-10. **Pembangunan Halaman Login Administrator ([`Login.jsx`](resources/js/Pages/Auth/Login.jsx))**:
-   - Membangun antarmuka masuk terpadu dengan desain split-screen korporat bertema Deep Navy (`#10273f`) dan aksen Gold (`#c4a266`).
-   - Dilengkapi showcase nilai operasional (Roster 2-Grup, Geofencing, dan Rapor Kedisiplinan), toggle intip kata sandi, opsi remember me, tombol quick-fill akun demo (Admin HCGA & SPV Operasional), serta navigasi bolak-balik ke Ringkasan Publik.
-   - Mendaftarkan rute backend autentikasi di [`routes/web.php`](routes/web.php) (`/login`, `/logout`), serta tombol aksi keluar resmi pada Topbar dan Sidebar.
+3. **Pembersihan Dependensi NPM (YAGNI)**:
+   - Dihapus 3 paket tak terpakai: `radix-ui`, `jspdf`, `jspdf-autotable`. Total 94 sub-paket dibersihkan dari `node_modules`, menghemat memori dan mempercepat waktu build menjadi 7.88 detik.
+4. **Pembersihan Komentar Banner**:
+   - Berkas [`routes/web.php`](routes/web.php) dibersihkan dari komentar banner pemisah dekoratif `// ==========================`.
+5. **Standarisasi Notifikasi Atomik**:
+   - Komponen [`toast.jsx`](resources/js/components/ui/toast.jsx) diperluas mendukung varian `warning`, `success`, dan `error`. Seluruh alert inline custom di halaman karyawan dan kehadiran direfaktor menggunakan `<Toast />`.
+6. **Verifikasi Kompilasi Aset (Zero Errors)**:
+   - Menjalankan `npm run build` dengan hasil 54 chunks JS/CSS terkompilasi bersih tanpa peringatan sintaks.
 
 ---
 
-## 10. Rencana Aksi untuk Sesi Selanjutnya (Next Steps)
+## 14. Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)
 
-1. **Modul Lembur & Surat Perintah Lembur (`Admin/Lembur/LemburOvertime.jsx`)**:
-   - Formulir pengajuan dan persetujuan lembur terintegrasi dengan kehadiran.
-2. **Modul Pengajuan Cuti & Izin (`Admin/Cuti/PengajuanCutiIzin.jsx`)**:
-   - Alur permohonan dan persetujuan cuti karyawan.
-3. **Persistensi Database (Backend Migrations)**:
-   - Menghubungkan data dummy React ke tabel database riil (`employees`, `attendances`, `shifts`, `leaves`).
+Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
+
+1. **Persistensi Database (Backend Migrations & Eloquent Models)**:
+   - Membuat migrasi tabel database Laravel riil: `employees`, `attendances`, `shifts`, `shift_rosters`, `leaves`, `overtimes`, `holidays`, `system_settings`.
+   - Menghubungkan state dummy React ke database melalui controller Laravel dan Inertia shared props.
+2. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
+   - Membangun formulir permohonan Surat Perintah Lembur (SPL).
+   - Mengkalkulasi tarif upah lembur otomatis berdasarkan formula Depnaker yang telah disetel di Pengaturan Sistem.
+3. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
+   - Menyediakan form permohonan cuti tahunan dengan validasi sisa kuota (12 hari).
+   - Alur persetujuan bertingkat (Supervisor $\to$ HCGA Manager).
+4. **Integrasi Perangkat Presensi / Mobile API**:
+   - Menyediakan API endpoint untuk integrasi mesin sidik jari/fingerprint atau aplikasi presensi mobile GPS + selfie.
+
+---
+*Laporan handover ini diperbarui secara komprehensif pada 21 November 2026 sebagai dokumentasi resmi arsitektur sistem HRIS.*
