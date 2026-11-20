@@ -51,7 +51,7 @@ export default function RingkasanPublik() {
         subtitle={`Monitoring agregat kesiapan personil dan disiplin operasional perusahaan — ${currentDateFormatted}.`}
         actions={
           <Link
-            href="/beranda"
+            href="/login"
             className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-md bg-[#10273f] text-white hover:bg-[#1a3a5c] transition-colors shadow-xs"
           >
             <LogIn className="w-3.5 h-3.5 text-[#c4a266]" />

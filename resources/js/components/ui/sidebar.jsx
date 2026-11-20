@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { Building2 } from 'lucide-react';
+import { Building2, LogOut } from 'lucide-react';
 import { navigationConfig } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
 
@@ -110,16 +110,27 @@ export function Sidebar({
 
         {/* User profile bottom */}
         <div className="sidebar-bottom">
-          <div className="sidebar-user">
-            <div className="avatar small text-slate-800 font-bold bg-amber-200 shrink-0">
-              {actorName.slice(0, 2).toUpperCase()}
+          <div className="sidebar-user flex items-center justify-between">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="avatar small text-slate-800 font-bold bg-amber-200 shrink-0">
+                {actorName.slice(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0 flex-1">
+                <strong className="truncate block" title={actorName}>
+                  {actorName}
+                </strong>
+                <small>Administrator HCGA</small>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <strong className="truncate block" title={actorName}>
-                {actorName}
-              </strong>
-              <small>Administrator HCGA</small>
-            </div>
+            <Link
+              href="/logout"
+              method="post"
+              as="button"
+              className="text-slate-400 hover:text-rose-400 p-1.5 rounded-md hover:bg-white/10 transition-colors shrink-0"
+              title="Keluar dari sistem"
+            >
+              <LogOut className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </aside>

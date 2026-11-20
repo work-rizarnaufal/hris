@@ -376,6 +376,10 @@ Pembersihan menyeluruh telah dieksekusi dengan hasil:
    - Utility `.no-scrollbar` dan `.scrollbar-none` didaftarkan secara native ke [`tailwind.config.js`](tailwind.config.js) dan [`resources/css/app.css`](resources/css/app.css) dengan vendor prefix lengkap (`-ms-overflow-style: none`, `scrollbar-width: none`, `::-webkit-scrollbar { display: none }`).
    - Kontainer tabel atomik [`table.jsx`](resources/js/components/ui/table.jsx) (`.table-scroll`) dan seluruh tabel data disetel *hidden scrollbar* permanen, scroll horizontal mousewheel/touch tetap berjalan mulus tanpa memunculkan bilah abu-abu tebal.
    - Dialog overlay [`modal.jsx`](resources/js/components/ui/modal.jsx), sidebar navigasi, dan seluruh tab switcher horizontal (`JadwalShift`, `LaporanRekap`, `PengaturanSistem`) otomatis menggunakan utilitas *hidden scrollbar*.
+10. **Pembangunan Halaman Login Administrator ([`Login.jsx`](resources/js/Pages/Auth/Login.jsx))**:
+   - Membangun antarmuka masuk terpadu dengan desain split-screen korporat bertema Deep Navy (`#10273f`) dan aksen Gold (`#c4a266`).
+   - Dilengkapi showcase nilai operasional (Roster 2-Grup, Geofencing, dan Rapor Kedisiplinan), toggle intip kata sandi, opsi remember me, tombol quick-fill akun demo (Admin HCGA & SPV Operasional), serta navigasi bolak-balik ke Ringkasan Publik.
+   - Mendaftarkan rute backend autentikasi di [`routes/web.php`](routes/web.php) (`/login`, `/logout`), serta tombol aksi keluar resmi pada Topbar dan Sidebar.
 
 ---
 

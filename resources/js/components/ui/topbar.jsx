@@ -1,5 +1,6 @@
 import React from 'react';
-import { Menu, X, Clock } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Menu, X, Clock, LogOut } from 'lucide-react';
 import { siteConfig } from '@/config/site.js';
 
 export function Topbar({
@@ -52,6 +53,16 @@ export function Topbar({
               {actorName}
             </span>
           </div>
+
+          <Link
+            href="/logout"
+            method="post"
+            as="button"
+            className="p-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            title="Keluar dari sistem"
+          >
+            <LogOut className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </header>

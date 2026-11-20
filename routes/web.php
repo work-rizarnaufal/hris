@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -7,6 +8,24 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return redirect('/beranda');
 });
+
+// Rute Autentikasi Administrator
+Route::get('/login', function () {
+    return Inertia::render('Auth/Login');
+})->name('login');
+
+Route::post('/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required',
+        'password' => 'required',
+    ]);
+
+    return redirect()->intended('/beranda')->with('success', 'Selamat datang kembali di Panel Administrator HCGA.');
+});
+
+Route::match(['get', 'post'], '/logout', function (Request $request) {
+    return redirect('/login')->with('success', 'Anda telah berhasil keluar dari sistem.');
+})->name('logout');
 
 // Rute Modul Administrator HRIS
 Route::get('/beranda', function () {
