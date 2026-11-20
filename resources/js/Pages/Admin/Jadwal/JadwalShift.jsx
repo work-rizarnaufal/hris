@@ -763,7 +763,7 @@ export default function JadwalShift() {
         </div>
 
         {/* Tab Switcher Segmented Control */}
-        <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3">
+        <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3 overflow-x-auto no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab('roster')}

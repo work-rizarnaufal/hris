@@ -582,7 +582,7 @@ export default function LaporanRekap() {
       />
 
       {/* Tab Switcher: Rekap Organisasi vs Rapor Individu */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3 mb-6">
+      <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3 mb-6 overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => setActiveTab('organisasi')}

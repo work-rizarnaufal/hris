@@ -3,7 +3,7 @@ import { ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils.js';
 
 const Table = React.forwardRef(({ className, containerClassName, ...props }, ref) => (
-  <div className={cn('table-scroll relative w-full overflow-x-auto', containerClassName)}>
+  <div className={cn('table-scroll no-scrollbar relative w-full overflow-x-auto', containerClassName)}>
     <table
       ref={ref}
       className={cn('w-full caption-bottom text-xs text-left border-collapse min-w-full', className)}

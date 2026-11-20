@@ -372,6 +372,10 @@ Pembersihan menyeluruh telah dieksekusi dengan hasil:
 8. **Standarisasi Notifikasi Atomik**:
    - Komponen [`toast.jsx`](resources/js/components/ui/toast.jsx) diperluas untuk mendukung varian `warning` selain `success` dan `error`.
    - Kode alert inline custom di [`DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx) dan [`CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx) direfaktor menggunakan atomik `<Toast />`.
+9. **Implementasi Hidden Scrollbar Menyeluruh (Cross-Browser)**:
+   - Utility `.no-scrollbar` dan `.scrollbar-none` didaftarkan secara native ke [`tailwind.config.js`](tailwind.config.js) dan [`resources/css/app.css`](resources/css/app.css) dengan vendor prefix lengkap (`-ms-overflow-style: none`, `scrollbar-width: none`, `::-webkit-scrollbar { display: none }`).
+   - Kontainer tabel atomik [`table.jsx`](resources/js/components/ui/table.jsx) (`.table-scroll`) dan seluruh tabel data disetel *hidden scrollbar* permanen, scroll horizontal mousewheel/touch tetap berjalan mulus tanpa memunculkan bilah abu-abu tebal.
+   - Dialog overlay [`modal.jsx`](resources/js/components/ui/modal.jsx), sidebar navigasi, dan seluruh tab switcher horizontal (`JadwalShift`, `LaporanRekap`, `PengaturanSistem`) otomatis menggunakan utilitas *hidden scrollbar*.
 
 ---
 

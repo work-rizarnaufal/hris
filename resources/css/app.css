@@ -522,26 +522,14 @@ h1 {
 .table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 .table-scroll::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-
-.table-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.table-scroll::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 9999px;
-}
-
-.table-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* Hidden Scrollbar Utilities (Cross-Browser) */
