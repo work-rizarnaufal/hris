@@ -650,7 +650,31 @@ Berdasarkan data operasional pabrik terkini dari `Data Karyawan.xlsx`:
 
 ---
 
-## 19. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 19. Modularisasi Modul Pengaturan Sistem (Refactoring File 1.994 Baris & Eliminasi Redundansi)
+
+Menindaklanjuti audit kode bahwa file `PengaturanSistem.jsx` membengkak hingga hampir 2.000 baris dan mengandung sejumlah duplikasi/dead code:
+1. **Dekomposisi Menjadi 7 Sub-Komponen Terisolasi (`resources/js/Pages/Admin/Pengaturan/Partials/`)**:
+   - `TabKebijakanPresensi.jsx`: Konfigurasi grace period keterlambatan, batas early check-in, batas pulang awal, kewajiban selfie, dan mock GPS.
+   - `TabJamKerjaShift.jsx`: Konfigurasi Shift Pagi (08:00 - 17:00), Shift Malam (20:00 - 05:00), handover operasional, dan personil terdaftar dinamis.
+   - `TabKalenderLibur.jsx`: Tabel daftar hari libur nasional & cuti bersama 2026 dengan filter pencarian dan badge status.
+   - `TabGeofencingLokasi.jsx`: Master switch geofence dan tabel titik koordinat radius lokasi site.
+   - `TabProfilPemeliharaan.jsx`: Profil resmi perusahaan, NIB/NPWP, serta status database dan cadangan snapshot JSON.
+   - `ModalHariLibur.jsx`: Dialog modal penambahan/perubahan hari libur resmi.
+   - `ModalEditLokasi.jsx`: Dialog modal pengubahan koordinat GPS dan radius geofence lokasi.
+2. **Eliminasi Redundansi & Dead Code**:
+   - Menghapus 4 ikon tak terpakai: `Settings`, `FileText`, `Bell`, `Fingerprint`.
+   - Menghilangkan redundansi toggle switch ganda pada validasi geofence GPS di Tab 1 dan Tab 3.
+   - Mengganti teks statis *"6 Personil Terdaftar"* menjadi pembacaan dinamis dari state `locations` (35 personil Mariuk, 51 personil Cimalaka).
+   - Memperbarui keterangan shift agar selaras dengan aturan baru (Pagi 08-17 buka 07-18; Malam 20-05 buka 19-06).
+   - Menyelaraskan informasi database menjadi SQLite 3 (bukan teks statis MariaDB/Redis).
+   - Memperbaiki bug prop modal: mengganti `maxWidth="max-w-xl"` menjadi `size="lg"` dan `subtitle` menjadi `description` agar deskripsi modal tampil di layar.
+3. **Dampak Optimasi Performa**:
+   - Ukuran bundle JavaScript `PengaturanSistem` terpangkas drastis dari **53.72 kB menjadi 12.09 kB** (turun >75%).
+   - File induk `PengaturanSistem.jsx` kini hanya berukuran ~440 baris sebagai orchestrator yang bersih.
+
+---
+
+## 20. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
