@@ -4,14 +4,10 @@ import {
   Pencil,
   Save,
   MapPin,
-  Lock,
   Building,
   Clock,
   Users,
-  ShieldCheck,
   CheckCircle2,
-  Calendar,
-  Sparkles,
 } from 'lucide-react';
 import {
   Modal,
@@ -33,10 +29,10 @@ const DIVISIONS = [
 ];
 
 const GROUPS = [
-  { value: 'Belum Ditetapkan', label: 'Belum Ditetapkan', desc: 'Jadwal belum ditentukan oleh admin' },
-  { value: 'Grup A', label: 'Grup A (Rotasi Hari Ganjil)', desc: 'Senin, Rabu, Jumat, Minggu' },
-  { value: 'Grup B', label: 'Grup B (Rotasi Hari Genap)', desc: 'Selasa, Kamis, Sabtu' },
-  { value: 'Non-Shift', label: 'Non-Shift (Staff Kantor)', desc: 'Jam kerja reguler Senin - Jumat' },
+  { value: 'Belum Ditetapkan', label: 'Belum Ditetapkan', desc: 'Jadwal belum ditentukan' },
+  { value: 'Grup A', label: 'Grup A', desc: 'Senin, Rabu, Jumat, Minggu' },
+  { value: 'Grup B', label: 'Grup B', desc: 'Selasa, Kamis, Sabtu' },
+  { value: 'Non-Shift', label: 'Non-Shift', desc: 'Senin - Jumat' },
 ];
 
 export default function ModalFormKaryawan({
@@ -52,7 +48,7 @@ export default function ModalFormKaryawan({
     const locs = getLocations();
     return locs.map((loc) => ({
       value: loc.name,
-      label: `📍 ${loc.name} (${loc.type || 'Pabrik'})`,
+      label: loc.name,
       badgeColor: loc.name.includes('Mariuk') ? 'amber' : loc.name.includes('Cimalaka') ? 'indigo' : 'slate',
     }));
   }, [isOpen]);
@@ -72,21 +68,21 @@ export default function ModalFormKaryawan({
         cat: 'Shift Pagi (08:00 - 17:00)',
         in: s.shiftPagiIn,
         out: s.shiftPagiOut,
-        desc: 'Buka absen masuk 07:00, tutup absen pulang 18:00',
+        desc: 'Buka absen 07:00, tutup absen 18:00',
       },
       {
         label: `${s.shiftMalamName} (${s.shiftMalamIn} - ${s.shiftMalamOut})`,
         cat: 'Shift Malam (20:00 - 05:00)',
         in: s.shiftMalamIn,
         out: s.shiftMalamOut,
-        desc: 'Buka absen masuk 19:00, tutup absen pulang 06:00 (lintas hari)',
+        desc: 'Buka absen 19:00, tutup absen 06:00 (+1 hari)',
       },
       {
         label: 'Non-Shift Kantor (08:00 - 17:00)',
         cat: 'Non-Shift Kantor (08:00 - 17:00)',
         in: '08:00',
         out: '17:00',
-        desc: 'Staf pendukung administrasi & kantor',
+        desc: 'Staf kantor reguler',
       },
     ];
   }, [isOpen]);
@@ -202,42 +198,46 @@ export default function ModalFormKaryawan({
           description={
             isEditing
               ? `Perbarui profil, divisi, lokasi kerja, serta penugasan shift untuk ${formData.name || 'karyawan'}.`
-              : 'Daftarkan personel baru ke dalam sistem operasional 24/7 (Mariuk & Cimalaka).'
+              : 'Daftarkan personel baru ke dalam sistem operasional (Mariuk & Cimalaka).'
           }
           onClose={onClose}
         />
 
-        <ModalBody className="space-y-5 p-6 overflow-y-auto no-scrollbar">
+        <ModalBody className="space-y-4.5 p-5 sm:p-6 overflow-y-auto no-scrollbar">
           {/* Header Card khusus mode Edit */}
           {isEditing && (
-            <div className="p-4 bg-slate-50/90 rounded-2xl border border-slate-200/90 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-navy text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs border border-navy/20">
+            <div className="p-3.5 bg-slate-50/90 rounded-xl border border-slate-200/90 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs border border-navy/20">
                   {(formData.name || 'K')
                     .split(' ')
                     .map((n) => n[0])
                     .slice(0, 2)
                     .join('')}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <strong className="text-sm font-bold text-navy">
+                    <strong className="text-sm font-bold text-navy truncate">
                       {formData.name || 'Nama Karyawan'}
                     </strong>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">
-                      <Lock className="w-3 h-3 text-slate-400" />
-                      {formData.nip}
+                    <span className="inline-flex items-center text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">
+                      {formData.nip || 'NIP Belum Ada'}
                     </span>
+                    {formData.biometricPin && (
+                      <span className="inline-flex items-center text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                        PIN: {formData.biometricPin}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5 truncate">
                     {formData.role || 'Jabatan'} · {formData.division || 'Belum Ditetapkan'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+              <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto shrink-0">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${
                     isMariuk
                       ? 'bg-amber-50 text-amber-900 border-amber-200'
                       : 'bg-indigo-50 text-indigo-900 border-indigo-200'
@@ -246,8 +246,19 @@ export default function ModalFormKaryawan({
                   <MapPin className="w-3.5 h-3.5 shrink-0" />
                   {formData.location}
                 </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-white text-slate-700 border border-slate-200 shadow-2xs">
                   {formData.group}
+                </span>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold border ${
+                    formData.status === 'Aktif'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : formData.status === 'Cuti'
+                      ? 'bg-sky-50 text-sky-800 border-sky-200'
+                      : 'bg-rose-50 text-rose-800 border-rose-200'
+                  }`}
+                >
+                  {formData.status}
                 </span>
               </div>
             </div>
@@ -258,7 +269,7 @@ export default function ModalFormKaryawan({
             <div className="flex items-center gap-2 pb-1.5 border-b border-slate-100">
               <Users className="w-4 h-4 text-navy" />
               <h3 className="text-xs font-bold text-navy uppercase tracking-wider">
-                1. Data Identitas & Jabatan
+                1. Data Identitas & Posisi
               </h3>
             </div>
 
@@ -283,52 +294,6 @@ export default function ModalFormKaryawan({
                     {errors.name}
                   </span>
                 )}
-              </div>
-
-              {/* NIP */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-slate-700">
-                    Nomor Induk Pegawai (NIP)
-                  </label>
-                  <span className="text-[10px] text-slate-400">Otomatis jika kosong</span>
-                </div>
-                <Input
-                  type="text"
-                  name="nip"
-                  placeholder="Contoh: HC-0121 (Opsional)"
-                  value={formData.nip}
-                  onChange={handleChange}
-                  className={`h-9.5 text-xs font-mono bg-white ${
-                    errors.nip ? 'border-rose-400 focus:ring-rose-400' : 'border-slate-200 focus:border-navy'
-                  }`}
-                />
-                {errors.nip && (
-                  <span className="text-rose-600 text-[11px] mt-1 block font-medium">
-                    {errors.nip}
-                  </span>
-                )}
-              </div>
-
-              {/* ID Mesin Fingerprint (PIN) */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-slate-700">
-                    ID Mesin Fingerprint (PIN)
-                  </label>
-                  <span className="text-[10px] text-slate-400">Opsional</span>
-                </div>
-                <Input
-                  type="text"
-                  name="biometricPin"
-                  placeholder="Contoh: 101"
-                  value={formData.biometricPin}
-                  onChange={handleChange}
-                  className="h-9.5 text-xs font-mono bg-white border-slate-200 focus:border-navy"
-                />
-                <span className="text-slate-400 text-[10px] mt-1 block">
-                  Nomor ID pada mesin fisik site (jika kosong, membaca angka NIP).
-                </span>
               </div>
 
               {/* Jabatan */}
@@ -373,16 +338,16 @@ export default function ModalFormKaryawan({
                 </select>
               </div>
 
-              {/* Status Karyawan */}
-              <div className="md:col-span-2">
+              {/* Status Keaktifan */}
+              <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Status Ketenagakerjaan
+                  Status Keaktifan
                 </label>
-                <div className="grid grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-3 gap-1.5 h-9.5 p-1 bg-slate-100/80 rounded-xl border border-slate-200/80 items-center">
                   {[
-                    { value: 'Aktif', label: 'Aktif (Bekerja Normal)' },
-                    { value: 'Cuti', label: 'Sedang Cuti Resmi' },
-                    { value: 'Non-Aktif', label: 'Non-Aktif / Resign' },
+                    { value: 'Aktif', label: 'Aktif' },
+                    { value: 'Cuti', label: 'Cuti' },
+                    { value: 'Non-Aktif', label: 'Non-Aktif' },
                   ].map((st) => {
                     const isSelected = formData.status === st.value;
                     return (
@@ -390,10 +355,10 @@ export default function ModalFormKaryawan({
                         key={st.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, status: st.value })}
-                        className={`py-2 px-3 text-xs rounded-xl border text-center transition-all cursor-pointer font-medium ${
+                        className={`h-full text-xs rounded-lg font-semibold transition-all cursor-pointer flex items-center justify-center ${
                           isSelected
-                            ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
-                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                            ? 'bg-white text-navy shadow-xs border border-slate-200/60 font-bold'
+                            : 'text-slate-600 hover:text-navy hover:bg-white/50'
                         }`}
                       >
                         {st.label}
@@ -401,6 +366,49 @@ export default function ModalFormKaryawan({
                     );
                   })}
                 </div>
+              </div>
+
+              {/* NIP */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Nomor Induk Pegawai (NIP)
+                  </label>
+                  <span className="text-[10px] text-slate-400">Otomatis jika kosong</span>
+                </div>
+                <Input
+                  type="text"
+                  name="nip"
+                  placeholder="Contoh: HC-0001 (Otomatis)"
+                  value={formData.nip}
+                  onChange={handleChange}
+                  className={`h-9.5 text-xs font-mono bg-white ${
+                    errors.nip ? 'border-rose-400 focus:ring-rose-400' : 'border-slate-200 focus:border-navy'
+                  }`}
+                />
+                {errors.nip && (
+                  <span className="text-rose-600 text-[11px] mt-1 block font-medium">
+                    {errors.nip}
+                  </span>
+                )}
+              </div>
+
+              {/* ID Mesin Fingerprint (PIN) */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700">
+                    ID Mesin Fingerprint (PIN)
+                  </label>
+                  <span className="text-[10px] text-slate-400">Default angka NIP</span>
+                </div>
+                <Input
+                  type="text"
+                  name="biometricPin"
+                  placeholder="Contoh: 101 (Nomor ID pada mesin fisik)"
+                  value={formData.biometricPin}
+                  onChange={handleChange}
+                  className="h-9.5 text-xs font-mono bg-white border-slate-200 focus:border-navy"
+                />
               </div>
             </div>
           </div>
@@ -420,7 +428,7 @@ export default function ModalFormKaryawan({
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Lokasi Pabrik / Site Penempatan <span className="text-rose-500">*</span>
                 </label>
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
                   {availableLocations.map((loc) => {
                     const isSelected = formData.location === loc.value;
                     return (
@@ -428,17 +436,17 @@ export default function ModalFormKaryawan({
                         key={loc.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, location: loc.value })}
-                        className={`w-full p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between min-h-[46px] ${
                           isSelected
                             ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
                             : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        <div className="flex items-center gap-2">
-                          <MapPin className={`w-4 h-4 ${loc.badgeColor === 'amber' ? 'text-amber-600' : 'text-indigo-600'}`} />
-                          <span className="text-xs">{loc.label}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <MapPin className={`w-4 h-4 shrink-0 ${loc.badgeColor === 'amber' ? 'text-amber-600' : 'text-indigo-600'}`} />
+                          <span className="text-xs font-medium truncate">{loc.label}</span>
                         </div>
-                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0" />}
+                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0 ml-1" />}
                       </button>
                     );
                   })}
@@ -450,7 +458,7 @@ export default function ModalFormKaryawan({
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Kelompok Roster Operasional (24/7) <span className="text-rose-500">*</span>
                 </label>
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
                   {GROUPS.map((grp) => {
                     const isSelected = formData.group === grp.value;
                     return (
@@ -458,17 +466,17 @@ export default function ModalFormKaryawan({
                         key={grp.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, group: grp.value })}
-                        className={`w-full p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                        className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between min-h-[46px] ${
                           isSelected
                             ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
                             : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        <div>
-                          <strong className="block text-xs">{grp.label}</strong>
-                          <span className="text-[11px] text-slate-500 font-normal">{grp.desc}</span>
+                        <div className="min-w-0">
+                          <strong className="block text-[11px] leading-tight truncate">{grp.label}</strong>
+                          <span className="text-[10px] text-slate-500 font-normal leading-tight block truncate mt-0.5">{grp.desc}</span>
                         </div>
-                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0" />}
+                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0 ml-1" />}
                       </button>
                     );
                   })}
@@ -483,7 +491,7 @@ export default function ModalFormKaryawan({
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-navy" />
                 <h3 className="text-xs font-bold text-navy uppercase tracking-wider">
-                  3. Pengaturan Shift Operasional & Jam Kerja
+                  3. Pengaturan Shift & Jam Kerja
                 </h3>
               </div>
               <span className="text-[11px] text-slate-500 font-medium">Shift Pagi 08:00 & Malam 20:00</span>
@@ -492,9 +500,9 @@ export default function ModalFormKaryawan({
             {/* Presets Button List */}
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Pilih Preset Shift Standar
+                Pilihan Jadwal / Shift
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {schedulePresets.map((preset) => {
                   const isCurrent = formData.scheduleCategory === preset.cat;
                   return (
@@ -502,15 +510,23 @@ export default function ModalFormKaryawan({
                       key={preset.label}
                       type="button"
                       onClick={() => handleSelectPreset(preset)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isCurrent
-                          ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
+                          ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy shadow-xs'
                           : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
                       }`}
                     >
-                      <strong className="block text-xs">{preset.cat}</strong>
-                      <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
-                        {preset.in && preset.out ? `${preset.in} - ${preset.out}` : 'Belum ditentukan'}
+                      <div>
+                        <div className="flex items-center justify-between gap-1">
+                          <strong className="block text-xs leading-snug truncate">{preset.cat}</strong>
+                          {isCurrent && <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0" />}
+                        </div>
+                        <span className="text-[11px] text-slate-500 font-mono mt-1 block">
+                          {preset.in && preset.out ? `${preset.in} - ${preset.out}` : 'Belum ditentukan'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-normal mt-1 block truncate">
+                        {preset.desc}
                       </span>
                     </button>
                   );
@@ -518,68 +534,77 @@ export default function ModalFormKaryawan({
               </div>
             </div>
 
-            {/* Waktu Masuk & Pulang Custom */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Label Kategori Shift
-                </label>
-                <Input
-                  type="text"
-                  name="scheduleCategory"
-                  value={formData.scheduleCategory}
-                  onChange={handleChange}
-                  className="h-9 text-xs bg-white border-slate-200"
-                />
+            {/* Info atau Input Jam Kerja */}
+            {formData.scheduleCategory === 'Belum Ditetapkan' ? (
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50/80 border border-slate-200/80 text-xs text-slate-600">
+                <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+                <span>
+                  <strong>Shift Belum Ditetapkan:</strong> Jam kerja masuk dan pulang dikosongkan. Admin dapat menentukan jadwal shift operasional sewaktu-waktu.
+                </span>
               </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Label Kategori Shift
+                  </label>
+                  <Input
+                    type="text"
+                    name="scheduleCategory"
+                    value={formData.scheduleCategory}
+                    onChange={handleChange}
+                    className="h-9.5 text-xs bg-white border-slate-200"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Jam Masuk Kerja (WIB) {formData.scheduleCategory && formData.scheduleCategory !== 'Belum Ditetapkan' && <span className="text-rose-500">*</span>}
-                </label>
-                <Input
-                  type="time"
-                  name="checkInTime"
-                  value={formData.checkInTime}
-                  onChange={handleChange}
-                  className="h-9 text-xs bg-white border-slate-200"
-                />
-                {errors.checkInTime && (
-                  <span className="text-rose-600 text-[11px] mt-1 block">{errors.checkInTime}</span>
-                )}
-              </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Jam Masuk Kerja (WIB) <span className="text-rose-500">*</span>
+                  </label>
+                  <Input
+                    type="time"
+                    name="checkInTime"
+                    value={formData.checkInTime}
+                    onChange={handleChange}
+                    className="h-9.5 text-xs bg-white border-slate-200"
+                  />
+                  {errors.checkInTime && (
+                    <span className="text-rose-600 text-[11px] mt-1 block">{errors.checkInTime}</span>
+                  )}
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Jam Pulang Kerja (WIB) {formData.scheduleCategory && formData.scheduleCategory !== 'Belum Ditetapkan' && <span className="text-rose-500">*</span>}
-                </label>
-                <Input
-                  type="time"
-                  name="checkOutTime"
-                  value={formData.checkOutTime}
-                  onChange={handleChange}
-                  className="h-9 text-xs bg-white border-slate-200"
-                />
-                {errors.checkOutTime && (
-                  <span className="text-rose-600 text-[11px] mt-1 block">{errors.checkOutTime}</span>
-                )}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Jam Pulang Kerja (WIB) <span className="text-rose-500">*</span>
+                  </label>
+                  <Input
+                    type="time"
+                    name="checkOutTime"
+                    value={formData.checkOutTime}
+                    onChange={handleChange}
+                    className="h-9.5 text-xs bg-white border-slate-200"
+                  />
+                  {errors.checkOutTime && (
+                    <span className="text-rose-600 text-[11px] mt-1 block">{errors.checkOutTime}</span>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </ModalBody>
 
-        <ModalFooter className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2.5">
-          <Button type="button" variant="outline" onClick={onClose} className="text-xs">
+        <ModalFooter className="px-6 py-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <Button type="button" variant="outline" onClick={onClose} className="text-xs h-9">
             Batal
           </Button>
           <Button
             type="submit"
             variant="default"
             disabled={isSubmitting}
-            className="gap-2 bg-navy hover:bg-navy/90 text-white text-xs font-semibold disabled:opacity-60"
+            className="gap-2 bg-navy hover:bg-navy/90 text-white text-xs font-semibold h-9 px-4 disabled:opacity-60"
           >
-            <Save className="w-4 h-4" />
-            <span>{isSubmitting ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan Karyawan' : 'Daftarkan Karyawan')}</span>
+            <Save className="w-3.5 h-3.5" />
+            <span>{isSubmitting ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Daftarkan Karyawan')}</span>
           </Button>
         </ModalFooter>
       </form>
