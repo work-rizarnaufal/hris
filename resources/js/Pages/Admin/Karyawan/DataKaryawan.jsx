@@ -582,7 +582,11 @@ export default function DataKaryawan() {
                             {emp.name.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
-                            <strong className="block text-xs font-semibold text-navy">
+                            <strong
+                              onClick={() => handleOpenEdit(emp)}
+                              className="block text-xs font-semibold text-navy hover:text-[#c4a266] transition-colors cursor-pointer"
+                              title="Klik untuk ubah data karyawan"
+                            >
                               {emp.name}
                             </strong>
                             <Text variant="caption" color="muted">

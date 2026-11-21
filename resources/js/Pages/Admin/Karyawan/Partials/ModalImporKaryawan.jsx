@@ -116,9 +116,9 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalHeader
-        icon={<FileSpreadsheet className="w-5 h-5" />}
+        icon={<FileSpreadsheet className="w-5 h-5 text-[#c4a266]" />}
         title="Impor Data Karyawan dari Excel"
-        description="Unggah file spreadsheet untuk mendaftarkan banyak karyawan sekaligus ke dalam sistem."
+        description="Unggah file spreadsheet untuk mendaftarkan banyak karyawan sekaligus ke dalam sistem operasional."
         onClose={onClose}
       />
 

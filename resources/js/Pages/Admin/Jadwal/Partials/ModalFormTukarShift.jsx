@@ -1,20 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeftRight, Calendar, User, Clock, FileText, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  ArrowLeftRight,
+  Calendar,
+  User,
+  Clock,
+  FileText,
+  CheckCircle2,
+  MapPin,
+  Save,
+  AlertCircle,
+  Building,
+  RotateCw,
+} from 'lucide-react';
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
+  Input,
 } from '@/components/ui';
 
-const SHIFT_OPTIONS = [
-  { value: 'Shift 1 (07:00 - 15:00)', label: 'Shift 1 (Pagi: 07:00 - 15:00)' },
-  { value: 'Shift 2 (15:00 - 23:00)', label: 'Shift 2 (Siang: 15:00 - 23:00)' },
-  { value: 'Security Shift 1 (06:30 - 14:30)', label: 'Security Shift 1 (06:30 - 14:30)' },
-  { value: 'Security Shift 2 (14:30 - 22:30)', label: 'Security Shift 2 (14:30 - 22:30)' },
-  { value: 'Normal Office (08:00 - 17:00)', label: 'Normal Office (08:00 - 17:00)' },
-  { value: 'Libur (OFF)', label: 'Libur (OFF / Tukar Hari Off)' },
+export const SHIFT_12H_OPTIONS = [
+  {
+    value: 'Shift Pagi (07:00 - 19:00)',
+    label: 'Shift Pagi: 12 Jam (07:00 - 19:00 WIB)',
+    time: '07:00 - 19:00',
+    type: 'Pagi',
+  },
+  {
+    value: 'Shift Malam (19:00 - 07:00)',
+    label: 'Shift Malam: 12 Jam (19:00 - 07:00 WIB)',
+    time: '19:00 - 07:00',
+    type: 'Malam',
+  },
+  {
+    value: 'Off Pasca-Dinas',
+    label: 'Off Pasca-Dinas (Libur Rotasi 24/7)',
+    time: 'Off',
+    type: 'Off',
+  },
+  {
+    value: 'Penugasan Khusus Operasional',
+    label: 'Penugasan Khusus / Lembur Operasional',
+    time: 'Fleksibel',
+    type: 'Khusus',
+  },
 ];
 
 export default function ModalFormTukarShift({
@@ -24,6 +55,8 @@ export default function ModalFormTukarShift({
   employees = [],
   initialData = null,
 }) {
+  const isEditing = Boolean(initialData?.id);
+
   const [formData, setFormData] = useState({
     type: 'swap', // 'swap' | 'override'
     employeeId: employees[0]?.id || 1,
@@ -34,7 +67,7 @@ export default function ModalFormTukarShift({
       month: '2-digit',
       day: '2-digit',
     }).format(new Date()),
-    targetShift: 'Shift 2 (15:00 - 23:00)',
+    targetShift: SHIFT_12H_OPTIONS[0].value,
     reason: '',
   });
 
@@ -43,11 +76,12 @@ export default function ModalFormTukarShift({
   useEffect(() => {
     if (initialData) {
       setFormData({
+        id: initialData.id,
         type: initialData.type || 'swap',
         employeeId: initialData.employeeId || employees[0]?.id || 1,
         targetEmployeeId: initialData.targetEmployeeId || employees[1]?.id || 2,
         date: initialData.date || new Date().toISOString().slice(0, 10),
-        targetShift: initialData.targetShift || 'Shift 2 (15:00 - 23:00)',
+        targetShift: initialData.targetShift || SHIFT_12H_OPTIONS[0].value,
         reason: initialData.reason || '',
       });
     } else {
@@ -61,19 +95,29 @@ export default function ModalFormTukarShift({
           month: '2-digit',
           day: '2-digit',
         }).format(new Date()),
-        targetShift: 'Shift 2 (15:00 - 23:00)',
+        targetShift: SHIFT_12H_OPTIONS[0].value,
         reason: '',
       });
     }
     setErrors({});
   }, [isOpen, initialData, employees]);
 
+  const sourceEmp = useMemo(
+    () => employees.find((e) => e.id === Number(formData.employeeId)),
+    [employees, formData.employeeId]
+  );
+
+  const targetEmp = useMemo(
+    () => employees.find((e) => e.id === Number(formData.targetEmployeeId)),
+    [employees, formData.targetEmployeeId]
+  );
+
   const validate = () => {
     const newErrors = {};
-    if (!formData.date) newErrors.date = 'Tanggal wajib diisi';
-    if (!formData.reason.trim()) newErrors.reason = 'Alasan / keterangan wajib diisi';
-    if (formData.type === 'swap' && formData.employeeId === formData.targetEmployeeId) {
-      newErrors.targetEmployeeId = 'Karyawan pengganti tidak boleh sama dengan pemohon';
+    if (!formData.date) newErrors.date = 'Tanggal efektif penugasan wajib ditentukan.';
+    if (!formData.reason.trim()) newErrors.reason = 'Alasan / keterangan operasional wajib diisi.';
+    if (formData.type === 'swap' && Number(formData.employeeId) === Number(formData.targetEmployeeId)) {
+      newErrors.targetEmployeeId = 'Karyawan rekan pengganti tidak boleh sama dengan pemohon.';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -83,19 +127,21 @@ export default function ModalFormTukarShift({
     e.preventDefault();
     if (!validate()) return;
 
-    const sourceEmp = employees.find((e) => e.id === Number(formData.employeeId));
-    const targetEmp = employees.find((e) => e.id === Number(formData.targetEmployeeId));
-
     onSave({
       ...formData,
+      id: initialData?.id || Date.now(),
       employeeId: Number(formData.employeeId),
       targetEmployeeId: Number(formData.targetEmployeeId),
-      employeeName: sourceEmp?.name || '',
-      employeeNip: sourceEmp?.nip || '',
-      employeeDivision: sourceEmp?.division || '',
-      sourceShift: sourceEmp?.baseShift || 'Shift 1 (07:00 - 15:00)',
-      targetEmployeeName: formData.type === 'swap' ? targetEmp?.name || '' : '-',
-      targetEmployeeNip: formData.type === 'swap' ? targetEmp?.nip || '' : '-',
+      employeeName: sourceEmp?.name || 'Karyawan',
+      employeeNip: sourceEmp?.nip || '-',
+      employeeDivision: sourceEmp?.division || '-',
+      employeeLocation: sourceEmp?.location || 'Lokasi Mariuk',
+      employeeGroup: sourceEmp?.group || 'Grup A',
+      sourceShift: sourceEmp?.baseShift || sourceEmp?.scheduleCategory || 'Shift Pagi (12 Jam)',
+      targetEmployeeName: formData.type === 'swap' ? targetEmp?.name || '-' : '-',
+      targetEmployeeNip: formData.type === 'swap' ? targetEmp?.nip || '-' : '-',
+      targetEmployeeLocation: formData.type === 'swap' ? targetEmp?.location || '-' : '-',
+      targetEmployeeGroup: formData.type === 'swap' ? targetEmp?.group || '-' : '-',
       status: 'Disetujui HCGA',
     });
 
@@ -104,181 +150,244 @@ export default function ModalFormTukarShift({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
         <ModalHeader
-          icon={<ArrowLeftRight className="w-5 h-5" />}
-          title="Atur Pengecualian / Tukar Shift"
-          description="Konfigurasi pertukaran jadwal antar-rekan kerja atau penugasan shift khusus operasional."
+          icon={<ArrowLeftRight className="w-5 h-5 text-[#c4a266]" />}
+          title={isEditing ? 'Ubah Pengaturan Tukar Shift' : 'Atur Pengecualian / Tukar Shift'}
+          description="Konfigurasi pertukaran jadwal antar-personel atau penugasan shift khusus operasional 24/7."
           onClose={onClose}
         />
 
-        <ModalBody className="space-y-4">
-          {/* Tipe Penugasan: Tukar Shift vs Pengecualian Mandiri */}
+        <ModalBody className="space-y-4 p-6 overflow-y-auto no-scrollbar">
+          {/* 1. Tipe Penugasan: Tukar Shift vs Pengecualian Mandiri */}
           <div>
             <label className="text-xs font-semibold text-slate-700 block mb-1.5">
-              Jenis Pengaturan Jadwal
+              Metode Pengaturan Jadwal
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'swap' })}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                   formData.type === 'swap'
                     ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
-                    : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                    : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <ArrowLeftRight className="w-4 h-4 text-navy" />
-                  <span className="text-xs">Tukar Shift Antar-Karyawan</span>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <ArrowLeftRight className="w-4 h-4 text-navy shrink-0" />
+                    <span className="text-xs font-bold">Tukar Shift Antar-Rekan</span>
+                  </div>
+                  {formData.type === 'swap' && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0" />
+                  )}
                 </div>
-                <p className="text-[11px] font-normal text-slate-500 mt-1">
-                  Karyawan A bertukar jadwal dengan Karyawan B pada hari yang sama.
+                <p className="text-[11px] font-normal text-slate-500 leading-relaxed">
+                  Karyawan A dan B saling bertukar giliran dinas pada hari yang sama.
                 </p>
               </button>
 
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, type: 'override' })}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                   formData.type === 'override'
                     ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
-                    : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                    : 'border-slate-200 bg-white hover:border-slate-300 text-slate-600'
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-navy" />
-                  <span className="text-xs">Pengecualian Shift Mandiri</span>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-navy shrink-0" />
+                    <span className="text-xs font-bold">Pengecualian Mandiri</span>
+                  </div>
+                  {formData.type === 'override' && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0" />
+                  )}
                 </div>
-                <p className="text-[11px] font-normal text-slate-500 mt-1">
-                  Penggantian jam kerja satu karyawan khusus pada tanggal tertentu.
+                <p className="text-[11px] font-normal text-slate-500 leading-relaxed">
+                  Penugasan shift khusus untuk satu karyawan pada tanggal tertentu.
                 </p>
               </button>
             </div>
           </div>
 
-          {/* Tanggal Efektif */}
+          {/* 2. Tanggal Efektif */}
           <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">
-              Tanggal Efektif <span className="text-rose-500">*</span>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+              Tanggal Efektif Penugasan <span className="text-rose-500">*</span>
             </label>
-            <div className="relative">
-              <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full h-9 pl-9 pr-3 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy"
-              />
-            </div>
-            {errors.date && <p className="text-[11px] text-rose-500 mt-1">{errors.date}</p>}
+            <Input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="h-9.5 text-xs bg-white border-slate-200"
+            />
+            {errors.date && <p className="text-[11px] text-rose-500 mt-1 font-medium">{errors.date}</p>}
           </div>
 
-          {/* Karyawan Pemohon */}
+          {/* 3. Karyawan Pemohon / Terjadwal */}
           <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">
-              Karyawan Pemohon / Terjadwal <span className="text-rose-500">*</span>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+              Karyawan Pemohon <span className="text-rose-500">*</span>
             </label>
-            <div className="relative">
-              <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <select
-                value={formData.employeeId}
-                onChange={(e) => setFormData({ ...formData, employeeId: Number(e.target.value) })}
-                className="w-full h-9 pl-9 pr-3 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer"
-              >
-                {employees.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.nip} - {emp.name} ({emp.division} • {emp.group})
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={formData.employeeId}
+              onChange={(e) => setFormData({ ...formData, employeeId: Number(e.target.value) })}
+              className="w-full h-9.5 text-xs rounded-xl border border-slate-200 bg-white px-3 focus:border-navy focus:ring-1 focus:ring-navy transition-all cursor-pointer"
+            >
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.nip} — {emp.name} ({emp.location || 'Mariuk'} · {emp.group || 'Grup A'} · {emp.role})
+                </option>
+              ))}
+            </select>
+
+            {/* Source Employee Preview Card */}
+            {sourceEmp && (
+              <div className="mt-2 p-3 bg-slate-50/90 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-navy text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    {sourceEmp.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                  </div>
+                  <div>
+                    <strong className="text-navy block">{sourceEmp.name}</strong>
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      {sourceEmp.nip} · {sourceEmp.role}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                    (sourceEmp.location || '').includes('Mariuk')
+                      ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                      : 'bg-indigo-50 text-indigo-900 border border-indigo-200'
+                  }`}>
+                    {sourceEmp.location || 'Mariuk'}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] bg-white border border-slate-200 text-slate-600 font-medium">
+                    {sourceEmp.group || 'Grup A'}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Kolom Khusus Tukar Shift: Karyawan Pengganti */}
+          {/* 4. Rekan Pengganti (Swap) ATAU Shift Pengganti (Override) */}
           {formData.type === 'swap' ? (
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
-                Karyawan Rekan Pengganti (Tukar) <span className="text-rose-500">*</span>
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <select
-                  value={formData.targetEmployeeId}
-                  onChange={(e) => setFormData({ ...formData, targetEmployeeId: Number(e.target.value) })}
-                  className="w-full h-9 pl-9 pr-3 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer"
-                >
-                  {employees
-                    .filter((e) => e.id !== Number(formData.employeeId))
-                    .map((emp) => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp.nip} - {emp.name} ({emp.division} • {emp.group})
-                      </option>
-                    ))}
-                </select>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-slate-700">
+                  Rekan Pengganti (Tukar Shift) <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[11px] text-slate-500">
+                  Sebaiknya di lokasi & divisi yang sama
+                </span>
               </div>
+              <select
+                value={formData.targetEmployeeId}
+                onChange={(e) => setFormData({ ...formData, targetEmployeeId: Number(e.target.value) })}
+                className="w-full h-9.5 text-xs rounded-xl border border-slate-200 bg-white px-3 focus:border-navy focus:ring-1 focus:ring-navy transition-all cursor-pointer"
+              >
+                {employees
+                  .filter((e) => e.id !== Number(formData.employeeId))
+                  .map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.nip} — {emp.name} ({emp.location || 'Mariuk'} · {emp.group || 'Grup B'} · {emp.role})
+                    </option>
+                  ))}
+              </select>
               {errors.targetEmployeeId && (
-                <p className="text-[11px] text-rose-500 mt-1">{errors.targetEmployeeId}</p>
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{errors.targetEmployeeId}</p>
+              )}
+
+              {/* Target Employee Preview Card */}
+              {targetEmp && (
+                <div className="mt-2 p-3 bg-slate-50/90 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-[#c4a266] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                      {targetEmp.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
+                    </div>
+                    <div>
+                      <strong className="text-navy block">{targetEmp.name}</strong>
+                      <span className="text-[11px] text-slate-500 font-mono">
+                        {targetEmp.nip} · {targetEmp.role}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                      (targetEmp.location || '').includes('Mariuk')
+                        ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                        : 'bg-indigo-50 text-indigo-900 border border-indigo-200'
+                    }`}>
+                      {targetEmp.location || 'Mariuk'}
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-white border border-slate-200 text-slate-600 font-medium">
+                      {targetEmp.group || 'Grup B'}
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           ) : (
             <div>
-              <label className="text-xs font-semibold text-slate-700 block mb-1">
-                Shift Pengganti / Khusus <span className="text-rose-500">*</span>
+              <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+                Shift Pengganti yang Diberikan <span className="text-rose-500">*</span>
               </label>
-              <div className="relative">
-                <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <select
-                  value={formData.targetShift}
-                  onChange={(e) => setFormData({ ...formData, targetShift: e.target.value })}
-                  className="w-full h-9 pl-9 pr-3 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer"
-                >
-                  {SHIFT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={formData.targetShift}
+                onChange={(e) => setFormData({ ...formData, targetShift: e.target.value })}
+                className="w-full h-9.5 text-xs rounded-xl border border-slate-200 bg-white px-3 focus:border-navy focus:ring-1 focus:ring-navy transition-all cursor-pointer"
+              >
+                {SHIFT_12H_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
-          {/* Alasan / Catatan Operasional */}
+          {/* 5. Alasan Operasional */}
           <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">
-              Alasan Pengajuan / Catatan Operasional <span className="text-rose-500">*</span>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+              Alasan Pengajuan / Rekomendasi Supervisor <span className="text-rose-500">*</span>
             </label>
-            <div className="relative">
-              <FileText className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
-              <textarea
-                value={formData.reason}
-                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                rows={2}
-                placeholder="Contoh: Keperluan keluarga darurat, telah berkoordinasi dan disetujui supervisor lapangan..."
-                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy resize-none"
-              />
-            </div>
-            {errors.reason && <p className="text-[11px] text-rose-500 mt-1">{errors.reason}</p>}
+            <textarea
+              value={formData.reason}
+              onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+              rows={2}
+              placeholder="Contoh: Keperluan keluarga darurat, telah berkoordinasi dengan rekan kerja dan disetujui Danru..."
+              className="w-full p-3 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy resize-none"
+            />
+            {errors.reason && <p className="text-[11px] text-rose-500 mt-1 font-medium">{errors.reason}</p>}
           </div>
 
-          <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl flex items-start gap-2 text-xs text-amber-900">
+          {/* Banner Integrasi Otomatis */}
+          <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-xl flex items-start gap-2.5 text-xs text-amber-900">
             <CheckCircle2 className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-            <span>
-              Perubahan jadwal ini akan secara otomatis terintegrasi ke <strong>Catatan Kehadiran Harian</strong> untuk toleransi check-in dan perhitungan keterlambatan.
-            </span>
+            <p className="leading-relaxed">
+              Perubahan jadwal ini akan langsung disinkronkan ke <strong>Tabel Presensi Harian</strong> sehingga jam toleransi keterlambatan menyesuaikan shift baru.
+            </p>
           </div>
         </ModalBody>
 
-        <ModalFooter>
-          <Button variant="outline" size="sm" type="button" onClick={onClose}>
+        <ModalFooter className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2.5">
+          <Button type="button" variant="outline" onClick={onClose} className="text-xs">
             Batal
           </Button>
-          <Button size="sm" type="submit">
-            Simpan Jadwal
+          <Button
+            type="submit"
+            variant="default"
+            className="gap-2 bg-navy hover:bg-navy/90 text-white text-xs font-semibold"
+          >
+            <Save className="w-4 h-4" />
+            <span>{isEditing ? 'Simpan Perubahan Jadwal' : 'Terapkan Penugasan Jadwal'}</span>
           </Button>
         </ModalFooter>
       </form>
     </Modal>
   );
 }
-

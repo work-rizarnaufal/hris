@@ -14,6 +14,7 @@ import {
   RotateCcw,
   CheckCircle2,
   Trash2,
+  Pencil,
 } from 'lucide-react';
 import {
   Card,
@@ -244,7 +245,18 @@ export default function JadwalShift() {
   const [filterGroup, setFilterGroup] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingException, setEditingException] = useState(null);
   const [alertInfo, setAlertInfo] = useState(null);
+
+  const handleOpenAddException = () => {
+    setEditingException(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditException = (item) => {
+    setEditingException(item);
+    setIsModalOpen(true);
+  };
 
   // Daftar Pengecualian & Tukar Shift Aktif
   const [exceptions, setExceptions] = useState([
@@ -378,20 +390,26 @@ export default function JadwalShift() {
     });
   };
 
-  // Handle Simpan Pengecualian / Tukar Shift Baru
-  const handleSaveException = (newException) => {
-    setExceptions([
-      {
-        id: Date.now(),
-        ...newException,
-        dateFormatted: formatDateDMY(newException.date),
-      },
-      ...exceptions,
-    ]);
+  // Handle Simpan Pengecualian / Tukar Shift (Tambah & Ubah)
+  const handleSaveException = (itemData) => {
+    setExceptions((prev) => {
+      const idx = prev.findIndex((e) => e.id === itemData.id);
+      const formatted = {
+        ...itemData,
+        id: itemData.id || Date.now(),
+        dateFormatted: formatDateDMY(itemData.date),
+      };
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = formatted;
+        return copy;
+      }
+      return [formatted, ...prev];
+    });
 
     setAlertInfo({
       type: 'success',
-      message: `Pengecualian jadwal untuk ${newException.employeeName} berhasil disimpan dan disinkronkan.`,
+      message: `Pengecualian jadwal untuk ${itemData.employeeName} berhasil disimpan dan disinkronkan.`,
     });
   };
 
@@ -664,7 +682,7 @@ export default function JadwalShift() {
 
             <Button
               size="sm"
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleOpenAddException}
               className="gap-1.5 shadow-sm"
             >
               <Plus className="w-4 h-4" />
@@ -1054,7 +1072,7 @@ export default function JadwalShift() {
 
               <Button
                 size="sm"
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleOpenAddException}
                 className="gap-1.5 text-xs self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
@@ -1089,8 +1107,14 @@ export default function JadwalShift() {
                           {item.dateFormatted}
                         </TableCell>
                         <TableCell>
-                          <p className="font-bold text-slate-900 text-xs">{item.employeeName}</p>
-                          <p className="text-[11px] text-slate-500">{item.employeeNip}</p>
+                          <p
+                            onClick={() => handleOpenEditException(item)}
+                            className="font-bold text-navy hover:text-[#c4a266] transition-colors cursor-pointer text-xs"
+                            title="Klik untuk ubah pengecualian"
+                          >
+                            {item.employeeName}
+                          </p>
+                          <p className="text-[11px] text-slate-500 font-mono">{item.employeeNip}</p>
                         </TableCell>
                         <TableCell className="text-xs text-slate-700">
                           {item.sourceShift}
@@ -1102,7 +1126,7 @@ export default function JadwalShift() {
                                 <ArrowLeftRight className="w-3 h-3 text-purple-600" />
                                 {item.targetEmployeeName}
                               </p>
-                              <p className="text-[11px] text-slate-500">{item.targetEmployeeNip}</p>
+                              <p className="text-[11px] text-slate-500 font-mono">{item.targetEmployeeNip}</p>
                             </div>
                           ) : (
                             <span className="text-xs font-bold text-navy">
@@ -1110,7 +1134,7 @@ export default function JadwalShift() {
                             </span>
                           )}
                         </TableCell>
-                        <TableCell className="text-xs text-slate-600 max-w-xs truncate">
+                        <TableCell className="text-xs text-slate-600 max-w-xs truncate" title={item.reason}>
                           {item.reason}
                         </TableCell>
                         <TableCell className="text-center">
@@ -1120,15 +1144,26 @@ export default function JadwalShift() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right pr-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteException(item.id)}
-                            className="h-7 w-7 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                            title="Batalkan Pengecualian"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenEditException(item)}
+                              className="h-7 w-7 p-0 text-slate-400 hover:text-navy hover:bg-slate-100"
+                              title="Ubah Pengecualian"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteException(item.id)}
+                              className="h-7 w-7 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                              title="Batalkan Pengecualian"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -1150,6 +1185,7 @@ export default function JadwalShift() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveException}
         employees={employees}
+        initialData={editingException}
       />
     </>
   );
