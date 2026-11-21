@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "resources/js/Layouts/LayoutUtama.jsx": {
-    "mtime": 1795196275.974758,
-    "seen": 1795250261.1956322,
-    "ast_hash": "05e691124417cbbb4131dd6cb3555fe6",
+    "mtime": 1795267899.4327803,
+    "seen": 1795267946.7592618,
+    "ast_hash": "e34d30c8fc086641f4dcafa1afc798ee",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Audit/LogAudit.jsx": {
@@ -270,9 +270,9 @@
     "semantic_hash": ""
   },
   "resources/js/components/ui/sidebar.jsx": {
-    "mtime": 1795199146.18279,
-    "seen": 1795250261.196631,
-    "ast_hash": "15f11c89446e9a9b018dbcaad4ebf051",
+    "mtime": 1795267712.488871,
+    "seen": 1795267946.7592618,
+    "ast_hash": "2d046ae9aa9c37e62ede957177cde4c3",
     "semantic_hash": ""
   },
   "resources/js/components/ui/table.jsx": {
@@ -294,9 +294,9 @@
     "semantic_hash": ""
   },
   "resources/js/components/ui/topbar.jsx": {
-    "mtime": 1795199020.6972537,
-    "seen": 1795250261.196631,
-    "ast_hash": "c877724fc62d2cb4f101b0f7395e4cf7",
+    "mtime": 1795267819.7861426,
+    "seen": 1795267946.7592618,
+    "ast_hash": "b9fd878aae4d1eca1bcd76df5bc66e32",
     "semantic_hash": ""
   },
   "resources/js/config/navigation.js": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795257575.762197,
-    "seen": 1795257743.3952103,
-    "ast_hash": "a439389afbadc602bf183354935e90f6",
+    "mtime": 1795267930.2687478,
+    "seen": 1795267946.7592618,
+    "ast_hash": "606217c3d2c37930ae608c3f1cc56f4a",
     "semantic_hash": ""
   },
   "README.md": {
@@ -531,6 +531,12 @@
     "mtime": 1795253506.4204848,
     "seen": 1795253549.751009,
     "ast_hash": "8afede2ea322829466f4c2e0421913e0",
+    "semantic_hash": ""
+  },
+  "resources/js/services/authRole.js": {
+    "mtime": 1795267652.4249766,
+    "seen": 1795267946.7592618,
+    "ast_hash": "40347bf1fa4e73d4754a6b433e8f2008",
     "semantic_hash": ""
   },
   "package-lock.json": {

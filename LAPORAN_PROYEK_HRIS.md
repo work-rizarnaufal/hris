@@ -48,7 +48,8 @@
 13. [Hasil Audit Rekayasa & Higienitas Kode](#13-hasil-audit-rekayasa--higienitas-kode)
 14. [Arsitektur Multi-Lokasi (Mariuk & Cimalaka) & Shift 12 Jam Non-Stop 24/7](#14-arsitektur-multi-lokasi-mariuk--cimalaka--shift-12-jam-non-stop-247)
 15. [Knowledge Graph Project (Graphify) & Visualisasi Arsitektur](#15-knowledge-graph-project-graphify--visualisasi-arsitektur)
-16. [Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)](#16-rencana-aksi-sesi-selanjutnya-roadmap-backend--db)
+16. [Implementasi Backend Fase 1 (Database Migrations, Eloquent Models, & Controllers)](#16-implementasi-backend-fase-1-database-migrations-eloquent-models--controllers)
+17. [Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)](#17-rencana-aksi-sesi-selanjutnya-roadmap-backend-lanjutan)
 
 ---
 
@@ -532,20 +533,61 @@ Proyek telah dipetakan secara mendalam ke dalam graph pengetahuan AST (*Abstract
 
 ---
 
-## 16. Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)
+## 16. Implementasi Backend Fase 1 (Database Migrations, Eloquent Models, & Controllers)
+
+Tahap backend telah resmi diaktifkan dengan mengimplementasikan fondasi database dan arsitektur controller Laravel 11 yang selaras 100% dengan frontend HRIS:
+
+### A. 9 Tabel Database & Migrations
+1. `users`: Autentikasi sistem, role (`super_admin`, `supervisor`, `karyawan`), NIP, avatar, is_active.
+2. `locations`: Data site operasional (Lokasi Mariuk & Lokasi Cimalaka), koordinat GPS, radius geofence (120m).
+3. `shifts`: Konfigurasi shift kerja (Shift Pagi 12 Jam `07:00–19:00`, Shift Malam 12 Jam `19:00–07:00`, Non-Shift Office `08:00–17:00`).
+4. `employees`: Master data induk 12 personel HCGA, relasi ke `users`, `locations`, dan `shifts`.
+5. `system_settings`: Penyimpanan fleksibel key-value JSON untuk kebijakan toleransi (15 menit), shift, dan profil korporat.
+6. `holidays`: Kalender 12 hari libur resmi nasional & operasional pabrik.
+7. `attendances`: Log presensi real-time, GPS in/out, foto selfie, perhitungan otomatis keterlambatan.
+8. `shift_schedules`: Roster jadwal rotasi harian 2-grup (Grup A & Grup B).
+9. `shift_swaps`: Transaksi pertukaran jadwal shift antar personel lapangan.
+
+### B. 9 Eloquent Models (`app/Models/`)
+Model dilengkapi *casting* tipe data, relasi Eloquent (`hasMany`, `belongsTo`), dan atribut virtual aksesori cerdas (`role`, `location`, `group`, `scheduleCategory`, `checkInTime`, `checkOutTime`) pada `Employee.php` sehingga saat diserialisasi ke JSON untuk Inertia, propertinya 100% kompatibel dengan komponen React frontend tanpa memerlukan modifikasi UI.
+
+### C. Seeding Master Data Resmi
+Eksekusi seeder (`php artisan db:seed`) menyuntikkan:
+- **12 Personel Master Resmi HCGA** lengkap (Budi Santoso, Dewi Anggraini, Hendra Wijaya, Ahmad Fauzi, Eko Prasetyo, Joko Susilo, Siti Rahmawati, Wahyu Hidayat, Dian Kusuma, Rina Marlina, Maya Indah Lestari, Nurul Aini).
+- **3 Akun Pengguna Terkoneksi** dengan password ter-enkripsi (`bcrypt`):
+  - Super Admin: `admin@nusantaraperkasa.co.id`
+  - Supervisor Site: `siti.rahmawati@nusantaraperkasa.co.id`
+  - Personel Lapangan: `budi.santoso@nusantaraperkasa.co.id`
+- **2 Lokasi Site**: Mariuk (Subang) & Cimalaka (Sumedang).
+- **3 Master Shift**: Pagi 12 Jam, Malam 12 Jam, Office 8 Jam.
+- **Kebijakan & Toleransi Sistem**: 15 menit batas keterlambatan.
+
+### D. Controller & Rute Terpadu (`app/Http/Controllers/`)
+- `AuthController`: Menangani alur `showLogin`, `login` (verifikasi kredensial asli), dan `logout`.
+- `BerandaController`: Menyajikan metrik eksekutif terhitung langsung dari database SQLite.
+- `KaryawanController`: Mengirimkan prop `employees`, `availableLocations`, `availableShifts`, serta menangani operasi `store`, `update`, dan `destroy`.
+- `PengaturanController`: Mengelola konfigurasi toleransi, geofence, dan jadwal libur.
+- **Automated Feature Tests**: Telah diuji dengan PHPUnit (`KaryawanBackendTest.php`) dengan hasil **2 passed (5 assertions), 100% sukses**.
+
+---
+
+## 17. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
-1. **Persistensi Database (Backend Migrations & Eloquent Models)**:
-   - Membuat migrasi tabel database Laravel riil: `employees`, `attendances`, `shifts`, `shift_rosters`, `leaves`, `overtimes`, `holidays`, `system_settings`.
-   - Menghubungkan state dummy React ke database melalui controller Laravel dan Inertia shared props.
-2. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
+1. **Backend Engine Presensi & Geofence (`KehadiranController`)**:
+   - Menghitung otomatis status `hadir` / `terlambat` / `menit_terlambat` berdasarkan toleransi 15 menit dari jam shift.
+   - Validasi formula jarak geofence (Haversine formula) terhadap koordinat Mariuk/Cimalaka saat check-in mobile.
+2. **Backend Engine Roster Rotasi 2-Grup (`JadwalController`)**:
+   - Generator otomatis jadwal dinas bergantian 12 jam (Senin, Rabu, Jumat Grup A; Selasa, Kamis, Sabtu Grup B).
+   - Logika verifikasi dan persetujuan tukar shift antar rekan kerja.
+3. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
    - Membangun formulir permohonan Surat Perintah Lembur (SPL).
    - Mengkalkulasi tarif upah lembur otomatis berdasarkan formula Depnaker yang telah disetel di Pengaturan Sistem.
-3. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
+4. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
    - Menyediakan form permohonan cuti tahunan dengan validasi sisa kuota (12 hari).
    - Alur persetujuan bertingkat (Supervisor $\to$ HCGA Manager).
-4. **Integrasi Perangkat Presensi / Mobile API**:
+5. **Integrasi Perangkat Presensi / Mobile API**:
    - Menyediakan API endpoint untuk integrasi mesin sidik jari/fingerprint atau aplikasi presensi mobile GPS + selfie.
 
 ---

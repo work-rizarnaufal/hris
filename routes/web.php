@@ -1,6 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\BerandaController;
+use App\Http\Controllers\Admin\KaryawanController;
+use App\Http\Controllers\Admin\PengaturanController;
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -10,32 +13,22 @@ Route::get('/', function () {
 });
 
 // Rute Autentikasi Administrator
-Route::get('/login', function () {
-    return Inertia::render('Auth/Login');
-})->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/login', function (Request $request) {
-    $request->validate([
-        'email' => 'required',
-        'password' => 'required',
-    ]);
+// Rute Modul Administrator HRIS (Controller-Driven)
+Route::get('/beranda', [BerandaController::class, 'index'])->name('admin.beranda');
 
-    return redirect()->intended('/beranda')->with('success', 'Selamat datang kembali di Panel Administrator HCGA.');
-});
+Route::get('/karyawan', [KaryawanController::class, 'index'])->name('admin.karyawan');
+Route::post('/karyawan', [KaryawanController::class, 'store'])->name('admin.karyawan.store');
+Route::put('/karyawan/{karyawan}', [KaryawanController::class, 'update'])->name('admin.karyawan.update');
+Route::delete('/karyawan/{karyawan}', [KaryawanController::class, 'destroy'])->name('admin.karyawan.destroy');
 
-Route::match(['get', 'post'], '/logout', function (Request $request) {
-    return redirect('/login')->with('success', 'Anda telah berhasil keluar dari sistem.');
-})->name('logout');
+Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('admin.pengaturan');
+Route::put('/pengaturan/settings/{key}', [PengaturanController::class, 'updateSetting'])->name('admin.pengaturan.updateSetting');
 
-// Rute Modul Administrator HRIS
-Route::get('/beranda', function () {
-    return Inertia::render('Admin/Beranda/Beranda');
-})->name('admin.beranda');
-
-Route::get('/karyawan', function () {
-    return Inertia::render('Admin/Karyawan/DataKaryawan');
-})->name('admin.karyawan');
-
+// Rute Modul Operasional & Staging
 Route::get('/organisasi', function () {
     return Inertia::render('Admin/Organisasi/OrganisasiJabatan');
 })->name('admin.organisasi');
@@ -72,10 +65,6 @@ Route::get('/laporan', function () {
     return Inertia::render('Admin/Laporan/LaporanRekap');
 })->name('admin.laporan');
 
-Route::get('/pengaturan', function () {
-    return Inertia::render('Admin/Pengaturan/PengaturanSistem');
-})->name('admin.pengaturan');
-
 Route::get('/audit', function () {
     return Inertia::render('Admin/Audit/LogAudit');
 })->name('admin.audit');
@@ -97,7 +86,3 @@ Route::prefix('user')->name('user.')->group(function () {
         return Inertia::render('User/RingkasanPublik');
     })->name('dashboard');
 });
-
-Route::get('/ringkasan-publik', function () {
-    return Inertia::render('User/RingkasanPublik');
-})->name('publik.ringkasan');

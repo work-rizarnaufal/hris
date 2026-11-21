@@ -35,33 +35,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                ] : [
-                    'id' => 'admin-demo',
-                    'name' => 'Admin HCGA',
-                    'email' => 'admin@hcga.local',
-                ],
-            ],
-            'appData' => [
-                'employees' => [],
-                'attendance' => [],
-                'config' => [
-                    'workdays' => [1, 2, 3, 4, 5, 6],
-                    'holidays' => [],
-                    'company' => 'HCGA · Area Operasional',
-                    'rotation' => [
-                        'plans' => [],
-                        'overrides' => [],
-                    ],
-                ],
-                'logs' => [],
-                'actor' => 'Admin HCGA',
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'nip' => $user->nip,
+                ] : null,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
@@ -70,4 +55,3 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 }
-
