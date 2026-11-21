@@ -91,8 +91,18 @@ export default function PengaturanSistem() {
     operationalNote: '',
   });
 
-  // State Lokasi Geofencing
+  // State Lokasi Geofencing & Modal
   const [locations, setLocations] = useState(() => getLocations());
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [locationForm, setLocationForm] = useState({
+    id: null,
+    name: '',
+    type: '',
+    latitude: 0,
+    longitude: 0,
+    radiusMeters: 120,
+    address: '',
+  });
 
   // State Profil Perusahaan
   const [companyProfile, setCompanyProfile] = useState(() => getCompanyProfile());
@@ -225,6 +235,45 @@ export default function PengaturanSistem() {
     setAlertInfo({
       type: 'warning',
       message: `Hari libur "${name}" telah dihapus dari kalender kerja dan roster jadwal.`,
+    });
+  };
+
+  // Handle Buka Modal Edit Lokasi Geofence
+  const handleOpenEditLocation = (loc) => {
+    setLocationForm({
+      id: loc.id,
+      name: loc.name,
+      type: loc.type,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      radiusMeters: loc.radiusMeters,
+      address: loc.address,
+    });
+    setIsLocationModalOpen(true);
+  };
+
+  // Handle Simpan Modal Edit Lokasi Geofence
+  const handleLocationSubmit = (e) => {
+    e.preventDefault();
+    const updated = locations.map((loc) =>
+      loc.id === locationForm.id
+        ? {
+            ...loc,
+            name: locationForm.name,
+            type: locationForm.type,
+            latitude: Number(locationForm.latitude),
+            longitude: Number(locationForm.longitude),
+            radiusMeters: Number(locationForm.radiusMeters),
+            address: locationForm.address,
+          }
+        : loc
+    );
+    setLocations(updated);
+    saveLocations(updated);
+    setIsLocationModalOpen(false);
+    setAlertInfo({
+      type: 'success',
+      message: `Konfigurasi geofence "${locationForm.name}" berhasil diperbarui dan disinkronkan.`,
     });
   };
 
@@ -1231,7 +1280,7 @@ export default function PengaturanSistem() {
                     <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Radius Valid (Meter)</TableHead>
                     <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Personil Terdaftar</TableHead>
                     <TableHead className="text-center text-xs font-semibold text-slate-600 w-28">Status Geofence</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 w-28">Aksi</TableHead>
+                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 min-w-[150px]">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
 
@@ -1240,7 +1289,20 @@ export default function PengaturanSistem() {
                     <TableRow key={loc.id} className="text-xs hover:bg-slate-50/70">
                       <TableCell className="text-center font-medium text-slate-500">{idx + 1}</TableCell>
                       <TableCell>
-                        <p className="font-bold text-navy">{loc.name}</p>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="font-bold text-navy">{loc.name}</p>
+                          <Badge
+                            className={
+                              loc.name.includes('Mariuk')
+                                ? 'bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-bold px-1.5 py-0'
+                                : loc.name.includes('Cimalaka')
+                                ? 'bg-indigo-50 text-indigo-800 border-indigo-200 text-[10px] font-bold px-1.5 py-0'
+                                : 'bg-slate-100 text-slate-700 border-slate-200 text-[10px] font-medium px-1.5 py-0'
+                            }
+                          >
+                            {loc.type || 'Pabrik'}
+                          </Badge>
+                        </div>
                         <p className="text-[11px] text-slate-500">{loc.address}</p>
                       </TableCell>
                       <TableCell className="font-mono text-slate-700">
@@ -1277,14 +1339,26 @@ export default function PengaturanSistem() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right pr-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleLocationStatus(loc.id)}
-                          className="h-7 text-[11px] px-2 font-medium cursor-pointer"
-                        >
-                          {loc.status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan'}
-                        </Button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenEditLocation(loc)}
+                            className="h-7 text-[11px] px-2 font-medium cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50 gap-1"
+                            title="Edit Parameter Geofence"
+                          >
+                            <Pencil className="w-3 h-3 text-[#c4a266]" />
+                            <span>Edit</span>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleToggleLocationStatus(loc.id)}
+                            className="h-7 text-[11px] px-2 font-medium cursor-pointer"
+                          >
+                            {loc.status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan'}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -1630,6 +1704,140 @@ export default function PengaturanSistem() {
             >
               <Save className="w-4 h-4" />
               <span>{editingHolidayId ? 'Simpan Perubahan Agenda' : 'Tambahkan Agenda Libur'}</span>
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
+
+      {/* MODAL EDIT PARAMETER GEOFENCE LOKASI */}
+      <Modal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        maxWidth="max-w-xl"
+      >
+        <ModalHeader
+          title={`Edit Parameter Geofence - ${locationForm.name}`}
+          subtitle="Sesuaikan titik koordinat GPS, batas radius validasi presensi, dan alamat operasional."
+          icon={<MapPin className="w-5 h-5 text-[#c4a266]" />}
+          onClose={() => setIsLocationModalOpen(false)}
+        />
+
+        <form onSubmit={handleLocationSubmit}>
+          <ModalBody className="p-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Nama Titik Lokasi Operasional <span className="text-rose-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Contoh: Lokasi Mariuk"
+                  value={locationForm.name}
+                  onChange={(e) => setLocationForm({ ...locationForm, name: e.target.value })}
+                  className="h-9.5 text-xs bg-white text-slate-800 border-slate-200 focus:border-navy"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Kategori Titik
+                </label>
+                <TableSelect
+                  value={locationForm.type}
+                  onChange={(e) => setLocationForm({ ...locationForm, type: e.target.value })}
+                  className="h-9.5 text-xs text-slate-700 bg-white"
+                  containerClassName="w-full"
+                >
+                  <option value="Pabrik Utama">Pabrik Utama</option>
+                  <option value="Pabrik Cabang">Pabrik Cabang</option>
+                  <option value="Head Office">Head Office</option>
+                  <option value="Gudang Logistik">Gudang Logistik</option>
+                </TableSelect>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Latitude GPS <span className="text-rose-500">*</span>
+                </label>
+                <Input
+                  type="number"
+                  step="any"
+                  placeholder="-6.8797"
+                  value={locationForm.latitude}
+                  onChange={(e) => setLocationForm({ ...locationForm, latitude: e.target.value })}
+                  className="h-9.5 text-xs bg-white text-slate-800 border-slate-200 focus:border-navy font-mono"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Longitude GPS <span className="text-rose-500">*</span>
+                </label>
+                <Input
+                  type="number"
+                  step="any"
+                  placeholder="107.9254"
+                  value={locationForm.longitude}
+                  onChange={(e) => setLocationForm({ ...locationForm, longitude: e.target.value })}
+                  className="h-9.5 text-xs bg-white text-slate-800 border-slate-200 focus:border-navy font-mono"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Radius Geofence (Meter) <span className="text-rose-500">*</span>
+                </label>
+                <Input
+                  type="number"
+                  min="20"
+                  max="1000"
+                  step="10"
+                  value={locationForm.radiusMeters}
+                  onChange={(e) => setLocationForm({ ...locationForm, radiusMeters: e.target.value })}
+                  className="h-9.5 text-xs bg-white text-slate-800 border-slate-200 focus:border-navy font-mono"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Alamat Lengkap & Patokan Operasional
+              </label>
+              <Input
+                type="text"
+                placeholder="Contoh: Jl. Raya Mariuk No. 88, Sumedang, Jawa Barat"
+                value={locationForm.address}
+                onChange={(e) => setLocationForm({ ...locationForm, address: e.target.value })}
+                className="h-9.5 text-xs bg-white text-slate-800 border-slate-200 focus:border-navy"
+              />
+            </div>
+
+            <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-lg flex items-start gap-2.5">
+              <MapPin className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+              <div className="text-[11px] text-amber-900 leading-relaxed">
+                Perubahan titik koordinat atau radius geofence akan langsung berdampak pada validasi jarak presensi mobile aplikasi karyawan di lokasi ini. Pastikan titik koordinat akurat.
+              </div>
+            </div>
+          </ModalBody>
+
+          <ModalFooter className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2.5">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsLocationModalOpen(false)}
+              className="text-xs text-slate-600 cursor-pointer"
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              className="text-xs font-semibold bg-navy hover:bg-[#193750] text-white cursor-pointer gap-1.5"
+            >
+              <Save className="w-4 h-4" />
+              <span>Simpan Parameter Geofence</span>
             </Button>
           </ModalFooter>
         </form>

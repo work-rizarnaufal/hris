@@ -328,29 +328,47 @@ Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/A
 
 ## 9. Modul Pengaturan Sistem & Kebijakan HR (`PengaturanSistem.jsx`)
 
-Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx)
+Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx) dan [`resources/js/services/systemSettings.js`](resources/js/services/systemSettings.js)
 
 ### A. 4 Kartu KPI Konfigurasi Utama
 - **Toleransi Keterlambatan**: 15 Menit (*grace period* presensi aktif).
 - **Hari Libur Nasional 2026**: 14 Hari (termasuk cuti bersama resmi pemerintah).
-- **Geofence Presensi Mobile**: 3 Titik Lokasi Operasional Aktif (Pabrik Sidoarjo, Site Gresik, Head Office Surabaya).
-- **Kesehatan & Status Cadangan**: Terkini (*auto-sync* data pengaturan).
+- **Geofence Presensi Mobile**: 3 Titik Lokasi Operasional Aktif (**Lokasi Mariuk**, **Lokasi Cimalaka**, dan **Head Office**) dengan proteksi Anti-Mock GPS.
+- **Kesehatan & Status Cadangan**: Terkini (*auto-sync* data pengaturan & cadangan database lokal).
 
 ### B. Tab 1: Kebijakan Presensi & Kerja (`attendance`)
-- Parameter toleransi keterlambatan, batas buka check-in, batas kepulangan lebih awal, dan jam kerja mingguan (40 jam).
+- Parameter toleransi keterlambatan (15 menit), batas buka check-in awal (120 menit), batas kepulangan lebih awal (0 menit), dan jam kerja mingguan (40 jam sesuai standar Depnaker; operasional shift 12 jam rolling rata-rata 42 jam/minggu).
 - Validasi wajib swafoto / selfie wajah dan proteksi Anti-Fake GPS / Mock Location.
-- Parameter lembur Depnaker (koefisien 1.5x dan 2.0x) serta kuota cuti tahunan (12 hari).
+- Parameter lembur Depnaker (koefisien 1.5x jam pertama dan 2.0x jam berikutnya) serta kuota cuti tahunan (12 hari).
 
-### C. Tab 2: Kalender Libur & Cuti Bersama (`calendar`)
+### C. Tab 2: Konfigurasi Shift 12 Jam Fleksibel & Tukar Shift (`shift`)
+- **Panel Parameter Jam Shift Lapangan 12 Jam**:
+  - Konfigurasi fleksibel waktu mulai dan selesai untuk **Shift Pagi** (`07:00 – 19:00 WIB`) dan **Shift Malam** (`19:00 – 07:00 WIB`).
+  - Dilengkapi perhitungan durasi otomatis (12 jam per shift) dan indikator status *Non-Stop 24/7 Rolling Schedule*.
+- **Parameter Handover & Serah Terima Tugas**:
+  - Waktu tukar shift terjadwal tepat pukul `07:00` dan `19:00` WIB.
+  - Durasi toleransi pergantian tugas shift (*handover*) 15 menit.
+- **Kebijakan Pengajuan Tukar Shift Antar-Karyawan**:
+  - Batas waktu pengajuan tukar shift maksimal 4 jam sebelum shift dimulai.
+  - Opsi wajib persetujuan atasan (*supervisor approval*) sebelum jadwal dinyatakan efektif.
+
+### D. Tab 3: Kalender Libur & Cuti Bersama (`holiday`)
 - Daftar Hari Libur Resmi 2026 dengan format standar `dd/mm/yyyy`.
 - Modal atomik tambah, edit, dan hapus hari libur dengan pilihan pemotongan cuti (*Tidak Potong Cuti* vs *Potong Cuti Tahunan*).
 - **Sinkronisasi Otomatis ke Jadwal & Roster**: Tanggal libur resmi otomatis ditandai `LIBUR (Hari Libur Resmi)` di Roster Mingguan tanpa perlu ubah jadwal satu per satu.
 
-### D. Tab 3: Geofencing & Lokasi Pabrik (`location`)
-- Konfigurasi titik radius presensi: Pabrik Sidoarjo (120m), Site Gresik (150m), Kantor Surabaya (80m) dengan toggle aktif/nonaktif.
+### E. Tab 4: Geofencing & Lokasi Pabrik (`location`)
+- Konfigurasi titik radius presensi:
+  - **Lokasi Mariuk** (Pabrik Utama): Radius 120m, 6 personil terdaftar, koordinat GPS `-6.8797, 107.9254`.
+  - **Lokasi Cimalaka** (Pabrik Cabang): Radius 120m, 6 personil terdaftar, koordinat GPS `-6.8523, 107.9402`.
+  - **Head Office** (Kantor Pusat): Radius 80m, koordinat GPS `-6.9147, 107.6098`.
+- **Fitur Modal Edit Parameter Geofence**:
+  - Tombol aksi *Edit* (ikon pensil) pada setiap baris tabel membuka dialog `<Modal>` atomik.
+  - Memungkinkan penyesuaian nama lokasi, kategori titik (Pabrik Utama, Pabrik Cabang, Head Office, Gudang Logistik), koordinat latitude/longitude GPS, radius valid meter, dan alamat lengkap.
+- Toggle status geofence (*Aktifkan* / *Nonaktifkan*) per lokasi operasional.
 
-### E. Tab 4: Profil Perusahaan & Pemeliharaan Data (`maintenance`)
-- Data legalitas perusahaan (PT Manufaktur Nusantara Perkasa Tbk, NIB, NPWP, Kontak PIC).
+### F. Tab 5: Profil Perusahaan & Pemeliharaan Data (`maintenance`)
+- Data legalitas perusahaan (PT Manufaktur Nusantara Perkasa Tbk, NIB, NPWP, Kontak HCGA).
 - Tombol **Unduh Backup JSON/SQL**, **Bersihkan Cache Presensi**, dan **Reset Default**.
 
 ---
