@@ -20,6 +20,7 @@ import {
   X,
   Sparkles,
   Info,
+  MapPin,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -73,6 +74,8 @@ const EVALUATION_DATASET = [
     division: 'Operasional & Lapangan',
     location: 'Lokasi Mariuk',
     group: 'Grup A',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -98,6 +101,8 @@ const EVALUATION_DATASET = [
     division: 'Operasional & Lapangan',
     location: 'Lokasi Mariuk',
     group: 'Grup A',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 22,
     lateCount: 1,
@@ -122,6 +127,8 @@ const EVALUATION_DATASET = [
     division: 'Security & Safety',
     location: 'Lokasi Mariuk',
     group: 'Grup A',
+    baseShift: 'Shift Malam (19:00 - 07:00)',
+    shiftCode: 'MALAM',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -146,6 +153,8 @@ const EVALUATION_DATASET = [
     division: 'Logistik & Gudang',
     location: 'Lokasi Mariuk',
     group: 'Grup B',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 21,
     lateCount: 2,
@@ -172,6 +181,8 @@ const EVALUATION_DATASET = [
     division: 'Operasional & Lapangan',
     location: 'Lokasi Mariuk',
     group: 'Grup B',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 20,
     lateCount: 4,
@@ -200,6 +211,8 @@ const EVALUATION_DATASET = [
     division: 'Security & Safety',
     location: 'Lokasi Mariuk',
     group: 'Grup B',
+    baseShift: 'Shift Malam (19:00 - 07:00)',
+    shiftCode: 'MALAM',
     workDays: 22,
     presentDays: 20,
     lateCount: 3,
@@ -230,6 +243,8 @@ const EVALUATION_DATASET = [
     division: 'Operasional & Lapangan',
     location: 'Lokasi Cimalaka',
     group: 'Grup A',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -254,6 +269,8 @@ const EVALUATION_DATASET = [
     division: 'Operasional & Lapangan',
     location: 'Lokasi Cimalaka',
     group: 'Grup A',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 21,
     lateCount: 3,
@@ -281,6 +298,8 @@ const EVALUATION_DATASET = [
     division: 'Security & Safety',
     location: 'Lokasi Cimalaka',
     group: 'Grup A',
+    baseShift: 'Shift Malam (19:00 - 07:00)',
+    shiftCode: 'MALAM',
     workDays: 22,
     presentDays: 22,
     lateCount: 1,
@@ -305,6 +324,8 @@ const EVALUATION_DATASET = [
     division: 'Logistik & Gudang',
     location: 'Lokasi Cimalaka',
     group: 'Grup B',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 17,
     lateCount: 0,
@@ -333,6 +354,8 @@ const EVALUATION_DATASET = [
     division: 'Operasional & Lapangan',
     location: 'Lokasi Cimalaka',
     group: 'Grup B',
+    baseShift: 'Shift Pagi (07:00 - 19:00)',
+    shiftCode: 'PAGI',
     workDays: 22,
     presentDays: 21,
     lateCount: 1,
@@ -358,6 +381,8 @@ const EVALUATION_DATASET = [
     division: 'Logistik & Gudang',
     location: 'Lokasi Cimalaka',
     group: 'Grup B',
+    baseShift: 'Shift Malam (19:00 - 07:00)',
+    shiftCode: 'MALAM',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -411,19 +436,25 @@ export default function LaporanRekap() {
     });
   }, [selectedLocation, selectedDivision, selectedStatus, searchQuery]);
 
-  // Statistik Ringkasan Evaluasi
-  const summaryStats = useMemo(() => {
-    const totalEmployees = EVALUATION_DATASET.length;
-    const totalPossibleDays = totalEmployees * 22;
-    const totalPresentDays = EVALUATION_DATASET.reduce((acc, curr) => acc + curr.presentDays, 0);
-    const totalLateIncidents = EVALUATION_DATASET.reduce((acc, curr) => acc + curr.lateCount, 0);
-    const totalLateMinutes = EVALUATION_DATASET.reduce((acc, curr) => acc + curr.totalLateMinutes, 0);
-    const totalAlpa = EVALUATION_DATASET.reduce((acc, curr) => acc + curr.alpaDays, 0);
+  // Dataset sesuai filter lokasi aktif (Semua / Mariuk / Cimalaka)
+  const locationDataset = useMemo(() => {
+    if (selectedLocation === 'ALL') return EVALUATION_DATASET;
+    return EVALUATION_DATASET.filter((e) => e.location === selectedLocation);
+  }, [selectedLocation]);
 
-    const attendanceRate = ((totalPresentDays / totalPossibleDays) * 100).toFixed(1);
-    const perfectCount = EVALUATION_DATASET.filter((e) => e.score === 100).length;
-    const warningCount = EVALUATION_DATASET.filter((e) => e.status === 'Peringatan / SP').length;
-    const coachingCount = EVALUATION_DATASET.filter((e) => e.status === 'Perlu Pembinaan').length;
+  // Statistik Ringkasan Evaluasi (Reaktif terhadap Lokasi Terpilih)
+  const summaryStats = useMemo(() => {
+    const totalEmployees = locationDataset.length;
+    const totalPossibleDays = totalEmployees * 22;
+    const totalPresentDays = locationDataset.reduce((acc, curr) => acc + curr.presentDays, 0);
+    const totalLateIncidents = locationDataset.reduce((acc, curr) => acc + curr.lateCount, 0);
+    const totalLateMinutes = locationDataset.reduce((acc, curr) => acc + curr.totalLateMinutes, 0);
+    const totalAlpa = locationDataset.reduce((acc, curr) => acc + curr.alpaDays, 0);
+
+    const attendanceRate = totalPossibleDays > 0 ? ((totalPresentDays / totalPossibleDays) * 100).toFixed(1) : '0.0';
+    const perfectCount = locationDataset.filter((e) => e.score === 100).length;
+    const warningCount = locationDataset.filter((e) => e.status === 'Peringatan / SP').length;
+    const coachingCount = locationDataset.filter((e) => e.status === 'Perlu Pembinaan').length;
 
     return {
       attendanceRate,
@@ -435,12 +466,12 @@ export default function LaporanRekap() {
       coachingCount,
       totalEmployees,
     };
-  }, []);
+  }, [locationDataset]);
 
-  // Data Grafik Per Divisi
+  // Data Grafik Per Divisi (Reaktif terhadap Lokasi Terpilih)
   const divisionChartData = useMemo(() => {
     const divMap = {};
-    EVALUATION_DATASET.forEach((emp) => {
+    locationDataset.forEach((emp) => {
       if (!divMap[emp.division]) {
         divMap[emp.division] = { division: emp.division, totalScore: 0, count: 0, totalLate: 0 };
       }
@@ -456,16 +487,16 @@ export default function LaporanRekap() {
       totalLate: d.totalLate,
       karyawan: d.count,
     }));
-  }, []);
+  }, [locationDataset]);
 
   // Top Performers (100% On-Time) & Perhatian Khusus
   const topPerformers = useMemo(() => {
-    return EVALUATION_DATASET.filter((e) => e.score === 100);
-  }, []);
+    return locationDataset.filter((e) => e.score === 100);
+  }, [locationDataset]);
 
   const warningList = useMemo(() => {
-    return EVALUATION_DATASET.filter((e) => e.status === 'Peringatan / SP' || e.status === 'Perlu Pembinaan');
-  }, []);
+    return locationDataset.filter((e) => e.status === 'Peringatan / SP' || e.status === 'Perlu Pembinaan');
+  }, [locationDataset]);
 
   // Fungsi Ekspor Excel
   const handleExportExcel = () => {
@@ -655,6 +686,52 @@ export default function LaporanRekap() {
             <Badge className="bg-amber-50 text-amber-800 border-amber-200 text-[10px]">
               Toleransi Terlambat: Maks 2x/Bulan
             </Badge>
+          </div>
+        </div>
+
+        {/* Segmented Location Controller (Semua Lokasi, Mariuk, Cimalaka) */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="p-1 bg-white rounded-xl border border-slate-200/90 shadow-2xs inline-flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setSelectedLocation('ALL')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                selectedLocation === 'ALL'
+                  ? 'bg-navy text-white shadow-xs'
+                  : 'text-slate-600 hover:text-navy hover:bg-slate-50'
+              }`}
+            >
+              Semua Lokasi ({EVALUATION_DATASET.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedLocation('Lokasi Mariuk')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                selectedLocation === 'Lokasi Mariuk'
+                  ? 'bg-amber-50 text-amber-900 border border-amber-200/80 shadow-xs'
+                  : 'text-slate-600 hover:text-navy hover:bg-slate-50'
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5 text-amber-600" />
+              Mariuk ({EVALUATION_DATASET.filter((e) => e.location === 'Lokasi Mariuk').length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedLocation('Lokasi Cimalaka')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                selectedLocation === 'Lokasi Cimalaka'
+                  ? 'bg-indigo-50 text-indigo-900 border border-indigo-200/80 shadow-xs'
+                  : 'text-slate-600 hover:text-navy hover:bg-slate-50'
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5 text-indigo-600" />
+              Cimalaka ({EVALUATION_DATASET.filter((e) => e.location === 'Lokasi Cimalaka').length})
+            </button>
+          </div>
+
+          <div className="text-xs text-slate-500 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Monitoring Disiplin & Evaluasi 24/7 Non-Stop</span>
           </div>
         </div>
 
@@ -1001,14 +1078,59 @@ export default function LaporanRekap() {
                           {index + 1}
                         </TableCell>
                         <TableCell>
-                          <div>
-                            <p className="font-bold text-navy text-xs">{emp.name}</p>
-                            <p className="text-[11px] text-slate-500">{emp.nip} • {emp.role}</p>
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-full bg-navy/10 text-navy font-bold flex items-center justify-center text-xs flex-shrink-0">
+                              {emp.name
+                                .split(' ')
+                                .map((n) => n[0])
+                                .slice(0, 2)
+                                .join('')}
+                            </div>
+                            <div>
+                              <p
+                                onClick={() => {
+                                  setSelectedEmployeeId(emp.id);
+                                  setActiveTab('individu');
+                                }}
+                                className="font-bold text-navy text-xs hover:text-[#c4a266] transition-colors cursor-pointer"
+                                title="Klik untuk buka rapor individu"
+                              >
+                                {emp.name}
+                              </p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[11px] text-slate-500 font-mono">{emp.nip}</span>
+                                <span className="text-[11px] text-slate-400">•</span>
+                                <span className="text-[11px] text-slate-500">{emp.role}</span>
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <p className="text-xs text-slate-800 font-medium">{emp.division}</p>
-                          <p className="text-[11px] text-slate-500">{emp.location}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span
+                              className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${
+                                emp.location?.includes('Mariuk')
+                                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                  : emp.location?.includes('Cimalaka')
+                                  ? 'bg-indigo-50 text-indigo-800 border border-indigo-200'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              {emp.location?.includes('Mariuk') ? 'Mariuk' : emp.location?.includes('Cimalaka') ? 'Cimalaka' : emp.location}
+                            </span>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
+                                emp.group === 'Grup A'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : emp.group === 'Grup B'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                            >
+                              {emp.group}
+                            </span>
+                          </div>
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="inline-block">

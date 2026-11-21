@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-21)
 
 ## Corpus Check
-- 88 files · ~58,853 words
+- 88 files · ~59,481 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 13 file(s) not represented in the graph (top: (none) 10, .example 1, .css 1)
 
 ## Summary
-- 418 nodes · 941 edges · 41 communities (13 shown, 28 thin omitted)
+- 418 nodes · 915 edges · 42 communities (14 shown, 28 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fd0d2243`
+- Built from commit: `36db52fc`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -23,6 +23,7 @@
 - Inertia React UI & Layout Components
 - react
 - System Settings & Configuration
+- ModalFormPresensi.jsx
 - Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)
 - Laravel Application Bootstrap
 - Frontend Build & Compiler Config
@@ -36,38 +37,38 @@
 1. `react` - 40 edges
 2. `cn()` - 36 edges
 3. `lucide-react` - 30 edges
-4. `Card()` - 22 edges
-5. `CardContent()` - 22 edges
-6. `CardDescription()` - 22 edges
-7. `CardHeader()` - 22 edges
-8. `CardTitle()` - 22 edges
-9. `PageHeader()` - 21 edges
-10. `LaporanRekap()` - 21 edges
+4. `@inertiajs/react` - 21 edges
+5. `PageHeader()` - 19 edges
+6. `Card()` - 18 edges
+7. `CardContent()` - 18 edges
+8. `CardDescription()` - 18 edges
+9. `CardHeader()` - 18 edges
+10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `JadwalShift()` --calls--> `ModalFormTukarShift()`  [EXTRACTED]
   resources/js/Pages/Admin/Jadwal/JadwalShift.jsx → resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx
 - `Card()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `LaporanRekap()` --calls--> `Card()`  [EXTRACTED]
-  resources/js/Pages/Admin/Laporan/LaporanRekap.jsx → resources/js/components/ui/card.jsx
-- `RaporIndividu()` --calls--> `Card()`  [EXTRACTED]
-  resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx → resources/js/components/ui/card.jsx
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardDescription()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (41 total, 28 thin omitted)
+## Communities (42 total, 28 thin omitted)
 
 ### Community 0 - "Inertia React UI & Layout Components"
 Cohesion: 0.31
 Nodes (18): @inertiajs/react, lucide-react, react, Card(), CardContent(), CardDescription(), CardHeader(), CardTitle() (+10 more)
 
 ### Community 1 - "Frontend Dependencies & Manifest"
-Cohesion: 0.07
-Nodes (33): dependencies, class-variance-authority@^0.7.1, clsx@^2.1.1, @inertiajs/react@^2.0.0, lucide-react@^0.475.0, react@^18.3.1, react-dom@^18.3.1, recharts@^2.15.0 (+25 more)
+Cohesion: 0.08
+Nodes (32): dependencies, clsx@^2.1.1, @inertiajs/react@^2.0.0, lucide-react@^0.475.0, react@^18.3.1, react-dom@^18.3.1, recharts@^2.15.0, tailwind-merge@^2.5.5 (+24 more)
 
 ### Community 2 - "Backend Composer Dependencies"
 Cohesion: 0.05
@@ -89,6 +90,10 @@ Nodes (13): renderAdminLayout(), renderUserLayout(), Footer(), PageContainer(), 
 Cohesion: 0.21
 Nodes (22): JadwalShift(), PanelRotasiGrup(), PengaturanSistem(), DEFAULT_ATTENDANCE_SETTINGS, DEFAULT_COMPANY_PROFILE, DEFAULT_SHIFT_SETTINGS, dispatchSyncEvent(), formatDateDMY() (+14 more)
 
+### Community 7 - "ModalFormPresensi.jsx"
+Cohesion: 0.15
+Nodes (15): ModalFormTukarShift(), SHIFT_12H_OPTIONS, DIVISIONS, GROUPS, LOCATIONS, SCHEDULE_PRESETS, CatatanKehadiran(), calculateTardiness() (+7 more)
+
 ### Community 8 - "Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)"
 Cohesion: 0.44
 Nodes (7): d(), f(), g(), n(), p(), u(), v()
@@ -98,8 +103,8 @@ Cohesion: 0.33
 Nodes (5): compilerOptions, baseUrl, jsx, paths, include
 
 ### Community 13 - "cn"
-Cohesion: 0.11
-Nodes (37): class-variance-authority, recharts, Badge(), badgeVariants, Button(), buttonVariants, CardFooter(), Input() (+29 more)
+Cohesion: 0.10
+Nodes (32): class-variance-authority@^0.7.1, class-variance-authority, Badge(), badgeVariants, Button(), buttonVariants, CardFooter(), Input() (+24 more)
 
 ### Community 39 - "Anti-Slop (Full Specification)"
 Cohesion: 0.18
@@ -110,8 +115,8 @@ Cohesion: 0.40
 Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, Ponytail (Companion Pragmatism Skill), The Decision Ladder
 
 ### Community 41 - "CatatanKehadiran.jsx"
-Cohesion: 0.09
-Nodes (27): xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, ModalFormTukarShift(), SHIFT_12H_OPTIONS, DataKaryawan() (+19 more)
+Cohesion: 0.14
+Nodes (18): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, DataKaryawan(), INITIAL_EMPLOYEES (+10 more)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
@@ -121,13 +126,13 @@ Nodes (27): xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, W
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `react`, `System Settings & Configuration`, `CatatanKehadiran.jsx`, `cn`?**
-  _High betweenness centrality (0.122) - this node is a cross-community bridge._
+- **Why does `react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `react`, `System Settings & Configuration`, `ModalFormPresensi.jsx`, `CatatanKehadiran.jsx`, `cn`?**
+  _High betweenness centrality (0.128) - this node is a cross-community bridge._
 - **What connects `Aturan Antislop & Ponytail` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend Dependencies & Manifest` be split into smaller, more focused modules?**
-  _Cohesion score 0.07301587301587302 - nodes in this community are weakly interconnected._
-- **Why does `@inertiajs/react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `react`, `System Settings & Configuration`, `CatatanKehadiran.jsx`, `cn`?**
+  _Cohesion score 0.07563025210084033 - nodes in this community are weakly interconnected._
+- **Why does `lucide-react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `react`, `System Settings & Configuration`, `ModalFormPresensi.jsx`, `CatatanKehadiran.jsx`, `cn`?**
   _High betweenness centrality (0.048) - this node is a cross-community bridge._
 - **Should `Backend Composer Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._

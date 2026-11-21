@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795250239.9194162,
-    "seen": 1795250261.196631,
-    "ast_hash": "6a2d65d1b81b4dc68d534c22c0ed08ea",
+    "mtime": 1795253531.365042,
+    "seen": 1795253549.751009,
+    "ast_hash": "33670790c6eff9635bdbbb6bbea9484b",
     "semantic_hash": ""
   },
   "README.md": {
@@ -525,6 +525,12 @@
     "mtime": 1793726137.6967828,
     "seen": 1795250261.196631,
     "ast_hash": "a3b155ab5048cd7975d3693d067eb4fb",
+    "semantic_hash": ""
+  },
+  "DESIGN.md": {
+    "mtime": 1795253506.4204848,
+    "seen": 1795253549.751009,
+    "ast_hash": "8afede2ea322829466f4c2e0421913e0",
     "semantic_hash": ""
   },
   "package-lock.json": {

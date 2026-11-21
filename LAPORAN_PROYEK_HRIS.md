@@ -236,31 +236,40 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
 
 ## 7. Modul Laporan & Rapor Evaluasi Kehadiran (`LaporanRekap.jsx`)
 
-Lokasi: [`resources/js/Pages/Admin/Laporan/LaporanRekap.jsx`](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx)
+Lokasi: [`resources/js/Pages/Admin/Laporan/LaporanRekap.jsx`](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) dan [`resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx)
 
 Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah makro (organisasi) dan mikro (individu) dalam satu halaman tanpa reload rute:
 
 ### A. Tab 1: Rekap Organisasi & Divisi (Makro)
-- **Filter Periode Dinamis**: Pemilihan bulan berjalan dan arsip periode sebelumnya.
-- **4 Kartu Metrik KPI Evaluasi**:
-  1. *Rata-rata Kehadiran Organisasi* (Target $\ge 95\%$).
-  2. *Karyawan Hadir 100%* (Kedisiplinan penuh tanpa telat).
-  3. *Total Keterlambatan* (Akumulasi frekuensi dan durasi menit).
-  4. *Perhatian Disiplin / SP* (Early warning deteksi indisipliner).
+- **Segmented Location Controller (Mariuk & Cimalaka)**:
+  - Tab pengontrol segmen instan: **Semua Lokasi (12)**, **Mariuk (6)** (amber), dan **Cimalaka (6)** (indigo).
+  - Dilengkapi indikator detak operasional live: *Monitoring Disiplin & Evaluasi 24/7 Non-Stop*.
+- **Filter Periode Dinamis**: Pemilihan bulan berjalan (November 2026) dan arsip periode sebelumnya.
+- **4 Kartu Metrik KPI Evaluasi Reaktif**:
+  - Dihitung dinamis mengikuti pilihan lokasi kerja aktif:
+    1. *Rata-rata Kehadiran Organisasi* (Target $\ge 95\%$).
+    2. *Karyawan Hadir 100%* (Kedisiplinan penuh tanpa telat).
+    3. *Total Keterlambatan* (Akumulasi frekuensi dan durasi menit).
+    4. *Perhatian Disiplin / SP* (Early warning deteksi indisipliner).
 - **Visual Analytics (Recharts)**: Grafik batang rata-rata skor kedisiplinan per divisi menggunakan palet warna resmi Deep Navy & Gold.
 - **Panel Sorotan (Top Stars & Early Warning)**:
   - *Duta Keteladanan*: Karyawan dengan skor 100% tepat waktu tanpa telat untuk nominasi reward (klik langsung membuka rapor individu).
   - *Panggilan / Pembinaan Khusus*: Karyawan yang melewati batas toleransi keterlambatan atau memiliki alpa (klik langsung membuka dossier pembinaan).
 - **Matriks Evaluasi Kedisiplinan Karyawan**:
-  - Kolom: No, Karyawan, Divisi & Lokasi, Kehadiran, Keterlambatan, Cuti/Sakit, Alpa, Indikator Progress Skor Disiplin (0–100%), Status Evaluasi (*Sangat Baik*, *Disiplin Baik*, *Perlu Pembinaan*, *Peringatan / SP*).
+  - **Identitas Lengkap & Interaktif**: Avatar inisial visual, nama karyawan interaktif (dapat diklik langsung untuk membuka rapor), NIP font-mono, jabatan, serta pill badge lokasi penempatan (`Mariuk` / `Cimalaka`) dan kelompok regu (`Grup A` / `Grup B`).
+  - Kolom metrik: Kehadiran (Hadir/Hari & %), Keterlambatan, Cuti/Sakit, Alpa, Indikator Progress Skor Disiplin (0–100%), Status Evaluasi (*Sangat Baik*, *Disiplin Baik*, *Perlu Pembinaan*, *Peringatan / SP*).
   - Tombol **"Buka Rapor"**: 1-klik beralih mulus ke Tab 2 dengan karyawan terkait langsung terpilih.
-- **Ekspor Dokumen Excel (`.xlsx`)**: 1-klik unduh rekapitulasi evaluasi kehadiran seluruh karyawan via SheetJS.
+- **Ekspor Dokumen Excel (`.xlsx`)**: 1-klik unduh rekapitulasi evaluasi kehadiran seluruh karyawan via SheetJS lengkap dengan NIP, Divisi, Jabatan, Lokasi, dan Rekomendasi Tindakan.
 
 ### B. Tab 2: Rapor Evaluasi Individu / Dossier Personel (Mikro)
-- **Toolbar Navigasi Cepat**: Dropdown pemilih karyawan aktif (12 karyawan), cetak rapor (`window.print()`), dan ekspor XLSX personal.
-- **Dossier Header Card**: Profil korporat lengkap, skor disiplin (0–100%), badge evaluasi, dan rekomendasi tindakan operasional HCGA.
+- **Toolbar Navigasi Cepat**: Tombol kembali ke rekap organisasi, dropdown pemilih karyawan aktif (12 personil), cetak rapor (`window.print()`), dan ekspor XLSX personal (profil lengkap + log 30 hari).
+- **Dossier Header Card**:
+  - Profil korporat lengkap dengan avatar inisial, NIP font-mono, badge lokasi kerja (Mariuk/Cimalaka), badge kelompok regu (Grup A/B), dan badge shift 12 jam (Pagi/Malam).
+  - Skor kedisiplinan (0–100%) dan kotak rekomendasi resmi tindakan manajemen HCGA.
 - **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha.
-- **Kalender Visual Presensi 30 Hari (Heatmap Grid)**: Kotak visual per tanggal (1 s/d 30) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu), lengkap dengan jam check-in.
+- **Kalender Visual Presensi 30 Hari (Heatmap Grid 24/7)**:
+  - Kotak visual per tanggal (1 s/d 30) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu).
+  - Selaras dengan pola dinas 24/7 shift 12 jam (Shift Pagi `07:00–19:00` / Shift Malam `19:00–07:00`) dan rotasi selang-seling Grup A & B.
 - **Grafik Tren Kedisiplinan 6 Bulan**: `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang.
 - **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**: Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi, dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
 

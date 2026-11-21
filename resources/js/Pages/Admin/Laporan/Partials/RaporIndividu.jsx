@@ -40,36 +40,44 @@ import {
   Button,
   Badge,
   TableSelect,
+  Toast,
 } from '@/components/ui';
 
-// Helper membuat 30 hari kalender November 2026 berdasarkan data insiden karyawan
+// Helper membuat 30 hari kalender November 2026 berdasarkan data insiden karyawan dan pola 24/7 (12 Jam)
 function generateCalendarDays(employee) {
   const days = [];
-  const daysInMonth = 30; // November
+  const daysInMonth = 30; // November 2026
   const incidents = employee.incidents || [];
+  const isMalam =
+    employee.shiftCode === 'MALAM' ||
+    employee.role?.toLowerCase().includes('malam') ||
+    ['HC-0105', 'HC-0109', 'HC-0110', 'HC-0112'].includes(employee.nip);
+  const isGroupA = employee.group === 'Grup A';
+  const isGroupB = employee.group === 'Grup B';
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dayStr = d < 10 ? `0${d}` : `${d}`;
     const dateFormatted = `${dayStr} Nov 2026`;
-    // Hari dalam seminggu untuk Nov 2026: 1 Nov 2026 adalah Hari Minggu (0)
     const dateObj = new Date(2026, 10, d);
     const dayOfWeek = dateObj.getDay(); // 0 = Minggu, 6 = Sabtu
 
-    // Cek apakah tanggal ini ada insiden khusus
+    // Pola 24/7 Rolling: Grup A berdinas tanggal ganjil (1, 3, 5, ...), Grup B tanggal genap (2, 4, 6, ...)
+    const isWorkingRoster = isGroupA ? d % 2 === 1 : isGroupB ? d % 2 === 0 : dayOfWeek !== 0 && dayOfWeek !== 6;
+
     const incident = incidents.find((inc) => inc.date && inc.date.includes(`${dayStr} Nov`));
 
-    let status = 'Hadir';
-    let detail = '07:00 - 15:00 (Tepat Waktu)';
-    let typeClass = 'status-hadir';
+    let status = isWorkingRoster ? 'Hadir' : 'Libur';
+    let detail = isWorkingRoster
+      ? isMalam
+        ? '19:00 - 07:00 WIB (Shift Malam 12 Jam)'
+        : '07:00 - 19:00 WIB (Shift Pagi 12 Jam)'
+      : 'Libur Pasca-Dinas (Rotasi 24/7)';
+    let typeClass = isWorkingRoster ? 'status-hadir' : 'status-libur';
 
-    if (dayOfWeek === 0) {
-      status = 'Libur';
-      detail = 'Hari Libur Mingguan';
-      typeClass = 'status-libur';
-    } else if (incident) {
+    if (incident) {
       if (incident.type.includes('Terlambat')) {
         status = 'Terlambat';
-        detail = incident.detail;
+        detail = `${isMalam ? 'Shift Malam 19:00' : 'Shift Pagi 07:00'} - ${incident.detail}`;
         typeClass = 'status-terlambat';
       } else if (incident.type.includes('Alpa') || incident.type.includes('Alpha')) {
         status = 'Alpha';
@@ -87,6 +95,10 @@ function generateCalendarDays(employee) {
         status = 'Izin';
         detail = incident.detail;
         typeClass = 'status-izin';
+      } else if (incident.type.includes('Tepat Waktu')) {
+        status = 'Hadir';
+        detail = incident.detail;
+        typeClass = 'status-hadir';
       }
     }
 
@@ -113,6 +125,7 @@ export default function RaporIndividu({
   const [selectedDay, setSelectedDay] = useState(null);
   const [newNote, setNewNote] = useState('');
   const [newNoteType, setNewNoteType] = useState('Konseling Rutin');
+  const [alertInfo, setAlertInfo] = useState(null);
 
   // State lokal untuk catatan pembinaan agar interaktif
   const [coachingLogs, setCoachingLogs] = useState(() => [
@@ -165,6 +178,10 @@ export default function RaporIndividu({
 
     setCoachingLogs([logItem, ...coachingLogs]);
     setNewNote('');
+    setAlertInfo({
+      type: 'success',
+      message: `Catatan pembinaan (${newNoteType}) untuk ${employee.name} berhasil disimpan.`,
+    });
   };
 
   // 8 Metrik KPI Rapor Individu
@@ -259,6 +276,9 @@ export default function RaporIndividu({
 
   return (
     <div className="space-y-6">
+      {/* Atomic Toast Feedback */}
+      <Toast toast={alertInfo} onClose={() => setAlertInfo(null)} />
+
       {/* Bar Navigasi & Pemilihan Karyawan */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -340,16 +360,34 @@ export default function RaporIndividu({
 
               <p className="text-sm text-slate-300 mt-1 font-medium">{employee.role}</p>
 
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-2">
+              <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-300 mt-2.5">
                 <span className="flex items-center gap-1.5">
                   <Building className="w-3.5 h-3.5 text-[#c4a266]" />
                   {employee.division}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#c4a266]" />
+                <span
+                  className={`px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 ${
+                    employee.location?.includes('Mariuk')
+                      ? 'bg-amber-400/20 text-amber-200 border border-amber-400/30'
+                      : 'bg-indigo-400/20 text-indigo-200 border border-indigo-400/30'
+                  }`}
+                >
+                  <MapPin className="w-3 h-3" />
                   {employee.location}
                 </span>
-                <span className="flex items-center gap-1.5">
+                <span
+                  className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                    employee.group === 'Grup A'
+                      ? 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30'
+                      : 'bg-amber-400/20 text-amber-200 border border-amber-400/30'
+                  }`}
+                >
+                  {employee.group}
+                </span>
+                <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-white/10 text-slate-200 border border-white/15">
+                  {employee.shiftCode === 'MALAM' ? 'Shift Malam (19:00 - 07:00)' : 'Shift Pagi (07:00 - 19:00)'}
+                </span>
+                <span className="flex items-center gap-1.5 text-slate-400">
                   <CalendarCheck className="w-3.5 h-3.5 text-[#c4a266]" />
                   Periode {selectedPeriod}
                 </span>
