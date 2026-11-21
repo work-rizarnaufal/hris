@@ -600,15 +600,13 @@ export default function CatatanKehadiran({
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsFingerprintOpen(true)}
-          className="shrink-0 text-xs gap-1.5 font-medium border-indigo-200 text-indigo-700 hover:bg-indigo-50/80 bg-white"
+        <Link
+          href="/kehadiran/impor"
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-navy hover:bg-navy/90 text-white shadow-2xs hover:shadow-sm shrink-0 transition-all cursor-pointer"
         >
-          <Fingerprint className="w-3.5 h-3.5" />
-          <span>Tarik Log Mesin</span>
-        </Button>
+          <Fingerprint className="w-4 h-4 text-[#c4a266]" />
+          <span>Tarik Log Mesin (Meja Kerja)</span>
+        </Link>
       </div>
 
       {/* KPI Cards (5 Cards) */}
@@ -831,16 +829,25 @@ export default function CatatanKehadiran({
                         ? 'Tidak ada data kehadiran yang cocok dengan kriteria filter yang Anda tentukan.'
                         : `Belum ada presensi yang dicatat untuk tanggal ${formattedDateTitle}.`}
                     </p>
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
                       {hasActiveFilters ? (
                         <Button variant="outline" size="sm" onClick={handleResetFilters}>
                           Reset Filter
                         </Button>
                       ) : (
-                        <Button variant="default" size="sm" onClick={handleOpenAdd} className="gap-1.5">
-                          <Plus className="w-4 h-4" />
-                          <span>Catat Presensi Sekarang</span>
-                        </Button>
+                        <>
+                          <Link
+                            href="/kehadiran/impor"
+                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-navy hover:bg-navy/90 text-white shadow-2xs cursor-pointer"
+                          >
+                            <Fingerprint className="w-4 h-4 text-[#c4a266]" />
+                            <span>Tarik Log Fingerprint</span>
+                          </Link>
+                          <Button variant="outline" size="sm" onClick={handleOpenAdd} className="gap-1.5">
+                            <Plus className="w-4 h-4" />
+                            <span>Catat Presensi Manual</span>
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>

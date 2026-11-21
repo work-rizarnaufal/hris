@@ -5,6 +5,7 @@ import {
   Upload,
   Fingerprint,
   CheckCircle2,
+  Check,
   AlertTriangle,
   AlertCircle,
   Save,
@@ -202,49 +203,55 @@ export default function ImporFingerprint({
     setIsProcessing(true);
 
     setTimeout(() => {
-      // Pemetaan PIN Karyawan komprehensif (global Mariuk & Cimalaka)
-      const empMap = {};
-      dbEmployees.forEach((emp) => {
-        const pin = String(emp.biometricPin || emp.biometric_pin || '').trim();
-        const idStr = String(emp.id);
-        const nipNumeric = emp.nip ? String(emp.nip).replace(/\D/g, '') : '';
+      try {
+        // Pemetaan PIN Karyawan komprehensif (global Mariuk & Cimalaka)
+        const empMap = {};
+        dbEmployees.forEach((emp) => {
+          const pin = String(emp.biometricPin || emp.biometric_pin || '').trim();
+          const idStr = String(emp.id);
+          const nipNumeric = emp.nip ? String(emp.nip).replace(/\D/g, '') : '';
 
-        if (pin && pin !== '-') {
-          empMap[pin] = emp;
-          const pinNum = parseInt(pin, 10);
-          if (!isNaN(pinNum)) {
-            empMap[String(pinNum)] = emp;
+          if (pin && pin !== '-') {
+            empMap[pin] = emp;
+            const pinNum = parseInt(pin, 10);
+            if (!isNaN(pinNum)) {
+              empMap[String(pinNum)] = emp;
+            }
           }
-        }
-        if (nipNumeric) {
-          empMap[nipNumeric] = emp;
-          const nipNum = parseInt(nipNumeric, 10);
-          if (!isNaN(nipNum)) {
-            empMap[String(nipNum)] = emp;
+          if (nipNumeric) {
+            empMap[nipNumeric] = emp;
+            const nipNum = parseInt(nipNumeric, 10);
+            if (!isNaN(nipNum)) {
+              empMap[String(nipNum)] = emp;
+            }
           }
-        }
-        empMap[idStr] = emp;
-      });
+          empMap[idStr] = emp;
+        });
 
-      const groupedByPin = {};
-      scans.forEach((s) => {
-        if (!groupedByPin[s.pin]) groupedByPin[s.pin] = [];
-        groupedByPin[s.pin].push(new Date(s.timestamp));
-      });
+        const groupedByPin = {};
+        scans.forEach((s) => {
+          if (!s.pin || !s.timestamp) return;
+          if (!groupedByPin[s.pin]) groupedByPin[s.pin] = [];
+          const dt = new Date(s.timestamp);
+          if (!isNaN(dt.getTime())) {
+            groupedByPin[s.pin].push(dt);
+          }
+        });
 
-      const stagingList = [];
-      const unmapped = [];
+        const stagingList = [];
+        const unmapped = [];
 
-      Object.entries(groupedByPin).forEach(([pin, timestamps]) => {
-        const emp = empMap[pin];
-        if (!emp) {
-          unmapped.push({
-            pin,
-            totalScans: timestamps.length,
-            sampleScan: timestamps[0].toISOString().replace('T', ' ').slice(0, 19),
-          });
-          return;
-        }
+        Object.entries(groupedByPin).forEach(([pin, timestamps]) => {
+          if (!timestamps || timestamps.length === 0) return;
+          const emp = empMap[pin];
+          if (!emp) {
+            unmapped.push({
+              pin,
+              totalScans: timestamps.length,
+              sampleScan: timestamps[0] && !isNaN(timestamps[0].getTime()) ? timestamps[0].toISOString().replace('T', ' ').slice(0, 19) : '-',
+            });
+            return;
+          }
 
         // Urutkan & deduplikasi scan ganda dalam 3 menit
         timestamps.sort((a, b) => a - b);
@@ -364,7 +371,12 @@ export default function ImporFingerprint({
       setTotalScansCount(scans.length);
       setIsProcessing(false);
       showAlert(`Berhasil memproses ${scans.length} scan log menjadi ${stagingList.length} rekaman presensi.`);
-    }, 200);
+    } catch (err) {
+      console.error('Error parsing scans:', err);
+      setIsProcessing(false);
+      showAlert('Terjadi kesalahan saat memproses data scan: ' + err.message, 'error');
+    }
+  }, 200);
   };
 
   // Helper Pengubahan Data Inline oleh Admin di Tabel Preview
