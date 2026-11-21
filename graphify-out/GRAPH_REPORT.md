@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-22)
 
 ## Corpus Check
-- 129 files · ~77,562 words
+- 130 files · ~95,523 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
 ## Summary
-- 645 nodes · 1415 edges · 48 communities (17 shown, 31 thin omitted)
+- 637 nodes · 1406 edges · 49 communities (15 shown, 34 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `58ae6807`
+- Built from commit: `3974c00d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,8 +20,8 @@
 - Frontend Dependencies & Manifest
 - Backend Composer Dependencies
 - HCGA HRIS Enterprise Design System (DESIGN.md)
-- FingerprintImportService.php
-- User
+- SystemSetting
+- Illuminate\Database\Eloquent\Factories\HasFactory
 - Employee
 - Illuminate\Database\Schema\Blueprint
 - Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)
@@ -32,12 +32,13 @@
 - Anti-Slop (Full Specification)
 - Ponytail (Companion Pragmatism Skill)
 - PengaturanSistem.jsx
-- Illuminate\Database\Eloquent\Factories\HasFactory
+- Illuminate\Database\Eloquent\Relations\BelongsTo
 - Illuminate\Database\Seeder
 - Illuminate\Http\Request
+- Attendance
+- KaryawanBackendTest
 - sidebar.jsx
 - Location
-- App\Models\Shift
 
 ## God Nodes (most connected - your core abstractions)
 1. `react` - 41 edges
@@ -52,25 +53,25 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `CatatanKehadiran()` --calls--> `ModalImporFingerprint()`  [EXTRACTED]
+  resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx → resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx
+- `Badge()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/badge.jsx → resources/js/lib/utils.js
 - `Card()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardDescription()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardTitle()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (48 total, 31 thin omitted)
+## Communities (49 total, 34 thin omitted)
 
 ### Community 0 - "@inertiajs/react"
-Cohesion: 0.42
-Nodes (15): Card(), CardContent(), CardDescription(), CardHeader(), CardTitle(), PageHeader(), LogAudit(), PengajuanCutiIzin() (+7 more)
+Cohesion: 0.34
+Nodes (17): Badge(), badgeVariants, Card(), CardContent(), CardDescription(), CardHeader(), CardTitle(), PageHeader() (+9 more)
 
 ### Community 1 - "Frontend Dependencies & Manifest"
 Cohesion: 0.08
@@ -83,6 +84,10 @@ Nodes (41): block, pestphp/pest-plugin, php-http/discovery, autoload, autoload-d
 ### Community 3 - "HCGA HRIS Enterprise Design System (DESIGN.md)"
 Cohesion: 0.06
 Nodes (33): 1. Overview, 2. Colors, 3. Typography, 4. Layout, 5. Elevation & Depth, 6. Shapes & Form Controls, 7. Atomic UI Component Catalog, 8. Do's and Don'ts (+25 more)
+
+### Community 5 - "Illuminate\Database\Eloquent\Factories\HasFactory"
+Cohesion: 0.26
+Nodes (3): Holiday, Location, ShiftSwap
 
 ### Community 7 - "Illuminate\Database\Schema\Blueprint"
 Cohesion: 0.08
@@ -98,7 +103,7 @@ Nodes (5): compilerOptions, baseUrl, jsx, paths, include
 
 ### Community 13 - "cn"
 Cohesion: 0.10
-Nodes (33): class-variance-authority@^0.7.1, class-variance-authority, Badge(), badgeVariants, Button(), buttonVariants, CardFooter(), Input() (+25 more)
+Nodes (31): class-variance-authority@^0.7.1, class-variance-authority, Button(), buttonVariants, CardFooter(), Input(), Modal(), ModalBody() (+23 more)
 
 ### Community 39 - "Anti-Slop (Full Specification)"
 Cohesion: 0.18
@@ -112,46 +117,34 @@ Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, 
 Cohesion: 0.07
 Nodes (57): lucide-react, react, recharts, xlsx, masterRecentAttendance, weeklyTrendData, JadwalShift(), WEEKS (+49 more)
 
-### Community 42 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.16
-Nodes (4): Attendance, Holiday, ShiftSchedule, ShiftSwap
-
 ### Community 43 - "Illuminate\Database\Seeder"
-Cohesion: 0.20
-Nodes (4): AttendanceSeeder, DatabaseSeeder, HolidaySeeder, LocationSeeder
+Cohesion: 0.08
+Nodes (7): User, AttendanceSeeder, DatabaseSeeder, EmployeeSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder
 
 ### Community 44 - "Illuminate\Http\Request"
 Cohesion: 0.05
-Nodes (11): BerandaController, JadwalController, {closure#1}(), KaryawanController, KehadiranController, PengaturanController, AuthController, Controller (+3 more)
+Nodes (10): BerandaController, JadwalController, {closure#1}(), KaryawanController, KehadiranController, PengaturanController, AuthController, Controller (+2 more)
 
 ### Community 47 - "sidebar.jsx"
 Cohesion: 0.09
 Nodes (18): @inertiajs/react, renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar(), Topbar(), getPageMetadata(), navigationConfig (+10 more)
 
-### Community 48 - "Location"
-Cohesion: 0.11
-Nodes (3): FingerprintAndManualAttendanceTest, KaryawanBackendTest, TestCase
-
-### Community 52 - "App\Models\Shift"
-Cohesion: 0.15
-Nodes (3): Shift, EmployeeSeeder, ShiftSeeder
-
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 242 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 234 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `PengaturanSistem.jsx` to `@inertiajs/react`, `Frontend Dependencies & Manifest`, `cn`, `sidebar.jsx`?**
-  _High betweenness centrality (0.059) - this node is a cross-community bridge._
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **What connects `Aturan Antislop & Ponytail` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend Dependencies & Manifest` be split into smaller, more focused modules?**
   _Cohesion score 0.07563025210084033 - nodes in this community are weakly interconnected._
 - **Why does `HCGA HRIS Enterprise Design System (DESIGN.md)` connect `HCGA HRIS Enterprise Design System (DESIGN.md)` to `sidebar.jsx`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
+  _High betweenness centrality (0.042) - this node is a cross-community bridge._
 - **Should `Backend Composer Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
 - **Why does `lucide-react` connect `PengaturanSistem.jsx` to `@inertiajs/react`, `Frontend Dependencies & Manifest`, `cn`, `sidebar.jsx`?**

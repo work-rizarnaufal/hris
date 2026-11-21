@@ -349,10 +349,14 @@ export default function CatatanKehadiran({
       work_duration_hours: (r.checkIn && r.checkOut && r.checkIn !== '-' && r.checkOut !== '-') ? 8.0 : 0,
       location_id: r.location_id || (r.location?.includes('Mariuk') ? 1 : 2),
       anomaly_reason: r.anomalyReason || r.anomaly_reason || null,
+      notes: r.notes || r.anomalyReason || r.anomaly_reason || null,
     }));
 
-    if (importedRecords[0]?.date) {
-      setSelectedDate(importedRecords[0].date);
+    if (importedRecords && importedRecords.length > 0) {
+      const dates = importedRecords.map((r) => r.date).filter(Boolean).sort();
+      if (dates.length > 0) {
+        setSelectedDate(dates[dates.length - 1]);
+      }
     }
 
     router.post('/kehadiran/commit-fingerprint', {

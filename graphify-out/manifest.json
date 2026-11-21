@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "mtime": 1795282980.8989801,
-    "seen": 1795283155.4847665,
-    "ast_hash": "9b98a111893abfeac2758574dc848eca",
+    "mtime": 1795286732.6766033,
+    "seen": 1795286767.0061364,
+    "ast_hash": "ee47086e92ee43265a4aa50010f05b4f",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
@@ -570,14 +570,14 @@
     "semantic_hash": ""
   },
   "app/Models/Attendance.php": {
-    "mtime": 1795284595.6648521,
-    "seen": 1795284806.2120507,
-    "ast_hash": "9089b87b20fa8c4b5ebbfe52ad4c273d",
+    "mtime": 1795284919.049328,
+    "seen": 1795286710.161662,
+    "ast_hash": "2d17561a22f54a606f817e369c3edbf5",
     "semantic_hash": ""
   },
   "app/Models/Employee.php": {
-    "mtime": 1795276909.0709987,
-    "seen": 1795276984.7194755,
+    "mtime": 1795285918.7415478,
+    "seen": 1795286710.161662,
     "ast_hash": "f0ca5c0e55c5f1822ff64ea58d6fc50b",
     "semantic_hash": ""
   },
@@ -726,21 +726,21 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/KehadiranController.php": {
-    "mtime": 1795284763.1265688,
-    "seen": 1795284806.2120507,
-    "ast_hash": "8d7017d6a1ef16e95bc9bd55075dfd46",
+    "mtime": 1795284919.010875,
+    "seen": 1795286710.161662,
+    "ast_hash": "548f1ec46278f8bd3cd0c057d933c8f7",
     "semantic_hash": ""
   },
   "app/Services/FingerprintImportService.php": {
-    "mtime": 1795284717.421904,
-    "seen": 1795284806.2120507,
-    "ast_hash": "2f5a0573f6bdf63c00d7b9a96fa770e8",
+    "mtime": 1795286557.9127676,
+    "seen": 1795286710.161662,
+    "ast_hash": "77e8089ce7e9338ff1ee1db4433e3d64",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx": {
-    "mtime": 1795281433.7266216,
-    "seen": 1795281866.7142336,
-    "ast_hash": "6d88c32e76b00d931ddb5c6554885a13",
+    "mtime": 1795286661.9492495,
+    "seen": 1795286710.161662,
+    "ast_hash": "dd1b44d7b12c2e6380eea529a434f125",
     "semantic_hash": ""
   },
   "tests/Feature/FingerprintAndManualAttendanceTest.php": {
@@ -768,15 +768,21 @@
     "semantic_hash": ""
   },
   "database/seeders/AttendanceSeeder.php": {
-    "mtime": 1795284782.311473,
-    "seen": 1795284806.2120507,
-    "ast_hash": "d14d798058c683c28182500eedd137b7",
+    "mtime": 1795284919.0786777,
+    "seen": 1795286710.161662,
+    "ast_hash": "d861caefe68bb42c50cdf2ffff2234ae",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_22_010938_add_shift_to_attendances_table.php": {
-    "mtime": 1795284585.8964016,
-    "seen": 1795284806.2120507,
-    "ast_hash": "12e9fb7fa50f24236ce1ec5508a0d254",
+    "mtime": 1795284919.0508697,
+    "seen": 1795286710.161662,
+    "ast_hash": "effe28434d7be7e8089544e7c56fa023",
+    "semantic_hash": ""
+  },
+  "database/data/scans_report_week.json": {
+    "mtime": 1795285047.9144578,
+    "seen": 1795286710.161662,
+    "ast_hash": "55920244cfa4e51feea27bbcf1b69b65",
     "semantic_hash": ""
   },
   "package-lock.json": {

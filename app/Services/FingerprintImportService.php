@@ -51,16 +51,9 @@ class FingerprintImportService
                 continue;
             }
 
-            $type = trim((string) ($scan['Tipe Absensi'] ?? $scan['type'] ?? ''));
-
             try {
                 $carbon = Carbon::parse($ts);
-                $scansByPin[$pin][] = [
-                    'carbon' => $carbon,
-                    'time' => $carbon->format('H:i'),
-                    'type' => $type,
-                    'timestamp' => $carbon->timestamp,
-                ];
+                $scansByPin[$pin][] = $carbon;
             } catch (\Exception $e) {
                 // Ignore invalid date format
             }
@@ -70,31 +63,31 @@ class FingerprintImportService
         $anomalies = [];
         $unmappedPins = [];
 
-        foreach ($scansByPin as $pin => $items) {
+        foreach ($scansByPin as $pin => $timestamps) {
             $employee = $empByPin[$pin] ?? null;
 
             if (! $employee) {
                 $unmappedPins[] = [
                     'pin' => $pin,
-                    'total_scans' => count($items),
-                    'sample_scan' => $items[0]['carbon']->format('Y-m-d H:i:s'),
+                    'total_scans' => count($timestamps),
+                    'sample_scan' => $timestamps[0]->format('Y-m-d H:i:s'),
                 ];
 
                 continue;
             }
 
             // Deduplicate scans: ignore duplicate scans within 5 minutes (300 seconds)
-            usort($items, fn ($a, $b) => $a['timestamp'] <=> $b['timestamp']);
+            usort($timestamps, fn ($a, $b) => $a->timestamp <=> $b->timestamp);
             $deduped = [];
-            foreach ($items as $item) {
+            foreach ($timestamps as $t) {
                 if (empty($deduped)) {
-                    $deduped[] = $item;
+                    $deduped[] = $t;
 
                     continue;
                 }
                 $last = $deduped[count($deduped) - 1];
-                if (($item['timestamp'] - $last['timestamp']) >= 300) {
-                    $deduped[] = $item;
+                if (($t->timestamp - $last->timestamp) >= 300) {
+                    $deduped[] = $t;
                 }
             }
 
@@ -124,7 +117,7 @@ class FingerprintImportService
 
     /**
      * Pair scans into daily attendance records.
-     * Shift Pagi : Buka absen 07:00, Kerja 08:00 - 17:00, Tutup absen 18:00 (lembur s/d malam)
+     * Shift Pagi : Buka absen 07:00, Kerja 08:00 - 17:00, Tutup absen 18:00
      * Shift Malam: Buka absen 19:00, Kerja 20:00 - 05:00, Tutup absen 06:00 (lintas hari)
      */
     protected function pairScansIntoDailyRecords(
@@ -134,146 +127,107 @@ class FingerprintImportService
         Employee $employee
     ): array {
         $records = [];
+        $grouped = [];
 
-        // Kelompokkan timestamps per tanggal kalender scan
-        $byDate = [];
-        foreach ($timestamps as $item) {
-            $t = $item['carbon'];
-            $byDate[$t->format('Y-m-d')][] = $item;
+        foreach ($timestamps as $t) {
+            $hour = (int) $t->format('H');
+            $timeStr = $t->format('H:i');
+
+            // Cek apakah scan ini adalah scan shift malam atau shift pagi
+            // Scan dini hari (04:00 - 06:30) selalu scan pulang dinas malam kemarin
+            if ($timeStr <= '06:30') {
+                $prevDate = $t->copy()->subDay()->format('Y-m-d');
+                $grouped[$prevDate]['out'][] = $t;
+                $grouped[$prevDate]['shift_type'] = 'MALAM';
+            } elseif ($timeStr >= '18:30') {
+                // Scan malam (18:30 ke atas) adalah scan masuk dinas malam hari ini
+                $dutyDate = $t->format('Y-m-d');
+                $grouped[$dutyDate]['in'][] = $t;
+                $grouped[$dutyDate]['shift_type'] = 'MALAM';
+            } else {
+                // Scan pagi & sore (06:31 - 18:29) adalah dinas shift pagi
+                $dutyDate = $t->format('Y-m-d');
+                $grouped[$dutyDate]['shift_type'] = 'PAGI';
+
+                if ($timeStr < '14:00') {
+                    $grouped[$dutyDate]['in'][] = $t;
+                } else {
+                    $grouped[$dutyDate]['out'][] = $t;
+                }
+            }
         }
 
-        foreach ($byDate as $dateStr => $dayItems) {
-            usort($dayItems, fn ($a, $b) => $a['timestamp'] <=> $b['timestamp']);
+        foreach ($grouped as $date => $slots) {
+            $inScans = $slots['in'] ?? [];
+            $outScans = $slots['out'] ?? [];
+            $shiftType = $slots['shift_type'] ?? ($isNightShift ? 'MALAM' : 'PAGI');
+            $isNight = $shiftType === 'MALAM';
 
-            // 1. Scan dini hari (<= 06:15): Pulang dinas Shift Malam kemarin jika tidak ada scan pagi
-            $earlyMorningOuts = array_filter($dayItems, fn ($item) => $item['time'] <= '06:15');
-            $hasDaytimeScans = ! empty(array_filter($dayItems, fn ($item) => $item['time'] > '06:15' && $item['time'] < '14:00'));
+            $firstIn = ! empty($inScans) ? $inScans[0]->format('H:i') : null;
+            $lastOut = ! empty($outScans) ? end($outScans)->format('H:i') : null;
 
-            if (! empty($earlyMorningOuts) && ! $hasDaytimeScans) {
-                $prevDate = Carbon::parse($dateStr)->subDay()->format('Y-m-d');
-                $lastOutItem = end($earlyMorningOuts);
-                $lastOut = $lastOutItem['time'];
+            $isAnomaly = false;
+            $anomalyReason = null;
 
-                $records[] = [
-                    'employee_id' => $employee->id,
-                    'employee_name' => $employee->name,
-                    'nip' => $employee->nip,
-                    'pin' => $employee->biometric_pin,
-                    'biometric_pin' => $employee->biometric_pin,
-                    'location_id' => $employee->location_id,
-                    'location_name' => $employee->location?->name ?? 'Site',
-                    'date' => $prevDate,
-                    'shift_name' => 'Shift Malam (20:00 - 05:00)',
-                    'check_in_time' => null,
-                    'check_out_time' => $lastOut,
-                    'late_minutes' => 0,
-                    'status' => 'hadir',
-                    'work_duration_hours' => 8.0,
-                    'is_anomaly' => true,
-                    'anomaly_reason' => 'Pulang Dinas Shift Malam (Tap Masuk di luar rentang file penarikan)',
-                    'method' => 'fingerprint',
-                ];
-            }
-
-            // 2. Scan pada hari aktif (> 06:15)
-            $activeScans = array_values(array_filter($dayItems, fn ($item) => $item['time'] > '06:15'));
-            if (empty($activeScans)) {
-                continue;
-            }
-
-            $morningScans = array_values(array_filter($activeScans, fn ($item) => $item['time'] < '14:00'));
-            $departureScans = array_values(array_filter($activeScans, fn ($item) => $item['time'] >= '14:00'));
-            $isEveningOnly = empty($morningScans) && ! empty($departureScans) && ($departureScans[0]['time'] >= '18:30');
-
-            if ($isEveningOnly) {
-                // Masuk dinas Shift Malam hari ini (menunggu scan pulang besok pagi)
-                $firstIn = $departureScans[0]['time'];
-                [$inH, $inM] = explode(':', $firstIn);
-                $inMin = ((int) $inH * 60) + (int) $inM;
-                $targetMin = 20 * 60; // 20:00 WIB
-                $late = max(0, $inMin - $targetMin);
-                $status = ($late > $toleranceMinutes) ? 'terlambat' : 'hadir';
-
-                $records[] = [
-                    'employee_id' => $employee->id,
-                    'employee_name' => $employee->name,
-                    'nip' => $employee->nip,
-                    'pin' => $employee->biometric_pin,
-                    'biometric_pin' => $employee->biometric_pin,
-                    'location_id' => $employee->location_id,
-                    'location_name' => $employee->location?->name ?? 'Site',
-                    'date' => $dateStr,
-                    'shift_name' => 'Shift Malam (20:00 - 05:00)',
-                    'check_in_time' => $firstIn,
-                    'check_out_time' => null,
-                    'late_minutes' => $late,
-                    'status' => $status,
-                    'work_duration_hours' => 0,
-                    'is_anomaly' => false,
-                    'anomaly_reason' => 'Sedang Berdinas Shift Malam (Menunggu scan pulang besok pagi 05:00-06:00)',
-                    'method' => 'fingerprint',
-                ];
-            } else {
-                // Shift Pagi (08:00 - 17:00)
-                $firstIn = ! empty($morningScans) ? $morningScans[0]['time'] : null;
-
-                // Prioritaskan scan yang secara eksplisit bertipe 'Absensi Pulang'
-                $explicitOutScans = array_values(array_filter($departureScans, fn ($item) => str_contains(strtolower($item['type']), 'pulang')));
-                $lastOut = null;
-                if (! empty($explicitOutScans)) {
-                    $lastOut = end($explicitOutScans)['time'];
-                } elseif (! empty($departureScans)) {
-                    $lastOut = end($departureScans)['time'];
-                }
-
-                // Cek apakah ada scan masuk malam lanjutan
-                $nightInScans = array_values(array_filter($departureScans, fn ($item) => $item['time'] >= '18:30' && str_contains(strtolower($item['type']), 'masuk')));
-                $nightInNote = ! empty($nightInScans) ? ' (Tercatat Tap Masuk Malam: '.end($nightInScans)['time'].')' : '';
-
-                $late = 0;
-                $status = 'hadir';
-                if ($firstIn) {
-                    [$inH, $inM] = explode(':', $firstIn);
-                    $inMin = ((int) $inH * 60) + (int) $inM;
-                    $targetMin = 8 * 60; // 08:00 WIB
-                    if ($inMin > ($targetMin + $toleranceMinutes)) {
-                        $late = $inMin - $targetMin;
-                        $status = 'terlambat';
-                    }
-                }
-
-                $isAnomaly = false;
-                $anomalyReason = null;
-                if ($firstIn && ! $lastOut) {
-                    $isAnomaly = true;
-                    $anomalyReason = 'Lupa Scan Pulang (Missing Out)'.$nightInNote;
-                } elseif (! $firstIn && $lastOut) {
-                    $isAnomaly = true;
-                    $anomalyReason = 'Lupa Scan Masuk (Missing In)'.$nightInNote;
+            if ($firstIn && ! $lastOut) {
+                // Jika shift malam masuk hari ini dan belum ada scan keluar besok pagi, status On Duty
+                if ($isNight && $date === Carbon::today()->format('Y-m-d')) {
+                    $isAnomaly = false;
+                    $anomalyReason = 'Sedang Berdinas (Menunggu Scan Pulang Besok 05:00-06:00)';
                 } else {
-                    $anomalyReason = 'Hadir Lengkap (Masuk '.$firstIn.', Pulang '.$lastOut.')'.$nightInNote;
+                    $isAnomaly = true;
+                    $anomalyReason = 'Lupa Scan Pulang (Missing Out)';
+                }
+            } elseif (! $firstIn && $lastOut) {
+                $isAnomaly = true;
+                $anomalyReason = 'Lupa Scan Masuk (Missing In)';
+            }
+
+            // Calculate Tardiness
+            $lateMinutes = 0;
+            $status = 'hadir';
+
+            $targetInHour = $isNight ? 20 : 8; // Shift Malam 20:00, Shift Pagi 08:00
+            $shiftName = $isNight ? 'Shift Malam (20:00 - 05:00)' : 'Shift Pagi (08:00 - 17:00)';
+
+            if ($firstIn) {
+                [$inH, $inM] = explode(':', $firstIn);
+                $inTotalMinutes = ((int) $inH * 60) + (int) $inM;
+                $targetTotalMinutes = ($targetInHour * 60);
+
+                if ($isNight && (int) $inH < 12) {
+                    $inTotalMinutes += (24 * 60);
                 }
 
-                $records[] = [
-                    'employee_id' => $employee->id,
-                    'employee_name' => $employee->name,
-                    'nip' => $employee->nip,
-                    'pin' => $employee->biometric_pin,
-                    'biometric_pin' => $employee->biometric_pin,
-                    'location_id' => $employee->location_id,
-                    'location_name' => $employee->location?->name ?? 'Site',
-                    'date' => $dateStr,
-                    'shift_name' => 'Shift Pagi (08:00 - 17:00)',
-                    'check_in_time' => $firstIn,
-                    'check_out_time' => $lastOut,
-                    'late_minutes' => $late,
-                    'status' => $status,
-                    'work_duration_hours' => ($firstIn && $lastOut) ? 8.0 : 0,
-                    'is_anomaly' => $isAnomaly,
-                    'anomaly_reason' => $anomalyReason,
-                    'method' => 'fingerprint',
-                ];
+                $diff = $inTotalMinutes - $targetTotalMinutes;
+                if ($diff > $toleranceMinutes) {
+                    $lateMinutes = $diff;
+                    $status = 'terlambat';
+                }
             }
+
+            // Work duration standard 8 jam kerja efektif (9 jam jadwal)
+            $workDuration = ($firstIn && $lastOut) ? 8.0 : 0;
+
+            $records[] = [
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'nip' => $employee->nip,
+                'pin' => $employee->biometric_pin,
+                'biometric_pin' => $employee->biometric_pin,
+                'location_id' => $employee->location_id,
+                'location_name' => $employee->location?->name ?? 'Site',
+                'date' => $date,
+                'shift_name' => $shiftName,
+                'check_in_time' => $firstIn,
+                'check_out_time' => $lastOut,
+                'late_minutes' => $lateMinutes,
+                'status' => $status,
+                'work_duration_hours' => $workDuration,
+                'is_anomaly' => $isAnomaly,
+                'anomaly_reason' => $anomalyReason,
+                'method' => 'fingerprint',
+            ];
         }
 
         return $records;
@@ -299,13 +253,12 @@ class FingerprintImportService
                     'check_in_time' => $row['check_in_time'] ?? null,
                     'check_out_time' => $row['check_out_time'] ?? null,
                     'status' => $row['status'] ?? 'hadir',
-                    'shift' => $row['shift_name'] ?? null,
                     'late_minutes' => $row['late_minutes'] ?? 0,
                     'work_duration_hours' => $row['work_duration_hours'] ?? 0,
                     'location_id' => $row['location_id'] ?? null,
                     'method' => 'fingerprint',
                     'import_batch_id' => $batchId,
-                    'notes' => ! empty($row['anomaly_reason']) ? 'Fingerprint: '.$row['anomaly_reason'] : 'Presensi biometric fingerprint site',
+                    'notes' => ! empty($row['notes']) ? $row['notes'] : (! empty($row['anomaly_reason']) ? 'Fingerprint: '.$row['anomaly_reason'] : 'Presensi biometric fingerprint site'),
                 ]
             );
             $savedCount++;

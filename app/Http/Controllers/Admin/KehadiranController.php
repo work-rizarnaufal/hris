@@ -25,7 +25,7 @@ class KehadiranController extends Controller
         $locations = Location::where('status', 'Aktif')->get();
         $shifts = Shift::where('is_active', true)->get();
 
-        $attendances = Attendance::with(['employee.shift', 'location'])
+        $attendances = Attendance::with(['employee', 'location'])
             ->orderBy('date', 'desc')
             ->get();
 

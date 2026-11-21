@@ -1,18 +1,19 @@
 {
   "0": "@inertiajs/react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "FingerprintImportService.php",
-  "5": "User",
+  "4": "SystemSetting",
+  "5": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
   "13": "cn",
   "39": "Anti-Slop (Full Specification)",
   "40": "Ponytail (Companion Pragmatism Skill)",
   "41": "PengaturanSistem.jsx",
-  "42": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+  "42": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
   "43": "Illuminate\\Database\\Seeder",
   "44": "Illuminate\\Http\\Request",
+  "45": "Attendance",
+  "46": "KaryawanBackendTest",
   "47": "sidebar.jsx",
-  "48": "Location",
-  "52": "App\\Models\\Shift"
+  "48": "Location"
 }

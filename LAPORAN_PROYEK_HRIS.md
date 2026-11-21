@@ -249,11 +249,15 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
   - **Shift Pagi**: Jam kerja operasional `08:00 - 17:00 WIB`. Jendela absen dibuka mulai `07:00 WIB` dan ditutup pada `18:00 WIB`.
   - **Shift Malam**: Jam kerja operasional `20:00 - 05:00 WIB` (lintas hari). Jendela absen dibuka mulai `19:00 WIB` dan ditutup pada `06:00 WIB` pagi hari berikutnya.
   - Toleransi keterlambatan dikonfigurasi dinamis (default: 15 menit).
-- **Integrasi Impor Mesin Biometric Fingerprint Fisik (`FingerprintImportService.php`)**:
+- **Integrasi Impor Mesin Biometric Fingerprint Fisik (`ModalImporFingerprint.jsx` & `FingerprintImportService.php`)**:
   - Mendukung format ekstraksi mesin fingerprint 9 kolom (`Cloud ID`, `ID/PIN`, `Nama`, `Tanggal Absensi`, `Jam Absensi`, `Verifikasi`, `Tipe Absensi`, `Jabatan`, `Kantor`).
-  - Pemisahan site otomatis (`MARIUK` vs `CIMALAKA`).
-  - Algoritma deduplikasi scan ganda dalam 5 menit, pengelompokan time-window cerdas (masuk & pulang), serta deteksi anomali single punch (lupa tap masuk/pulang).
-  - Alur commit langsung ke database via `POST /kehadiran/commit-fingerprint`.
+  - Pemisahan site otomatis (`MARIUK` vs `CIMALAKA`) dengan pencocokan fallback PIN biometrik global.
+  - **Mode Preview & Staging Interaktif Sebelum Simpan**:
+    - Parsing otomatis dijalankan 1 kali di awal saat file diunggah tanpa membebani sistem.
+    - Menampilkan tabel preview interaktif (*staging area*) yang memungkinkan admin melakukan *inline edit* untuk Jam Masuk, Jam Pulang, Dropdown Status (`Hadir`, `Terlambat`, `Izin`, `Sakit`, `Cuti`, `Alpha`), dan Catatan.
+    - Dilengkapi tombol 1-klik **"Auto-Fill Pulang"** untuk anomali *Missing Out* (otomatis mengisi jam 17:00 untuk Pagi atau 05:00 untuk Malam).
+    - Dilengkapi tombol hapus baris sampah/anomali dan filter tab (*Semua*, *Perlu Review*, *Lengkap*, *PIN Belum Terdaftar*).
+    - Data yang disimpan ke SQLite adalah hasil editan akhir admin yang sudah diverifikasi bersih via `POST /kehadiran/commit-fingerprint`.
 - **Komponen Atomik `<TablePagination>`**:
   - Dilengkapi kontrol navigasi halaman cerdas dengan ellipsis, pilihan ukuran baris (`10, 25, 50, 100`), dan penomoran baris kontinu `(currentPage - 1) * perPage + index + 1`.
   - Ukuran font dan tombol diperbesar sesuai preferensi operasional (`text-xs sm:text-sm`).
