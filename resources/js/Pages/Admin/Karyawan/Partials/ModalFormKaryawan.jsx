@@ -465,16 +465,16 @@ export default function ModalFormKaryawan({
             </div>
           </div>
 
-          {/* Bagian 3: Jam Kerja Shift 12 Jam */}
+          {/* Bagian 3: Jam Kerja Shift Operasional */}
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-navy" />
                 <h3 className="text-xs font-bold text-navy uppercase tracking-wider">
-                  3. Pengaturan Shift 12 Jam & Jam Kerja
+                  3. Pengaturan Shift Operasional & Jam Kerja
                 </h3>
               </div>
-              <span className="text-[11px] text-slate-500 font-medium">Tukar shift pukul 07:00 & 19:00</span>
+              <span className="text-[11px] text-slate-500 font-medium">Shift Pagi 08:00 & Malam 20:00</span>
             </div>
 
             {/* Presets Button List */}

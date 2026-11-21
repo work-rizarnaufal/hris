@@ -55,10 +55,10 @@ export default function PanelRotasiGrup({
     }).format(new Date())
   );
   const [targetGroup, setTargetGroup] = useState('Grup A');
-  const [shift1In, setShift1In] = useState('07:00');
-  const [shift1Out, setShift1Out] = useState('19:00');
-  const [shift2In, setShift2In] = useState('19:00');
-  const [shift2Out, setShift2Out] = useState('07:00');
+  const [shift1In, setShift1In] = useState('08:00');
+  const [shift1Out, setShift1Out] = useState('17:00');
+  const [shift2In, setShift2In] = useState('20:00');
+  const [shift2Out, setShift2Out] = useState('05:00');
   const [reason, setReason] = useState('');
 
   // Pisahkan personil operasional (yang ikut rotasi) dan staf kantor (non-shift)
@@ -142,7 +142,7 @@ export default function PanelRotasiGrup({
       grupBStatus: 'LIBUR (OFF)',
       grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
       officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A berdinas 2 shift 12 jam (Pagi & Malam). Grup B libur otomatis.',
+      note: 'Grup A berdinas shift operasional (Pagi & Malam). Grup B libur otomatis.',
     },
     {
       day: 'Selasa',
@@ -152,7 +152,7 @@ export default function PanelRotasiGrup({
       grupBStatus: 'MASUK (Pagi & Malam)',
       grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
       officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A otomatis libur paska dinas Senin. Giliran Grup B masuk 2 shift 12 jam.',
+      note: 'Grup A otomatis libur paska dinas Senin. Giliran Grup B masuk shift operasional.',
     },
     {
       day: 'Rabu',
@@ -216,14 +216,14 @@ export default function PanelRotasiGrup({
               Aturan Operasional Permanen 24/7
             </span>
             <Badge className="bg-white/10 text-white text-[10px] font-medium border-white/10">
-              Shift 12 Jam (Pagi 07:00-19:00 & Malam 19:00-07:00) • 2 Kelompok (A & B)
+              Shift Operasional (Pagi 08:00-17:00 & Malam 20:00-05:00) • 2 Kelompok (A & B)
             </Badge>
           </div>
           <h3 className="text-base font-bold font-display mt-2 text-white">
             Pusat Penugasan & Rotasi Roster Grup A & Grup B (Mariuk & Cimalaka)
           </h3>
           <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            Operasional berjalan <strong>non-stop 7 hari per minggu (24/7)</strong> dengan <strong>2 shift 12 jam (Pagi & Malam)</strong>. Kelompok A dan B bertugas secara selang-seling setiap hari: jika <strong>Kelompok A masuk hari Senin</strong>, maka otomatis <strong>hari Selasa libur (OFF)</strong>, demikian sebaliknya untuk <strong>Kelompok B</strong>. Jatah libur hari Minggu bergantian adil setiap 2 minggu.
+            Operasional berjalan <strong>7 hari per minggu (24/7)</strong> dengan <strong>2 shift operasional (Pagi 08:00-17:00 & Malam 20:00-05:00)</strong>. Kelompok A dan B bertugas secara selang-seling setiap hari: jika <strong>Kelompok A masuk hari Senin</strong>, maka otomatis <strong>hari Selasa libur (OFF)</strong>, demikian sebaliknya untuk <strong>Kelompok B</strong>. Jatah libur hari Minggu bergantian adil setiap 2 minggu.
           </p>
         </div>
 
@@ -626,12 +626,12 @@ export default function PanelRotasiGrup({
 
             {/* Baris 2: Jam Operasional Shift 1 & Shift 2 (Format TIME) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-              {/* Blok Shift 1 (Pagi 12 Jam) */}
+              {/* Blok Shift 1 (Pagi 9 Jam) */}
               <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-2.5">
                 <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
                   <Sun className="w-4 h-4 text-emerald-600" />
                   <span className="text-xs font-bold text-slate-800">
-                    Konfigurasi Shift Pagi (12 Jam: 07:00 - 19:00 WIB)
+                    Konfigurasi Shift Pagi (08:00 - 17:00 WIB)
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -662,12 +662,12 @@ export default function PanelRotasiGrup({
                 </div>
               </div>
 
-              {/* Blok Shift 2 (Malam 12 Jam) */}
+              {/* Blok Shift 2 (Malam 9 Jam) */}
               <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-2.5">
                 <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
                   <Moon className="w-4 h-4 text-indigo-600" />
                   <span className="text-xs font-bold text-slate-800">
-                    Konfigurasi Shift Malam (12 Jam: 19:00 - 07:00 WIB)
+                    Konfigurasi Shift Malam (20:00 - 05:00 WIB)
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">

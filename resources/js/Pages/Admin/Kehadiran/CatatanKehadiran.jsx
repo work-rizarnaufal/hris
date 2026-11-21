@@ -79,7 +79,16 @@ export default function CatatanKehadiran({
   dbShifts = [],
   dbAttendances = [],
 }) {
-  const [selectedDate, setSelectedDate] = useState(DEFAULT_DATE);
+  const defaultDate = useMemo(() => {
+    if (dbAttendances && dbAttendances.length > 0) {
+      const dates = dbAttendances.map((a) => (typeof a.date === 'string' ? a.date.slice(0, 10) : new Date(a.date).toISOString().slice(0, 10)));
+      dates.sort().reverse();
+      return dates[0];
+    }
+    return DEFAULT_DATE;
+  }, [dbAttendances]);
+
+  const [selectedDate, setSelectedDate] = useState(defaultDate);
 
   const initialEmployeesList = useMemo(() => {
     if (dbEmployees && dbEmployees.length > 0) {
@@ -256,7 +265,7 @@ export default function CatatanKehadiran({
       // 4. Filter Divisi
       const matchDivision = filterDivision === 'ALL' || rec.division === filterDivision;
 
-      // 5. Filter Shift 12 Jam
+      // 5. Filter Shift Operasional
       const matchShift =
         filterShift === 'ALL' ||
         (filterShift === 'Pagi' && rec.shift.toLowerCase().includes('pagi')) ||
@@ -742,7 +751,7 @@ export default function CatatanKehadiran({
               <option value="Security & Safety">Security & Safety</option>
             </TableSelect>
 
-            {/* Filter Shift 12 Jam */}
+            {/* Filter Shift Operasional */}
             <TableSelect
               value={filterShift}
               onChange={(e) => setFilterShift(e.target.value)}
@@ -1048,6 +1057,7 @@ export default function CatatanKehadiran({
         onClose={() => setIsFingerprintOpen(false)}
         onSuccess={handleFingerprintImportSuccess}
         employees={employees}
+        locations={dbLocations}
       />
     </>
   );

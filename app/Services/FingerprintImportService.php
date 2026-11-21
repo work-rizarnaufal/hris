@@ -23,15 +23,18 @@ class FingerprintImportService
             15
         );
 
-        $employees = Employee::with(['shift', 'location'])
-            ->where('location_id', $locationId)
-            ->get();
-
-        // Map by biometric_pin, with fallback to numeric NIP
+        // Map by biometric_pin, with fallback to numeric NIP across all employees
+        $allEmployees = Employee::with(['shift', 'location'])->get();
         $empByPin = [];
-        foreach ($employees as $emp) {
+        foreach ($allEmployees as $emp) {
             $pin = (string) ($emp->biometric_pin ?? preg_replace('/\D/', '', $emp->nip));
             $empByPin[$pin] = $emp;
+        }
+        if ($locationId > 0) {
+            foreach ($allEmployees->where('location_id', $locationId) as $emp) {
+                $pin = (string) ($emp->biometric_pin ?? preg_replace('/\D/', '', $emp->nip));
+                $empByPin[$pin] = $emp;
+            }
         }
 
         // 1. Group scans by PIN & clean/sort timestamps

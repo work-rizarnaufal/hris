@@ -1,7 +1,7 @@
 {
-  "0": "react",
+  "0": "@inertiajs/react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "Illuminate\\Http\\Request",
+  "4": "App\\Http\\Controllers\\Admin\\KehadiranController",
   "5": "web.php",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
@@ -14,6 +14,7 @@
   "44": "App\\Http\\Controllers\\Admin\\PengaturanController",
   "45": "App\\Http\\Controllers\\Admin\\KaryawanController",
   "46": "HandleInertiaRequests.php",
+  "47": "sidebar.jsx",
   "48": "Location",
   "52": "App\\Models\\Employee"
 }

@@ -282,7 +282,7 @@ const EVALUATION_DATASET = [
     alpaDays: 0,
     score: 84,
     status: 'Perlu Pembinaan',
-    actionRecommendation: 'Pengawasan kehadiran awal shift 12 jam Cimalaka',
+    actionRecommendation: 'Pengawasan kehadiran awal shift operasional Cimalaka',
     incidents: [
       { date: '02 Nov 2026', type: 'Terlambat', detail: '14 Menit' },
       { date: '04 Nov 2026', type: 'Terlambat', detail: '16 Menit' },

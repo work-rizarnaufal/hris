@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Beranda/Beranda.jsx": {
-    "mtime": 1795251307.1603293,
-    "seen": 1795251345.9342005,
-    "ast_hash": "0e0f3223af583cf9112373e23855ddd7",
+    "mtime": 1795282972.7494864,
+    "seen": 1795283155.4847665,
+    "ast_hash": "3716421f18730d8e4b286ce8c92423d5",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx": {
@@ -90,51 +90,51 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/JadwalShift.jsx": {
-    "mtime": 1795253125.8209527,
-    "seen": 1795253171.5512578,
-    "ast_hash": "dbb850085fd95770602c1c2d500fbf50",
+    "mtime": 1795282915.1374705,
+    "seen": 1795283155.4847665,
+    "ast_hash": "0cc19e6d296360105cfd4d0b83969c43",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx": {
-    "mtime": 1795257014.313436,
-    "seen": 1795257114.3746305,
-    "ast_hash": "91997bbc7e5ee9e504d0cf64f7aa67a5",
+    "mtime": 1795283110.972887,
+    "seen": 1795283155.4847665,
+    "ast_hash": "74e835b1bb5695221f16a0814ae028b1",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx": {
-    "mtime": 1795253141.0258565,
-    "seen": 1795253171.5512578,
-    "ast_hash": "35a4270b8361e3cd92b4ad9b18962449",
+    "mtime": 1795282906.3510044,
+    "seen": 1795283155.4847665,
+    "ast_hash": "6c0a11f05a30e5fba82d4c7f944c5b2e",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx": {
-    "mtime": 1795278590.6890306,
-    "seen": 1795278648.880655,
-    "ast_hash": "7e717b7644259632b6d9d36c21e15691",
+    "mtime": 1795283026.2924597,
+    "seen": 1795283155.4847665,
+    "ast_hash": "e5539b18a60185061842ca90b7a41df5",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
-    "mtime": 1795281134.8555765,
-    "seen": 1795281866.7142336,
-    "ast_hash": "8dede7250bd062026b45f9cc7df9a52a",
+    "mtime": 1795283044.6272597,
+    "seen": 1795283155.4847665,
+    "ast_hash": "f69b8162383bd669fa0e23dad0ca9251",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx": {
-    "mtime": 1795278071.4102404,
-    "seen": 1795278146.3177986,
-    "ast_hash": "8221b27f4d1857e6500934c55ebcee18",
+    "mtime": 1795283061.4153779,
+    "seen": 1795283155.4847665,
+    "ast_hash": "55335d7e0d870941595977ee544636b9",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "mtime": 1795281820.4464457,
-    "seen": 1795281866.7142336,
-    "ast_hash": "b9a081d258998076acfea25977cd788d",
+    "mtime": 1795282980.8989801,
+    "seen": 1795283155.4847665,
+    "ast_hash": "9b98a111893abfeac2758574dc848eca",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
-    "mtime": 1795281405.8276508,
-    "seen": 1795281866.7142336,
-    "ast_hash": "0ba8bbfc52ae910350e0346d55aabcbd",
+    "mtime": 1795283074.3941476,
+    "seen": 1795283155.4847665,
+    "ast_hash": "8938074c0ae7f55ede11541796279d73",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx": {
@@ -144,15 +144,15 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/LaporanRekap.jsx": {
-    "mtime": 1795256179.1157677,
-    "seen": 1795256272.2165556,
-    "ast_hash": "7e2386de4f8d7f3485232c22a62a72fa",
+    "mtime": 1795283114.2476282,
+    "seen": 1795283155.4847665,
+    "ast_hash": "831aa74b5d5f376d321bd79a42951a72",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx": {
-    "mtime": 1795256254.4376676,
-    "seen": 1795256272.2165556,
-    "ast_hash": "74018bf1c16c977e1420d8f55fa85db1",
+    "mtime": 1795283090.2908409,
+    "seen": 1795283155.4847665,
+    "ast_hash": "5ef43d7c61e84c9c4b9a70b956fd42c4",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Lembur/LemburOvertime.jsx": {
@@ -174,9 +174,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx": {
-    "mtime": 1795271301.658781,
-    "seen": 1795271350.963075,
-    "ast_hash": "49928e95533e140cb09c12647068be34",
+    "mtime": 1795283122.3814566,
+    "seen": 1795283155.4847665,
+    "ast_hash": "ff01819c9dd70b3ed79cb9acccab73e6",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx": {
@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1795281387.4377794,
-    "seen": 1795281866.7142336,
-    "ast_hash": "4d0c7f364d3f52d94d8b6849875534dc",
+    "mtime": 1795282505.8472774,
+    "seen": 1795283155.4860735,
+    "ast_hash": "7d6309cc292eaeb1e78c20372df8a942",
     "semantic_hash": ""
   },
   "storage/framework/views/33035f1adbd8fc13ef8a3b77d50480bf.php": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795278640.951969,
-    "seen": 1795278648.880655,
-    "ast_hash": "2001216e6592b279aa7445f8018da3ae",
+    "mtime": 1795281892.2342799,
+    "seen": 1795283155.4860735,
+    "ast_hash": "e0cb7e35181b3e5bb061d1ffed8f1682",
     "semantic_hash": ""
   },
   "README.md": {
@@ -678,9 +678,9 @@
     "semantic_hash": ""
   },
   "database/seeders/DatabaseSeeder.php": {
-    "mtime": 1795270072.0730217,
-    "seen": 1795270339.955239,
-    "ast_hash": "259d685b537ef605c67aad052baa6a81",
+    "mtime": 1795282419.2995453,
+    "seen": 1795283155.4847665,
+    "ast_hash": "0e46f817fa20937e0323648bdfdc0318",
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
@@ -732,9 +732,9 @@
     "semantic_hash": ""
   },
   "app/Services/FingerprintImportService.php": {
-    "mtime": 1795281046.099382,
-    "seen": 1795281866.7142336,
-    "ast_hash": "7082761c80ce8f5cb905a1b976802dd7",
+    "mtime": 1795282400.2422223,
+    "seen": 1795283155.4847665,
+    "ast_hash": "3e6e26ca6d4c926dcf62f3007d5593ac",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx": {
@@ -753,6 +753,24 @@
     "mtime": 1795276787.3611019,
     "seen": 1795276984.7194755,
     "ast_hash": "4540348eb5848a4f3d36d2097d709dce",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Admin/JadwalController.php": {
+    "mtime": 1795282486.621086,
+    "seen": 1795283155.4847665,
+    "ast_hash": "1ed56b0dbddf9342458c33bb08a65e41",
+    "semantic_hash": ""
+  },
+  "database/data/scans_report.json": {
+    "mtime": 1795282330.7549124,
+    "seen": 1795283155.4847665,
+    "ast_hash": "c1a88469e73fb52ff316645a2733ebd1",
+    "semantic_hash": ""
+  },
+  "database/seeders/AttendanceSeeder.php": {
+    "mtime": 1795282407.2817583,
+    "seen": 1795283155.4847665,
+    "ast_hash": "d861caefe68bb42c50cdf2ffff2234ae",
     "semantic_hash": ""
   },
   "package-lock.json": {

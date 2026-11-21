@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import { getHolidays, getShiftSettings, formatDateDMY } from '@/services/systemSettings.js';
 import {
@@ -37,150 +37,12 @@ import {
   TableSearch,
   TableFilterGroup,
   TableSelect,
+  TablePagination,
   Toast,
   Text,
 } from '@/components/ui';
 import ModalFormTukarShift from './Partials/ModalFormTukarShift.jsx';
 import PanelRotasiGrup from './Partials/PanelRotasiGrup.jsx';
-
-// Data Induk Karyawan & Jadwal Default (Sinkron Mariuk & Cimalaka)
-const EMPLOYEES_SCHEDULE = [
-  // --- LOKASI MARIUK (6 Personil) ---
-  {
-    id: 1,
-    name: 'Budi Santoso',
-    nip: 'HC-0101',
-    role: 'Senior Operator Lapangan',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 2,
-    name: 'Dewi Anggraini',
-    nip: 'HC-0104',
-    role: 'Quality Assurance Inspector',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 3,
-    name: 'Hendra Wijaya',
-    nip: 'HC-0105',
-    role: 'Danru Keamanan & K3',
-    division: 'Security & Safety',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    baseShift: 'Shift Malam (19:00 - 07:00)',
-    shiftCode: 'MALAM',
-  },
-  {
-    id: 4,
-    name: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    role: 'Operator Forklift Utama',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 5,
-    name: 'Eko Prasetyo',
-    nip: 'HC-0107',
-    role: 'Teknisi Maintenance Mesin',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 6,
-    name: 'Joko Susilo',
-    nip: 'HC-0109',
-    role: 'Anggota Patroli Keamanan',
-    division: 'Security & Safety',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    baseShift: 'Shift Malam (19:00 - 07:00)',
-    shiftCode: 'MALAM',
-  },
-
-  // --- LOKASI CIMALAKA (6 Personil) ---
-  {
-    id: 7,
-    name: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    role: 'Supervisor Operasional Site',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 8,
-    name: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    role: 'Operator Mesin Produksi',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 9,
-    name: 'Dian Kusuma',
-    nip: 'HC-0110',
-    role: 'Petugas Keamanan Site',
-    division: 'Security & Safety',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    baseShift: 'Shift Malam (19:00 - 07:00)',
-    shiftCode: 'MALAM',
-  },
-  {
-    id: 10,
-    name: 'Rina Marlina',
-    nip: 'HC-0106',
-    role: 'Koordinator Gudang & Logistik',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 11,
-    name: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    role: 'Operator QC Lapangan',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    baseShift: 'Shift Pagi (07:00 - 19:00)',
-    shiftCode: 'PAGI',
-  },
-  {
-    id: 12,
-    name: 'Nurul Aini',
-    nip: 'HC-0112',
-    role: 'Petugas Inventory Stok',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    baseShift: 'Shift Malam (19:00 - 07:00)',
-    shiftCode: 'MALAM',
-  },
-];
 
 // Opsi Minggu Tersedia (Format DD/MM/YYYY)
 const WEEKS = [
@@ -238,9 +100,36 @@ const WEEKS = [
   },
 ];
 
-export default function JadwalShift() {
+export default function JadwalShift({
+  dbEmployees = [],
+  dbLocations = [],
+  dbShifts = [],
+}) {
+  const initialEmployees = useMemo(() => {
+    if (dbEmployees && dbEmployees.length > 0) {
+      return dbEmployees.map((emp) => ({
+        id: emp.id,
+        name: emp.name,
+        nip: emp.nip,
+        role: emp.role || emp.position || emp.role_title || '-',
+        division: emp.division || '-',
+        location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+        location_id: emp.location_id,
+        group: emp.shift_group || emp.group || 'Grup A',
+        baseShift: emp.shift?.name || 'Shift Pagi (08:00 - 17:00)',
+        shiftCode: emp.shift?.code || 'PAGI',
+      }));
+    }
+    return [];
+  }, [dbEmployees]);
+
   const [activeTab, setActiveTab] = useState('roster'); // 'roster' | 'patterns' | 'exceptions'
-  const [employees, setEmployees] = useState(EMPLOYEES_SCHEDULE);
+  const [employees, setEmployees] = useState(initialEmployees);
+
+  useEffect(() => {
+    setEmployees(initialEmployees);
+  }, [initialEmployees]);
+
   const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
   const [filterLocation, setFilterLocation] = useState('ALL');
   const [filterDivision, setFilterDivision] = useState('ALL');
@@ -249,6 +138,10 @@ export default function JadwalShift() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingException, setEditingException] = useState(null);
   const [alertInfo, setAlertInfo] = useState(null);
+
+  // Pagination States untuk Roster Karyawan
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
 
   const handleOpenAddException = () => {
     setEditingException(null);
@@ -261,55 +154,10 @@ export default function JadwalShift() {
   };
 
   // Daftar Pengecualian & Tukar Shift Aktif
-  const [exceptions, setExceptions] = useState([
-    {
-      id: 1,
-      date: '2026-11-04',
-      dateFormatted: '04/11/2026',
-      type: 'swap',
-      employeeId: 4,
-      employeeName: 'Ahmad Fauzi',
-      employeeNip: 'HC-0103',
-      sourceShift: 'Shift Pagi (07:00 - 19:00)',
-      targetEmployeeId: 1,
-      targetEmployeeName: 'Budi Santoso',
-      targetEmployeeNip: 'HC-0101',
-      targetShift: 'Shift Pagi (07:00 - 19:00)',
-      reason: 'Keperluan muat logistik pagi & urusan keluarga',
-      status: 'Disetujui HCGA',
-    },
-    {
-      id: 2,
-      date: '2026-11-06',
-      dateFormatted: '06/11/2026',
-      type: 'override',
-      employeeId: 6,
-      employeeName: 'Joko Susilo',
-      employeeNip: 'HC-0109',
-      sourceShift: 'Shift Malam (19:00 - 07:00)',
-      targetEmployeeName: '-',
-      targetEmployeeNip: '-',
-      targetShift: 'Shift Pagi (07:00 - 19:00)',
-      reason: 'Penugasan khusus pengawalan audit K3 gerbang utama',
-      status: 'Disetujui HCGA',
-    },
-  ]);
+  const [exceptions, setExceptions] = useState([]);
 
   // Daftar Perubahan Jadwal Operasional Manual
-  const [manualSchedules, setManualSchedules] = useState([
-    {
-      id: 1,
-      startDate: '2026-11-05',
-      startDateFormatted: '05/11/2026',
-      targetGroup: 'Grup B',
-      shift1In: '07:00',
-      shift1Out: '19:00',
-      shift2In: '19:00',
-      shift2Out: '07:00',
-      reason: 'Penyesuaian jam operasional paska maintenance mesin',
-      status: 'Aktif',
-    },
-  ]);
+  const [manualSchedules, setManualSchedules] = useState([]);
 
   // Kalender Hari Libur & Konfigurasi Shift yang Disinkronkan dari Modul Pengaturan Sistem
   const [holidays, setHolidays] = useState(() => getHolidays());
@@ -342,6 +190,18 @@ export default function JadwalShift() {
     });
   }, [employees, filterLocation, filterDivision, filterGroup, searchQuery]);
 
+  // Reset page on filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterLocation, filterDivision, filterGroup, searchQuery, selectedWeekIndex]);
+
+  const totalFiltered = filteredEmployees.length;
+  const totalPages = Math.ceil(totalFiltered / perPage) || 1;
+  const paginatedEmployees = useMemo(() => {
+    const start = (currentPage - 1) * perPage;
+    return filteredEmployees.slice(start, start + perPage);
+  }, [filteredEmployees, currentPage, perPage]);
+
   // Statistik Ringkasan Jadwal (Reaktif terhadap Filter Lokasi)
   const stats = useMemo(() => {
     const list =
@@ -365,38 +225,49 @@ export default function JadwalShift() {
   // Handle Update Grup Karyawan per Individu (dari Kolom Dropdown)
   const handleUpdateEmployeeGroup = (empId, newGroup) => {
     const targetEmp = employees.find((e) => e.id === empId);
-    setEmployees((prev) =>
-      prev.map((emp) => (emp.id === empId ? { ...emp, group: newGroup } : emp))
-    );
-    setAlertInfo({
-      type: 'success',
-      message: `Grup kerja ${targetEmp?.name || 'personil'} berhasil diubah menjadi ${newGroup}.`,
+    router.put(`/jadwal/employee/${empId}/group`, { group: newGroup }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setAlertInfo({
+          type: 'success',
+          message: `Grup kerja ${targetEmp?.name || 'personil'} berhasil diubah menjadi ${newGroup}.`,
+        });
+      },
+      onError: () => {
+        setAlertInfo({ type: 'error', message: 'Gagal mengubah grup kerja.' });
+      },
     });
   };
 
   // Handle Pemindahan Massal (Bulk Update Group)
   const handleBulkUpdateGroup = (selectedIds, targetGroup) => {
-    setEmployees((prev) =>
-      prev.map((emp) => (selectedIds.includes(emp.id) ? { ...emp, group: targetGroup } : emp))
-    );
-    setAlertInfo({
-      type: 'success',
-      message: `${selectedIds.length} personil berhasil dipindahkan ke ${targetGroup}.`,
+    router.post('/jadwal/bulk-update-group', { employee_ids: selectedIds, group: targetGroup }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setAlertInfo({
+          type: 'success',
+          message: `${selectedIds.length} personil berhasil dipindahkan ke ${targetGroup}.`,
+        });
+      },
+      onError: () => {
+        setAlertInfo({ type: 'error', message: 'Gagal memindahkan grup personil.' });
+      },
     });
   };
 
   // Handle Tukar Semua Personil Grup A dan Grup B
   const handleSwapAllGroups = () => {
-    setEmployees((prev) =>
-      prev.map((emp) => {
-        if (emp.group === 'Grup A') return { ...emp, group: 'Grup B' };
-        if (emp.group === 'Grup B') return { ...emp, group: 'Grup A' };
-        return emp;
-      })
-    );
-    setAlertInfo({
-      type: 'success',
-      message: 'Rotasi siklus berhasil: Seluruh personil Grup A & B berhasil ditukar jadwal gilirannya.',
+    router.post('/jadwal/swap-group', {}, {
+      preserveScroll: true,
+      onSuccess: () => {
+        setAlertInfo({
+          type: 'success',
+          message: 'Rotasi siklus berhasil: Seluruh personil Grup A & B berhasil ditukar jadwal gilirannya.',
+        });
+      },
+      onError: () => {
+        setAlertInfo({ type: 'error', message: 'Gagal melakukan rotasi grup.' });
+      },
     });
   };
 
@@ -586,25 +457,25 @@ export default function JadwalShift() {
       };
     }
 
-    // Jika hari kerja operasional 12 jam: Tampilkan shift personil (Pagi 07:00-19:00 atau Malam 19:00-07:00)
+    // Jika hari kerja operasional: Tampilkan shift personil (Pagi 08:00-17:00 atau Malam 20:00-05:00)
     const isMalam =
       emp.shiftCode === 'MALAM' || (emp.baseShift && emp.baseShift.toLowerCase().includes('malam'));
     if (isMalam) {
       return {
-        code: 'MALAM (19-07)',
+        code: 'MALAM (20-05)',
         label: `${shiftSettings.shiftMalamName} (${shiftSettings.shiftMalamIn} - ${shiftSettings.shiftMalamOut})`,
         badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200 font-bold',
       };
     }
 
     return {
-      code: 'PAGI (07-19)',
+      code: 'PAGI (08-17)',
       label: `${shiftSettings.shiftPagiName} (${shiftSettings.shiftPagiIn} - ${shiftSettings.shiftPagiOut})`,
       badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold',
     };
   };
 
-  // Kalkulasi total jam kerja mingguan aktual berdasarkan jadwal aktif (12 jam per dinas)
+  // Kalkulasi total jam kerja mingguan aktual berdasarkan jadwal aktif (8 jam efektif per dinas)
   const calculateWeeklyHours = (emp, days) => {
     let totalHours = 0;
     days.forEach((day) => {
@@ -616,7 +487,7 @@ export default function JadwalShift() {
         shiftInfo.code.includes('S1') ||
         shiftInfo.code.includes('S2')
       ) {
-        totalHours += 12;
+        totalHours += 8;
       } else if (shiftInfo.code === 'NON') {
         totalHours += 8;
       }
@@ -739,7 +610,7 @@ export default function JadwalShift() {
                 </p>
                 <p className="text-[11px] text-slate-500 font-medium mt-0.5">
                   {filterLocation === 'ALL'
-                    ? '6 Mariuk + 6 Cimalaka (24/7)'
+                    ? `${stats.groupA} Grup A + ${stats.groupB} Grup B · ${stats.nonShift} Non-Shift`
                     : `${stats.groupA} Grup A + ${stats.groupB} Grup B`}
                 </p>
               </div>
@@ -759,7 +630,7 @@ export default function JadwalShift() {
                   {stats.groupA} <span className="text-sm font-normal text-slate-400">Personil</span>
                 </p>
                 <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
-                  Shift 12 Jam (Pagi 07-19 & Malam 19-07)
+                  Shift 9 Jam (08:00 - 17:00 & 20:00 - 05:00)
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -778,7 +649,7 @@ export default function JadwalShift() {
                   {stats.groupB} <span className="text-sm font-normal text-slate-400">Personil</span>
                 </p>
                 <p className="text-[11px] text-amber-700 font-medium mt-0.5">
-                  Shift 12 Jam (Pagi 07-19 & Malam 19-07)
+                  Shift 9 Jam (08:00 - 17:00 & 20:00 - 05:00)
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -797,7 +668,7 @@ export default function JadwalShift() {
                   {stats.totalExceptions + stats.totalManualSchedules} <span className="text-sm font-normal text-slate-400">Kasus</span>
                 </p>
                 <p className="text-[11px] text-purple-600 font-medium mt-0.5">
-                  Handover Jam 07:00 & 19:00 WIB
+                  Penyesuaian Jadwal & Rotasi Aktif
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
@@ -945,7 +816,7 @@ export default function JadwalShift() {
 
               <div className="text-xs text-slate-500 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Roster 24/7 Non-Stop · Pergantian Shift 07:00 & 19:00 WIB</span>
+                <span>Roster Operasional · Shift Pagi 08:00-17:00 & Shift Malam 20:00-05:00 WIB</span>
               </div>
             </div>
 
@@ -989,10 +860,10 @@ export default function JadwalShift() {
                   title="Filter Grup"
                 >
                   <option value="ALL">Semua Grup</option>
-                  <option value="Grup A">Grup A (Sen/Rab/Jum)</option>
-                  <option value="Grup B">Grup B (Sel/Kam/Sab)</option>
+                  <option value="Grup A">Grup A</option>
+                  <option value="Grup B">Grup B</option>
                   <option value="Belum Ditetapkan">Belum Ditetapkan</option>
-                  <option value="Non-Shift">Non-Shift (Kantor)</option>
+                  <option value="Non-Shift">Non-Shift (Staff)</option>
                 </TableSelect>
 
                 {/* Reset Filters */}
@@ -1045,19 +916,20 @@ export default function JadwalShift() {
                 </TableHeader>
 
                 <TableBody>
-                  {filteredEmployees.length === 0 ? (
+                  {paginatedEmployees.length === 0 ? (
                     <TableEmpty colSpan={11} message="Tidak ada data karyawan yang cocok dengan kriteria filter." />
                   ) : (
-                    filteredEmployees.map((emp, index) => {
+                    paginatedEmployees.map((emp, index) => {
+                      const globalIndex = (currentPage - 1) * perPage + index + 1;
                       const weeklyHours = calculateWeeklyHours(emp, currentWeek.days);
-                      const dutyDays = weeklyHours > 0 ? (weeklyHours >= 12 ? Math.round(weeklyHours / 12) : 1) : 0;
+                      const dutyDays = weeklyHours > 0 ? (weeklyHours >= 8 ? Math.round(weeklyHours / 8) : 1) : 0;
                       const isMariuk = emp.location?.includes('Mariuk');
                       const isCimalaka = emp.location?.includes('Cimalaka');
 
                       return (
                         <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
                           <TableCell className="text-center font-medium text-slate-500 text-xs">
-                            {index + 1}
+                            {globalIndex}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2.5">
@@ -1130,17 +1002,30 @@ export default function JadwalShift() {
                 </TableBody>
               </Table>
 
+              {/* Pagination Roster */}
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalRows={totalFiltered}
+                perPage={perPage}
+                onPageChange={(page) => setCurrentPage(page)}
+                onPerPageChange={(newPerPage) => {
+                  setPerPage(newPerPage);
+                  setCurrentPage(1);
+                }}
+              />
+
               {/* Footer Roster Info & Legenda */}
               <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-slate-600">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="font-bold text-slate-700">Legenda Kode:</span>
                   <span className="inline-flex items-center gap-1.5 text-[11px]">
                     <span className="w-2.5 h-2.5 rounded bg-emerald-600 inline-block" />
-                    <strong>PAGI (07-19)</strong>: Shift Pagi 12 Jam
+                    <strong>PAGI (08-17)</strong>: Shift Pagi 9 Jam
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[11px]">
                     <span className="w-2.5 h-2.5 rounded bg-indigo-600 inline-block" />
-                    <strong>MALAM (19-07)</strong>: Shift Malam 12 Jam
+                    <strong>MALAM (20-05)</strong>: Shift Malam 9 Jam
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-[11px]">
                     <span className="w-2.5 h-2.5 rounded bg-sky-600 inline-block" />
@@ -1161,7 +1046,7 @@ export default function JadwalShift() {
                 </div>
 
                 <div className="text-[11px] text-slate-400">
-                  Menampilkan <strong>{filteredEmployees.length}</strong> dari total <strong>{employees.length}</strong> karyawan
+                  Menampilkan <strong>{paginatedEmployees.length}</strong> dari <strong>{filteredEmployees.length}</strong> tersaring (Total <strong>{employees.length}</strong> karyawan)
                 </div>
               </div>
             </CardContent>

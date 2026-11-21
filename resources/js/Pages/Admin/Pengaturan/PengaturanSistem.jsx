@@ -72,7 +72,7 @@ export default function PengaturanSistem() {
   // State Konfigurasi Kehadiran & Parameter Kerja
   const [attendanceSettings, setAttendanceSettings] = useState(() => getAttendanceSettings());
 
-  // State Konfigurasi Shift & Jam Kerja Fleksibel 12 Jam
+  // State Konfigurasi Shift & Jam Kerja Fleksibel
   const [shiftSettings, setShiftSettings] = useState(() => getShiftSettings());
 
   // State Kalender Libur
@@ -138,7 +138,7 @@ export default function PengaturanSistem() {
     saveCompanyProfile(companyProfile);
     setAlertInfo({
       type: 'success',
-      message: 'Seluruh konfigurasi jam kerja 12 jam, parameter sistem, dan kebijakan HR berhasil disimpan & disinkronkan.',
+      message: 'Seluruh konfigurasi jam kerja operasional, parameter sistem, dan kebijakan HR berhasil disimpan & disinkronkan.',
     });
   };
 
@@ -493,9 +493,9 @@ export default function PengaturanSistem() {
             }`}
           >
             <ArrowLeftRight className="w-4 h-4" />
-            <span>Jam Kerja & Shift 12 Jam</span>
+            <span>Jam Kerja & Shift Operasional</span>
             <Badge className={activeTab === 'shifts' ? 'bg-white/20 text-white font-mono text-[10px]' : 'bg-slate-200 text-slate-700 text-[10px]'}>
-              12 Jam • 24/7
+              Roster Operasional
             </Badge>
           </button>
 
@@ -900,15 +900,15 @@ export default function PengaturanSistem() {
           </div>
         )}
 
-        {/* TAB 2: JAM KERJA & SHIFT 12 JAM FLEKSIBEL */}
+        {/* TAB 2: JAM KERJA & SHIFT OPERASIONAL */}
         {activeTab === 'shifts' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Card 1: Konfigurasi Jam Masuk/Pulang Shift 12 Jam */}
+            {/* Card 1: Konfigurasi Jam Masuk/Pulang Shift Operasional */}
             <Card className="border-slate-200 shadow-2xs">
               <CardHeader className="p-4 sm:p-5 border-b border-slate-100">
                 <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
                   <Clock className="w-4 h-4 text-[#c4a266]" />
-                  Master Jam Kerja Shift 12 Jam
+                  Master Jam Kerja Shift Operasional
                 </CardTitle>
                 <CardDescription className="text-xs mt-0.5">
                   Atur jam masuk, jam pulang, dan serah terima tugas (handover) untuk Shift Pagi dan Malam.
@@ -924,7 +924,7 @@ export default function PengaturanSistem() {
                       Pengaturan Shift 1 (Pagi)
                     </span>
                     <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 font-mono text-[10px]">
-                      12 Jam Siang
+                      Shift Siang (08:00 - 17:00)
                     </Badge>
                   </div>
 
@@ -979,7 +979,7 @@ export default function PengaturanSistem() {
                       Pengaturan Shift 2 (Malam)
                     </span>
                     <Badge className="bg-indigo-100 text-indigo-800 border-indigo-300 font-mono text-[10px]">
-                      12 Jam Malam (Overnight)
+                      Shift Malam (20:00 - 05:00)
                     </Badge>
                   </div>
 

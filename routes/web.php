@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BerandaController;
+use App\Http\Controllers\Admin\JadwalController;
 use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\KehadiranController;
 use App\Http\Controllers\Admin\PengaturanController;
@@ -43,9 +44,10 @@ Route::post('/kehadiran/preview-fingerprint', [KehadiranController::class, 'prev
 Route::post('/kehadiran/commit-fingerprint', [KehadiranController::class, 'commitFingerprint'])->name('admin.kehadiran.commitFingerprint');
 Route::post('/kehadiran/link-biometric-pin', [KehadiranController::class, 'linkBiometricPin'])->name('admin.kehadiran.linkBiometricPin');
 
-Route::get('/jadwal', function () {
-    return Inertia::render('Admin/Jadwal/JadwalShift');
-})->name('admin.jadwal');
+Route::get('/jadwal', [JadwalController::class, 'index'])->name('admin.jadwal');
+Route::put('/jadwal/employee/{employee}/group', [JadwalController::class, 'updateGroup'])->name('admin.jadwal.updateGroup');
+Route::post('/jadwal/bulk-update-group', [JadwalController::class, 'bulkUpdateGroup'])->name('admin.jadwal.bulkUpdateGroup');
+Route::post('/jadwal/swap-group', [JadwalController::class, 'swapGroup'])->name('admin.jadwal.swapGroup');
 
 Route::get('/lembur', function () {
     return Inertia::render('Admin/Lembur/LemburOvertime');

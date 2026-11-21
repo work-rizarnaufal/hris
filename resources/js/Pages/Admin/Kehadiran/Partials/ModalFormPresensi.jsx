@@ -421,7 +421,7 @@ export default function ModalFormPresensi({
             )}
           </div>
 
-          {/* 2. Tanggal Presensi & Shift 12 Jam */}
+          {/* 2. Tanggal Presensi & Shift Operasional */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -437,7 +437,7 @@ export default function ModalFormPresensi({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Jadwal / Shift 12 Jam
+                Jadwal / Shift Operasional
               </label>
               <select
                 value={formData.shift}

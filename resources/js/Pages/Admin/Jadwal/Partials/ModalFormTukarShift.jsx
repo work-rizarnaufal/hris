@@ -27,19 +27,19 @@ export function getDynamicShift12HOptions() {
   return [
     {
       value: `Shift Pagi (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
-      label: `${shifts.shiftPagiName}: 12 Jam (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut} WIB)`,
+      label: `${shifts.shiftPagiName} (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut} WIB)`,
       time: `${shifts.shiftPagiIn} - ${shifts.shiftPagiOut}`,
       type: 'Pagi',
     },
     {
       value: `Shift Malam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
-      label: `${shifts.shiftMalamName}: 12 Jam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut} WIB)`,
+      label: `${shifts.shiftMalamName} (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut} WIB)`,
       time: `${shifts.shiftMalamIn} - ${shifts.shiftMalamOut}`,
       type: 'Malam',
     },
     {
       value: 'Off Pasca-Dinas',
-      label: 'Off Pasca-Dinas (Libur Rotasi 24/7)',
+      label: 'Off Pasca-Dinas (Libur Rotasi)',
       time: 'Off',
       type: 'Off',
     },
@@ -54,20 +54,20 @@ export function getDynamicShift12HOptions() {
 
 export const SHIFT_12H_OPTIONS = [
   {
-    value: 'Shift Pagi (07:00 - 19:00)',
-    label: 'Shift Pagi: 12 Jam (07:00 - 19:00 WIB)',
-    time: '07:00 - 19:00',
+    value: 'Shift Pagi (08:00 - 17:00)',
+    label: 'Shift Pagi: 9 Jam (08:00 - 17:00 WIB)',
+    time: '08:00 - 17:00',
     type: 'Pagi',
   },
   {
-    value: 'Shift Malam (19:00 - 07:00)',
-    label: 'Shift Malam: 12 Jam (19:00 - 07:00 WIB)',
-    time: '19:00 - 07:00',
+    value: 'Shift Malam (20:00 - 05:00)',
+    label: 'Shift Malam: 9 Jam (20:00 - 05:00 WIB)',
+    time: '20:00 - 05:00',
     type: 'Malam',
   },
   {
     value: 'Off Pasca-Dinas',
-    label: 'Off Pasca-Dinas (Libur Rotasi 24/7)',
+    label: 'Off Pasca-Dinas (Libur Rotasi)',
     time: 'Off',
     type: 'Off',
   },
@@ -169,7 +169,7 @@ export default function ModalFormTukarShift({
       employeeDivision: sourceEmp?.division || '-',
       employeeLocation: sourceEmp?.location || 'Lokasi Mariuk',
       employeeGroup: sourceEmp?.group || 'Grup A',
-      sourceShift: sourceEmp?.baseShift || sourceEmp?.scheduleCategory || 'Shift Pagi (12 Jam)',
+      sourceShift: sourceEmp?.baseShift || sourceEmp?.scheduleCategory || 'Shift Pagi (08:00 - 17:00)',
       targetEmployeeName: formData.type === 'swap' ? targetEmp?.name || '-' : '-',
       targetEmployeeNip: formData.type === 'swap' ? targetEmp?.nip || '-' : '-',
       targetEmployeeLocation: formData.type === 'swap' ? targetEmp?.location || '-' : '-',

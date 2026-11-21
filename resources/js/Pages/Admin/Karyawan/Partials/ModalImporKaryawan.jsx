@@ -33,9 +33,9 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
         Divisi: 'Operasional & Lapangan',
         'Lokasi Kerja': 'Lokasi Mariuk',
         Grup: 'Grup A',
-        'Kategori Jadwal': 'Shift Pagi (12 Jam)',
-        'Jam Masuk': '07:00',
-        'Jam Pulang': '19:00',
+        'Kategori Jadwal': 'Shift Pagi (08:00 - 17:00)',
+        'Jam Masuk': '08:00',
+        'Jam Pulang': '17:00',
         Status: 'Aktif',
       },
       {
@@ -46,9 +46,9 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
         Divisi: 'Operasional & Lapangan',
         'Lokasi Kerja': 'Lokasi Cimalaka',
         Grup: 'Grup A',
-        'Kategori Jadwal': 'Shift Pagi (12 Jam)',
-        'Jam Masuk': '07:00',
-        'Jam Pulang': '19:00',
+        'Kategori Jadwal': 'Shift Pagi (08:00 - 17:00)',
+        'Jam Masuk': '08:00',
+        'Jam Pulang': '17:00',
         Status: 'Aktif',
       },
     ];
@@ -91,9 +91,9 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
           division: row['Divisi'] || row['Departemen'] || row['division'] || 'Operasional & Lapangan',
           location: row['Lokasi Kerja'] || row['Lokasi'] || row['location'] || 'Lokasi Mariuk',
           group: row['Grup'] || row['group'] || 'Grup A',
-          scheduleCategory: row['Kategori Jadwal'] || row['Jadwal'] || 'Shift Pagi (12 Jam)',
-          checkInTime: row['Jam Masuk'] || '07:00',
-          checkOutTime: row['Jam Pulang'] || '19:00',
+          scheduleCategory: row['Kategori Jadwal'] || row['Jadwal'] || 'Shift Pagi (08:00 - 17:00)',
+          checkInTime: row['Jam Masuk'] || '08:00',
+          checkOutTime: row['Jam Pulang'] || '17:00',
           status: row['Status'] || 'Aktif',
         }));
 

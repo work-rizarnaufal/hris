@@ -43,7 +43,7 @@ import {
   Toast,
 } from '@/components/ui';
 
-// Helper membuat 30 hari kalender November 2026 berdasarkan data insiden karyawan dan pola 24/7 (12 Jam)
+// Helper membuat 30 hari kalender November 2026 berdasarkan data insiden karyawan dan pola roster operasional
 function generateCalendarDays(employee) {
   const days = [];
   const daysInMonth = 30; // November 2026
@@ -69,15 +69,15 @@ function generateCalendarDays(employee) {
     let status = isWorkingRoster ? 'Hadir' : 'Libur';
     let detail = isWorkingRoster
       ? isMalam
-        ? '19:00 - 07:00 WIB (Shift Malam 12 Jam)'
-        : '07:00 - 19:00 WIB (Shift Pagi 12 Jam)'
+        ? '20:00 - 05:00 WIB (Shift Malam 9 Jam)'
+        : '08:00 - 17:00 WIB (Shift Pagi 9 Jam)'
       : 'Libur Pasca-Dinas (Rotasi 24/7)';
     let typeClass = isWorkingRoster ? 'status-hadir' : 'status-libur';
 
     if (incident) {
       if (incident.type.includes('Terlambat')) {
         status = 'Terlambat';
-        detail = `${isMalam ? 'Shift Malam 19:00' : 'Shift Pagi 07:00'} - ${incident.detail}`;
+        detail = `${isMalam ? 'Shift Malam 20:00' : 'Shift Pagi 08:00'} - ${incident.detail}`;
         typeClass = 'status-terlambat';
       } else if (incident.type.includes('Alpa') || incident.type.includes('Alpha')) {
         status = 'Alpha';

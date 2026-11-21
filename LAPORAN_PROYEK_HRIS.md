@@ -310,54 +310,50 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 
 ---
 
-## 8. Modul Jadwal & Roster Shift 2-Grup (`JadwalShift.jsx`)
+## 8. Modul Jadwal & Roster Shift Operasional (`JadwalShift.jsx`)
 
-Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx), [`resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx), dan [`resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx`](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx)
+Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx), [`resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx), [`resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx`](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx), dan [`app/Http/Controllers/Admin/JadwalController.php`](app/Http/Controllers/Admin/JadwalController.php)
 
-### A. 4 Kartu KPI Roster Jadwal Operasional (Reaktif terhadap Filter Lokasi)
-1. *Total Personil Terjadwal*: 12 Personil (6 Lokasi Mariuk + 6 Lokasi Cimalaka, 100% ter-cover roster operasional 24/7).
-2. *Grup Operasional A*: 6 Personil (3 Mariuk, 3 Cimalaka) - Shift 12 Jam (Pagi 07:00–19:00 & Malam 19:00–07:00).
-3. *Grup Operasional B*: 6 Personil (3 Mariuk, 3 Cimalaka) - Shift 12 Jam (Pagi 07:00–19:00 & Malam 19:00–07:00).
-4. *Jadwal Khusus & Tukar Shift*: Pemantauan real-time kasus tukar shift dan penugasan operasional dengan handover terpadu pukul 07:00 & 19:00 WIB.
+### A. Sinkronisasi Penuh Database SQLite (86 Karyawan Riil) & Backend Controller
+- **Integrasi Backend `JadwalController.php`**:
+  - Halaman `/jadwal` kini menyajikan 100% data riil dari database SQLite (seluruh 86 karyawan dari site Mariuk dan Cimalaka) melalui relasi Eloquent `location` dan `shift`.
+  - Endpoint pembaruan grup karyawan (`PUT /jadwal/employee/{employee}/group`), rotasi massal (`POST /jadwal/bulk-update-group`), dan swap siklus grup A ⇄ B (`POST /jadwal/swap-group`) terhubung langsung ke database dengan validasi atomik dan notifikasi `<Toast />`.
+- **Integrasi Komponen Atomik `<TablePagination>`**:
+  - Dilengkapi paginasi responsif 25 karyawan per halaman dengan penomoran baris kontinu `(currentPage - 1) * perPage + index + 1`.
+  - Pilihan ukuran baris dinamis (10, 25, 50, 100) dan reset otomatis saat filter pencarian, lokasi, divisi, atau grup berubah.
 
-### B. Segmented Location Controller (Mariuk & Cimalaka)
+### B. Implementasi Aturan Shift 9 Jam (8 Jam Efektif + 1 Jam Istirahat)
+- **Shift Pagi**: `08:00 – 17:00 WIB` (Jendela absen buka `07:00`, tutup `18:00`).
+- **Shift Malam**: `20:00 – 05:00 WIB` (Jendela absen buka `19:00`, tutup `06:00`).
+- Rata-rata jam kerja dihitung 8 jam dinas efektif per shift reguler.
+
+### C. 4 Kartu KPI Roster Jadwal Operasional (Reaktif terhadap Filter Lokasi)
+1. *Total Personil Terjadwal*: Total karyawan aktif dari database (distribusi per site Mariuk & Cimalaka serta staf Non-Shift).
+2. *Grup Operasional A*: Personil Grup A dengan shift operasional 9 jam (08:00 - 17:00 & 20:00 - 05:00).
+3. *Grup Operasional B*: Personil Grup B dengan shift operasional 9 jam (08:00 - 17:00 & 20:00 - 05:00).
+4. *Jadwal Khusus & Tukar Shift*: Pemantauan real-time kasus tukar shift dan penyesuaian jadwal aktif.
+
+### D. Segmented Location Controller (Mariuk & Cimalaka)
 - Tab switcher segmen satu sentuhan di atas tabel roster:
-  - **Semua Lokasi (12)**: Pandangan makro seluruh personil lintas pabrik.
-  - **Mariuk (6)**: Terfilter otomatis hanya personil Lokasi Mariuk dengan badge kuning amber.
-  - **Cimalaka (6)**: Terfilter otomatis hanya personil Lokasi Cimalaka dengan badge ungu indigo.
-- Indikator status live: *Roster 24/7 Non-Stop · Pergantian Shift 07:00 & 19:00 WIB*.
+  - **Semua Lokasi**: Pandangan makro seluruh personil lintas pabrik.
+  - **Mariuk**: Terfilter otomatis personil Lokasi Mariuk dengan badge amber.
+  - **Cimalaka**: Terfilter otomatis personil Lokasi Cimalaka dengan badge indigo.
+- Indikator status live: *Roster Operasional · Shift Pagi 08:00-17:00 & Shift Malam 20:00-05:00 WIB*.
 
-### C. Tab 1: Matriks Roster Mingguan (`roster`)
-- **Aturan Baku Operasional 24/7 (Non-Stop 7 Hari Kerja)**:
-  - 1 hari 2 shift 12 jam: **Shift Pagi** (07:00–19:00 WIB) dan **Shift Malam** (19:00–07:00 WIB), tukar shift tepat jam 07:00 dan 19:00.
-  - Tidak ada libur akhir pekan untuk regu shift lapangan pabrik (beroperasi 7 hari seminggu).
-- **Logika Continuous Rolling Selang-Seling**:
-  - Minggu ganjil (Minggu 1 & 3): Grup A masuk hari Senin, Rabu, Jumat, Minggu (4 hari dinas = 48 jam); Grup B masuk Selasa, Kamis, Sabtu (3 hari dinas = 36 jam).
-  - Minggu genap (Minggu 2 & 4): Grup B masuk Senin, Rabu, Jumat, Minggu (48 jam); Grup A masuk Selasa, Kamis, Sabtu (36 jam).
-  - Rata-rata jam kerja adil dan proporsional: 42 jam/minggu.
+### E. Tab 1: Matriks Roster Mingguan (`roster`)
 - **Tabel Matriks Roster 7 Hari Dinamis**:
   - Kolom karyawan dilengkapi inisial avatar visual, NIP font-mono, jabatan, dan pill badge lokasi penempatan (`Mariuk` / `Cimalaka`).
-  - Kalkulasi total jam kerja mingguan aktual per karyawan: `48 Jam (4 Hari Dinas)` atau `36 Jam (3 Hari Dinas)`.
-  - Legenda kode terstandarisasi: `PAGI (07-19)`, `MALAM (19-07)`, `NON (Office 08-17)`, `SWAP`, `LIBUR`, `OFF`.
+  - Kalkulasi total jam kerja mingguan aktual dan hari dinas per karyawan berbasis 8 jam efektif per hari.
+  - Legenda kode terstandarisasi: `PAGI (08-17)`, `MALAM (20-05)`, `NON (Office 08-17)`, `SWAP`, `LIBUR`, `OFF`.
 - **Ekspor Dokumen Excel (.xlsx)**:
   - Unduh roster mingguan via SheetJS mencakup nama, NIP, lokasi pabrik, divisi, 7 kolom hari, dan kalkulasi dinas aktual.
 
-### D. Tab 2: Rotasi Grup & Jadwal Manual (`patterns`) — `PanelRotasiGrup.jsx`
-- **Tabel Alur Rotasi 7 Hari Non-Stop**:
-  - Alur dinas Senin s/d Minggu menampilkan giliran masuk 2 shift 12 jam dan pasca-dinas (OFF).
-- **Penetapan & Pemindahan Personil**:
-  - Dropdown per baris, bulk transfer dengan multi-select checkbox, dan tombol *Tukar Semua Giliran (Grup A ⇄ Grup B)*.
-  - Dilengkapi pill badge lokasi (`Mariuk` / `Cimalaka`) dan shift badge 12 jam (`Pagi 07:00–19:00` / `Malam 19:00–07:00`).
-- **Form Perubahan Jadwal Operasional Manual**:
-  - Konfigurasi ad-hoc dengan rentang jam shift 12 jam (Shift 1 Masuk 07:00 / Pulang 19:00; Shift 2 Masuk 19:00 / Pulang 07:00), grup sasaran, tanggal, dan alasan.
+### F. Tab 2: Rotasi Grup & Jadwal Manual (`patterns`) — `PanelRotasiGrup.jsx`
+- Alur rotasi kelompok A & B selang-seling serta formulir penyesuaian jadwal ad-hoc dengan rentang jam shift operasional (`08:00 - 17:00` dan `20:00 - 05:00`).
+- Fitur *Tukar Siklus Grup A ⇄ Grup B* terhubung ke `POST /jadwal/swap-group`.
 
-### E. Tab 3: Log Pengecualian & Tukar Shift (`exceptions`)
-- Rekam pertukaran shift resmi antar-rekan kerja atau penugasan khusus yang disetujui HCGA.
-- Nama pemohon dapat diklik langsung untuk membuka modal form ubah (*inline edit*), dilengkapi tombol aksi pensil dan hapus.
-
-### F. Modal Atomik Tukar Shift (`ModalFormTukarShift.jsx`)
-- Dialog modal atomik terstandarisasi dengan pilihan shift 12 jam (`Shift Pagi 07:00–19:00`, `Shift Malam 19:00–07:00`, `Off Pasca-Dinas`, `Penugasan Khusus`).
-- Preview card komparasi real-time antara *Karyawan Pemohon* dan *Rekan Pengganti* lengkap dengan identitas avatar, NIP, jabatan, dan badge lokasi kerja.
+### G. Tab 3: Log Pengecualian & Tukar Shift (`exceptions`) & Modal Atomik (`ModalFormTukarShift.jsx`)
+- Rekam pertukaran shift resmi antar-rekan kerja atau penugasan khusus yang disetujui HCGA dengan preset shift operasional 9 jam.
 
 ---
 

@@ -536,7 +536,7 @@ export default function Beranda() {
             </div>
           </Link>
 
-          {/* 2. Jadwal & Shift 12 Jam */}
+          {/* 2. Jadwal & Shift Kerja */}
           <Link
             href="/jadwal"
             className="group p-4 bg-white border border-slate-200/90 rounded-xl hover:border-[#c4a266]/70 hover:shadow-sm hover:-translate-y-0.5 transition-all flex flex-col justify-between"
@@ -546,16 +546,16 @@ export default function Beranda() {
                 <CalendarDays className="w-4 h-4" />
               </div>
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#f7f2e8] text-[#ab874b] border border-[#c4a266]/40">
-                24/7 Roster
+                Roster Shift
               </span>
             </div>
             <div>
               <div className="text-xs font-bold text-navy group-hover:text-[#c4a266] transition-colors flex items-center justify-between">
-                <span>Jadwal & Shift 12 Jam</span>
+                <span>Jadwal & Shift Kerja</span>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-[#c4a266] group-hover:translate-x-0.5 transition-all" />
               </div>
               <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">
-                Rotasi 2-kelompok non-stop
+                Rotasi 2-kelompok (Pagi & Malam)
               </p>
             </div>
           </Link>
@@ -716,7 +716,7 @@ export default function Beranda() {
               </Badge>
             </div>
             <CardDescription className="text-xs mt-0.5">
-              Monitoring check-in real-time karyawan aktif beserta verifikasi shift 12 jam dan lokasi kerja
+              Monitoring check-in real-time karyawan aktif beserta verifikasi shift operasional dan lokasi kerja
             </CardDescription>
           </div>
           <Link
