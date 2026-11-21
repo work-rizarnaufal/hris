@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Employee;
 use App\Models\Location;
 use App\Models\Shift;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,10 +18,10 @@ class KaryawanBackendTest extends TestCase
         $response = $this->get('/karyawan');
 
         $response->assertStatus(200);
-        $this->assertDatabaseCount('employees', 12);
+        $this->assertDatabaseCount('employees', 86);
         $this->assertDatabaseHas('employees', [
-            'nip' => 'HC-0101',
-            'name' => 'Budi Santoso',
+            'nip' => 'HC-0027',
+            'name' => 'Abdul Saepudin',
         ]);
     }
 

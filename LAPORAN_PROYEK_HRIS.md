@@ -557,12 +557,16 @@ Model dilengkapi *casting* tipe data, relasi Eloquent (`hasMany`, `belongsTo`), 
 
 ### C. Seeding Master Data Resmi
 Eksekusi seeder (`php artisan db:seed`) menyuntikkan:
-- **12 Personel Master Resmi HCGA** lengkap (Budi Santoso, Dewi Anggraini, Hendra Wijaya, Ahmad Fauzi, Eko Prasetyo, Joko Susilo, Siti Rahmawati, Wahyu Hidayat, Dian Kusuma, Rina Marlina, Maya Indah Lestari, Nurul Aini).
+- **86 Personel Riil Lapangan & Site** (hasil ekstraksi resmi dari `Data Karyawan.xlsx`, seluruh 12 data dummy lama telah dibersihkan 100%):
+  - **Site Mariuk**: 35 Personil (termasuk Muhammad M - CEO Mariuk).
+  - **Site Cimalaka**: 51 Personil (termasuk Nabiel F - CEO Cimalaka).
+  - **Penomoran NIP Opsi B**: Format rapi ber-padding `HC-0001` s/d `HC-0120` unik.
+  - **Identitas Biometric PIN**: Menyimpan User ID asli mesin sidik jari fisik (`biometric_pin`) untuk pemindaian log instan.
 - **3 Akun Pengguna Terkoneksi** dengan password ter-enkripsi (`bcrypt`):
   - Super Admin: `admin@nusantaraperkasa.co.id`
-  - Supervisor Site: `siti.rahmawati@nusantaraperkasa.co.id`
-  - Personel Lapangan: `budi.santoso@nusantaraperkasa.co.id`
-- **2 Lokasi Site**: Mariuk (Subang) & Cimalaka (Sumedang).
+  - Supervisor Site: `nabiel.f@nusantaraperkasa.co.id`
+  - Personel Lapangan: `abdul.saepudin@nusantaraperkasa.co.id`
+- **2 Lokasi Site**: Mariuk (Subang, 35 personil) & Cimalaka (Sumedang, 51 personil).
 - **3 Master Shift**: Pagi 12 Jam, Malam 12 Jam, Office 8 Jam.
 - **Kebijakan & Toleransi Sistem**: 15 menit batas keterlambatan.
 

@@ -1,12 +1,11 @@
 {
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
   "5": "lucide-react",
-  "6": "PengaturanSistem.jsx",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
   "13": "cn",
   "39": "Anti-Slop (Full Specification)",
   "40": "Ponytail (Companion Pragmatism Skill)",
-  "41": "CatatanKehadiran.jsx",
+  "41": "PengaturanSistem.jsx",
   "42": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
   "43": "Illuminate\\Database\\Seeder",
   "44": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",

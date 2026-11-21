@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import {
@@ -210,8 +210,19 @@ const INITIAL_EMPLOYEES = [
   },
 ];
 
-export default function DataKaryawan() {
-  const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
+export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
+  const [employees, setEmployees] = useState(() => {
+    if (initialDbEmployees && initialDbEmployees.length > 0) {
+      return initialDbEmployees;
+    }
+    return INITIAL_EMPLOYEES;
+  });
+
+  useEffect(() => {
+    if (initialDbEmployees && initialDbEmployees.length > 0) {
+      setEmployees(initialDbEmployees);
+    }
+  }, [initialDbEmployees]);
   const locationList = useMemo(() => getLocations(), []);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLocation, setFilterLocation] = useState('ALL');

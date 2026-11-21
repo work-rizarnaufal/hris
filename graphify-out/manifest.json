@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx": {
-    "mtime": 1795257724.0343366,
-    "seen": 1795257743.3936532,
-    "ast_hash": "d13c2e994ced3803c356f6272561b417",
+    "mtime": 1795276946.9981134,
+    "seen": 1795276984.7194755,
+    "ast_hash": "3d59896571bf972d2de3f37ae8f4b353",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795271339.6380708,
-    "seen": 1795271350.9640713,
-    "ast_hash": "b23977525a01413c579ec3f921bf7896",
+    "mtime": 1795273434.0180566,
+    "seen": 1795276984.7194755,
+    "ast_hash": "61bed2558eba0e74bd77df2ea8e80cd5",
     "semantic_hash": ""
   },
   "README.md": {
@@ -576,9 +576,9 @@
     "semantic_hash": ""
   },
   "app/Models/Employee.php": {
-    "mtime": 1795273195.097967,
-    "seen": 1795273395.922694,
-    "ast_hash": "f6883fbe02e85284a2995428b8fa0d96",
+    "mtime": 1795276909.0709987,
+    "seen": 1795276984.7194755,
+    "ast_hash": "f0ca5c0e55c5f1822ff64ea58d6fc50b",
     "semantic_hash": ""
   },
   "app/Models/Holiday.php": {
@@ -684,9 +684,9 @@
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795272647.6877854,
-    "seen": 1795273395.922694,
-    "ast_hash": "ef5157d86952f6b4b3aa79cfd890b8c3",
+    "mtime": 1795276809.4230986,
+    "seen": 1795276984.7194755,
+    "ast_hash": "354723523682278db64a233a621f8faa",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {
@@ -696,9 +696,9 @@
     "semantic_hash": ""
   },
   "database/seeders/LocationSeeder.php": {
-    "mtime": 1795270040.359844,
-    "seen": 1795270339.955239,
-    "ast_hash": "ffc78b44da2ba58d0dafa2b4d65b2667",
+    "mtime": 1795276915.8246431,
+    "seen": 1795276984.7194755,
+    "ast_hash": "8aecf8fc69727db8b3a1da558bfca0f0",
     "semantic_hash": ""
   },
   "database/seeders/ShiftSeeder.php": {
@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "tests/Feature/KaryawanBackendTest.php": {
-    "mtime": 1795270234.0292342,
-    "seen": 1795270339.955239,
-    "ast_hash": "acde105f3d52fea62b8fb5e65ef5303f",
+    "mtime": 1795276860.3114939,
+    "seen": 1795276984.7194755,
+    "ast_hash": "9ea35c998ebd197307856863e0a46548",
     "semantic_hash": ""
   },
   "tests/TestCase.php": {
@@ -744,9 +744,15 @@
     "semantic_hash": ""
   },
   "tests/Feature/FingerprintAndManualAttendanceTest.php": {
-    "mtime": 1795273364.3646288,
-    "seen": 1795273395.922694,
-    "ast_hash": "bedd34b9cad2bb83266f5a94ed4481c3",
+    "mtime": 1795276851.8473694,
+    "seen": 1795276984.7194755,
+    "ast_hash": "93adb3c6f7f59e3eddbbb7069e7d3a22",
+    "semantic_hash": ""
+  },
+  "database/data/karyawan.json": {
+    "mtime": 1795276787.3611019,
+    "seen": 1795276984.7194755,
+    "ast_hash": "4540348eb5848a4f3d36d2097d709dce",
     "semantic_hash": ""
   },
   "package-lock.json": {

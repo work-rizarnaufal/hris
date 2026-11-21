@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-21)
 
 ## Corpus Check
-- 120 files · ~66,986 words
+- 124 files · ~70,865 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
 ## Summary
-- 581 nodes · 1252 edges · 50 communities (16 shown, 34 thin omitted)
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.85)
+- 606 nodes · 1329 edges · 49 communities (17 shown, 32 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8bdde426`
+- Built from commit: `67100225`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,15 +37,14 @@
 - Illuminate\Database\Eloquent\Factories\HasFactory
 - Employee
 - User
-- SystemSetting
-- KaryawanBackendTest.php
 - Location
+- Shift
 
 ## God Nodes (most connected - your core abstractions)
-1. `react` - 40 edges
+1. `react` - 41 edges
 2. `cn()` - 36 edges
-3. `lucide-react` - 31 edges
-4. `Employee` - 22 edges
+3. `lucide-react` - 32 edges
+4. `Employee` - 27 edges
 5. `@inertiajs/react` - 21 edges
 6. `Card()` - 18 edges
 7. `CardContent()` - 18 edges
@@ -54,21 +53,21 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `CatatanKehadiran()` --calls--> `ModalImporFingerprint()`  [EXTRACTED]
+  resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx → resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx
+- `PanelRotasiGrup()` --calls--> `formatDateDMY()`  [EXTRACTED]
+  resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx → resources/js/services/systemSettings.js
 - `Card()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardDescription()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardTitle()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (50 total, 34 thin omitted)
+## Communities (49 total, 32 thin omitted)
 
 ### Community 0 - "Inertia React UI & Layout Components"
 Cohesion: 0.29
@@ -84,19 +83,19 @@ Nodes (41): block, pestphp/pest-plugin, php-http/discovery, autoload, autoload-d
 
 ### Community 3 - "HCGA HRIS Enterprise Design System (DESIGN.md)"
 Cohesion: 0.06
-Nodes (33): 1. Overview, 2. Colors, 3. Typography, 4. Layout, 5. Elevation & Depth, 6. Shapes & Form Controls, 7. Atomic UI Component Catalog, 8. Do's and Don'ts (+25 more)
+Nodes (34): 1. Overview, 2. Colors, 3. Typography, 4. Layout, 5. Elevation & Depth, 6. Shapes & Form Controls, 7. Atomic UI Component Catalog, 8. Do's and Don'ts (+26 more)
 
 ### Community 4 - "Inertia React UI & Layout Components"
 Cohesion: 0.06
-Nodes (6): BerandaController, KaryawanController, PengaturanController, AuthController, Controller, HandleInertiaRequests
+Nodes (8): BerandaController, KaryawanController, KehadiranController, PengaturanController, AuthController, Controller, HandleInertiaRequests, FingerprintImportService
 
 ### Community 5 - "lucide-react"
-Cohesion: 0.09
-Nodes (17): renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar(), Topbar(), getPageMetadata(), navigationConfig, siteConfig (+9 more)
+Cohesion: 0.10
+Nodes (16): renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar(), Topbar(), getPageMetadata(), navigationConfig, siteConfig (+8 more)
 
 ### Community 6 - "PengaturanSistem.jsx"
-Cohesion: 0.10
-Nodes (40): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, PanelRotasiGrup(), DataKaryawan(), DIVISIONS, GROUPS (+32 more)
+Cohesion: 0.11
+Nodes (39): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, DataKaryawan(), DIVISIONS, GROUPS, ModalFormKaryawan() (+31 more)
 
 ### Community 7 - "Illuminate\Database\Schema\Blueprint"
 Cohesion: 0.09
@@ -124,35 +123,39 @@ Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, 
 
 ### Community 41 - "CatatanKehadiran.jsx"
 Cohesion: 0.13
-Nodes (15): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, INITIAL_EMPLOYEES, DEFAULT_DATE (+7 more)
+Nodes (17): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, PanelRotasiGrup(), INITIAL_EMPLOYEES (+9 more)
 
 ### Community 43 - "Illuminate\Database\Seeder"
-Cohesion: 0.21
-Nodes (4): DatabaseSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder
+Cohesion: 0.17
+Nodes (5): DatabaseSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder, SystemSettingSeeder
 
 ### Community 44 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.21
-Nodes (3): Attendance, Holiday, Shift
+Cohesion: 0.18
+Nodes (3): Attendance, Holiday, SystemSetting
+
+### Community 48 - "Location"
+Cohesion: 0.13
+Nodes (4): Location, FingerprintAndManualAttendanceTest, KaryawanBackendTest, TestCase
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 219 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 225 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `lucide-react`, `PengaturanSistem.jsx`, `CatatanKehadiran.jsx`, `cn`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **What connects `Aturan Antislop & Ponytail` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend Dependencies & Manifest` be split into smaller, more focused modules?**
   _Cohesion score 0.07563025210084033 - nodes in this community are weakly interconnected._
-- **Why does `HCGA HRIS Enterprise Design System (DESIGN.md)` connect `HCGA HRIS Enterprise Design System (DESIGN.md)` to `lucide-react`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `Employee` connect `Employee` to `Location`, `Shift`, `Inertia React UI & Layout Components`, `Illuminate\Database\Eloquent\Factories\HasFactory`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
 - **Should `Backend Composer Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
-- **Why does `lucide-react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `lucide-react`, `PengaturanSistem.jsx`, `CatatanKehadiran.jsx`, `cn`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Should `HCGA HRIS Enterprise Design System (DESIGN.md)` be split into smaller, more focused modules?**
-  _Cohesion score 0.06060606060606061 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05547652916073969 - nodes in this community are weakly interconnected._
+- **Should `Inertia React UI & Layout Components` be split into smaller, more focused modules?**
+  _Cohesion score 0.05687645687645688 - nodes in this community are weakly interconnected._

@@ -20,7 +20,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
             ->component('Admin/Kehadiran/CatatanKehadiran')
-            ->has('dbEmployees', 12)
+            ->has('dbEmployees', 86)
             ->has('dbLocations')
             ->has('dbShifts')
         );
@@ -63,10 +63,10 @@ class FingerprintAndManualAttendanceTest extends TestCase
         $payload = [
             'location_id' => $mariuk->id,
             'scans' => [
-                ['pin' => '101', 'timestamp' => '2026-11-21 06:48:00'],
-                ['pin' => '101', 'timestamp' => '2026-11-21 06:48:30'], // duplicate scan < 5 min
-                ['pin' => '101', 'timestamp' => '2026-11-21 19:05:00'],
-                ['pin' => '104', 'timestamp' => '2026-11-21 07:22:00'], // anomaly single punch
+                ['pin' => '27', 'timestamp' => '2026-11-21 06:48:00'],
+                ['pin' => '27', 'timestamp' => '2026-11-21 06:48:30'], // duplicate scan < 5 min
+                ['pin' => '27', 'timestamp' => '2026-11-21 19:05:00'],
+                ['pin' => '30', 'timestamp' => '2026-11-21 07:22:00'], // anomaly single punch
                 ['pin' => '9999', 'timestamp' => '2026-11-21 07:00:00'], // unmapped PIN
             ],
         ];
@@ -83,12 +83,12 @@ class FingerprintAndManualAttendanceTest extends TestCase
 
         $json = $response->json();
         $this->assertNotEmpty($json['ready']);
-        $this->assertEquals('101', $json['ready'][0]['pin']);
+        $this->assertEquals('27', $json['ready'][0]['pin']);
         $this->assertEquals('06:48', $json['ready'][0]['check_in_time']);
         $this->assertEquals('19:05', $json['ready'][0]['check_out_time']);
 
         $this->assertNotEmpty($json['anomalies']);
-        $this->assertEquals('104', $json['anomalies'][0]['pin']);
+        $this->assertEquals('30', $json['anomalies'][0]['pin']);
 
         $this->assertNotEmpty($json['unmapped']);
         $this->assertEquals('9999', $json['unmapped'][0]['pin']);
@@ -99,7 +99,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
         $this->seed();
 
         $mariuk = Location::where('code', 'MRK')->first();
-        $employee = Employee::where('biometric_pin', '101')->first();
+        $employee = Employee::where('biometric_pin', '27')->first();
 
         $records = [
             [
@@ -133,7 +133,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
     {
         $this->seed();
 
-        $employee = Employee::where('nip', 'HC-0101')->first();
+        $employee = Employee::where('nip', 'HC-0027')->first();
 
         $response = $this->postJson('/kehadiran/link-biometric-pin', [
             'employee_id' => $employee->id,

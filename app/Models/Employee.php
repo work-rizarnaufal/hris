@@ -58,7 +58,7 @@ class Employee extends Model
 
     public function getLocationAttribute(): string
     {
-        return $this->location?->name ?? 'Lokasi Mariuk';
+        return $this->location?->name ?? ($this->location_id === 2 ? 'Lokasi Cimalaka' : 'Lokasi Mariuk');
     }
 
     public function getGroupAttribute(): string
