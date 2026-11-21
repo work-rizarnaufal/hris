@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-21)
 
 ## Corpus Check
-- 88 files · ~60,757 words
+- 88 files · ~61,324 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 13 file(s) not represented in the graph (top: (none) 10, .example 1, .css 1)
 
 ## Summary
-- 417 nodes · 936 edges · 40 communities (12 shown, 28 thin omitted)
+- 417 nodes · 933 edges · 40 communities (12 shown, 28 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5dabd9de`
+- Built from commit: `1d742ebe`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -46,13 +46,13 @@
 ## Surprising Connections (you probably didn't know these)
 - `renderAdminLayout()` --calls--> `LayoutUtama()`  [EXTRACTED]
   resources/js/app.jsx → resources/js/Layouts/LayoutUtama.jsx
-- `JadwalShift()` --calls--> `ModalFormTukarShift()`  [EXTRACTED]
-  resources/js/Pages/Admin/Jadwal/JadwalShift.jsx → resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx
-- `ModalFormKaryawan()` --calls--> `getLocations()`  [EXTRACTED]
-  resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx → resources/js/services/systemSettings.js
-- `ModalFormKaryawan()` --calls--> `getShiftSettings()`  [EXTRACTED]
-  resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx → resources/js/services/systemSettings.js
+- `DataKaryawan()` --calls--> `ModalFormKaryawan()`  [EXTRACTED]
+  resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx → resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx
 - `Card()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardContent()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardDescription()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles
@@ -81,8 +81,8 @@ Cohesion: 0.07
 Nodes (3): HandleInertiaRequests, MATCH /logout(), POST /login()
 
 ### Community 6 - "PengaturanSistem.jsx"
-Cohesion: 0.12
-Nodes (33): getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, DIVISIONS, GROUPS, CatatanKehadiran(), calculateTardiness(), getDynamicShiftOptions() (+25 more)
+Cohesion: 0.11
+Nodes (37): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, PanelRotasiGrup(), DIVISIONS, GROUPS, ModalFormKaryawan() (+29 more)
 
 ### Community 8 - "Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)"
 Cohesion: 0.44
@@ -105,8 +105,8 @@ Cohesion: 0.40
 Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, Ponytail (Companion Pragmatism Skill), The Decision Ladder
 
 ### Community 41 - "CatatanKehadiran.jsx"
-Cohesion: 0.13
-Nodes (21): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, JadwalShift(), WEEKS, PanelRotasiGrup() (+13 more)
+Cohesion: 0.14
+Nodes (17): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, DataKaryawan(), INITIAL_EMPLOYEES (+9 more)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
