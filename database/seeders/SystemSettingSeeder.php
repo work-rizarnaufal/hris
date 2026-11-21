@@ -18,6 +18,7 @@ class SystemSettingSeeder extends Seeder
                     'earlyCheckInMinutes' => 60,
                     'earlyDepartureToleranceMinutes' => 0,
                     'weeklyMinHours' => 40,
+                    'enableGeofence' => true,
                     'requireSelfie' => true,
                     'preventMockGps' => true,
                     'minOvertimeMinutes' => 60,

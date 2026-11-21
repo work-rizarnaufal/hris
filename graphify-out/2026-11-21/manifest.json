@@ -1,8 +1,8 @@
 {
   "app/Http/Middleware/HandleInertiaRequests.php": {
-    "mtime": 1793726137.6731875,
-    "seen": 1795250261.1956322,
-    "ast_hash": "201b711924ddb57cd5fa76ff5b07c595",
+    "mtime": 1795270132.0190623,
+    "seen": 1795270339.955239,
+    "ast_hash": "c9631895e743765675ecb5f51d06ac1e",
     "semantic_hash": ""
   },
   "artisan": {
@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1795198797.511464,
-    "seen": 1795250261.196631,
-    "ast_hash": "78c5fa2771ef8904bb416acbca0a3d94",
+    "mtime": 1795270193.192382,
+    "seen": 1795270339.955239,
+    "ast_hash": "2f5367d3e50eae18984809147237c722",
     "semantic_hash": ""
   },
   "storage/framework/views/33035f1adbd8fc13ef8a3b77d50480bf.php": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795267930.2687478,
-    "seen": 1795267946.7592618,
-    "ast_hash": "606217c3d2c37930ae608c3f1cc56f4a",
+    "mtime": 1795270313.3072312,
+    "seen": 1795270339.955239,
+    "ast_hash": "1c4daadf7d679e553cdbeadac0c912e8",
     "semantic_hash": ""
   },
   "README.md": {
@@ -537,6 +537,192 @@
     "mtime": 1795267652.4249766,
     "seen": 1795267946.7592618,
     "ast_hash": "40347bf1fa4e73d4754a6b433e8f2008",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Admin/BerandaController.php": {
+    "mtime": 1795270166.152252,
+    "seen": 1795270339.955239,
+    "ast_hash": "a02885d738c146c8cdbed062991be940",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Admin/KaryawanController.php": {
+    "mtime": 1795270192.6950955,
+    "seen": 1795270339.955239,
+    "ast_hash": "8cb54edb8a6c3b44ebbd1d02eb08f319",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Admin/PengaturanController.php": {
+    "mtime": 1795270166.4762855,
+    "seen": 1795270339.955239,
+    "ast_hash": "1470ad1baff6ac399cf32bd3873ebf37",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Auth/AuthController.php": {
+    "mtime": 1795270192.7281375,
+    "seen": 1795270339.955239,
+    "ast_hash": "1196c3836843b3ea9cdb8e8a04dd5955",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Controller.php": {
+    "mtime": 1795270165.8725772,
+    "seen": 1795270339.955239,
+    "ast_hash": "25a307335c0719bc9a91b3f7babd186d",
+    "semantic_hash": ""
+  },
+  "app/Models/Attendance.php": {
+    "mtime": 1795270004.3697784,
+    "seen": 1795270339.955239,
+    "ast_hash": "cad7ac79a4254f575d6bd9cf1ce06f37",
+    "semantic_hash": ""
+  },
+  "app/Models/Employee.php": {
+    "mtime": 1795270123.7858672,
+    "seen": 1795270339.955239,
+    "ast_hash": "d322c2a94559eb05d567ef6662839702",
+    "semantic_hash": ""
+  },
+  "app/Models/Holiday.php": {
+    "mtime": 1795270004.2368443,
+    "seen": 1795270339.955239,
+    "ast_hash": "9a3dd9821cb57a333ae9b482825df3b3",
+    "semantic_hash": ""
+  },
+  "app/Models/Location.php": {
+    "mtime": 1795270003.6713507,
+    "seen": 1795270339.955239,
+    "ast_hash": "31d67bb505665f486a9a102de3332ced",
+    "semantic_hash": ""
+  },
+  "app/Models/Shift.php": {
+    "mtime": 1795270003.8085012,
+    "seen": 1795270339.955239,
+    "ast_hash": "92af1ef1e53b3ca7afff5accabcaa32e",
+    "semantic_hash": ""
+  },
+  "app/Models/ShiftSchedule.php": {
+    "mtime": 1795270004.5115416,
+    "seen": 1795270339.955239,
+    "ast_hash": "9569dca61a105a4036bb41e4243b7bfc",
+    "semantic_hash": ""
+  },
+  "app/Models/ShiftSwap.php": {
+    "mtime": 1795270004.6429965,
+    "seen": 1795270339.955239,
+    "ast_hash": "b2caa57a6202632c161ab94f600ce63b",
+    "semantic_hash": ""
+  },
+  "app/Models/SystemSetting.php": {
+    "mtime": 1795270192.8586326,
+    "seen": 1795270339.955239,
+    "ast_hash": "faee1a0014eeac63a1d88a454019ee64",
+    "semantic_hash": ""
+  },
+  "app/Models/User.php": {
+    "mtime": 1795270003.5308516,
+    "seen": 1795270339.955239,
+    "ast_hash": "ceaacf1ec162c067aaa30b9a4cf9edf9",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210509_create_locations_table.php": {
+    "mtime": 1795269961.061934,
+    "seen": 1795270339.955239,
+    "ast_hash": "912cc09dad78396e55c1637a9924a743",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210509_create_shifts_table.php": {
+    "mtime": 1795269961.1857913,
+    "seen": 1795270339.955239,
+    "ast_hash": "5fc6ca69358e815022435ac739a45adb",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210509_create_users_table.php": {
+    "mtime": 1795269960.9375534,
+    "seen": 1795270339.955239,
+    "ast_hash": "3cadae8491f309b6e9724e4e02bbb72d",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210510_create_employees_table.php": {
+    "mtime": 1795269961.312252,
+    "seen": 1795270339.955239,
+    "ast_hash": "ddee40472c04162997528cbd86cdb5ed",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210510_create_holidays_table.php": {
+    "mtime": 1795269961.6389093,
+    "seen": 1795270339.955239,
+    "ast_hash": "58b94695c91d867c94b154422fdf7808",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210510_create_system_settings_table.php": {
+    "mtime": 1795269961.5040996,
+    "seen": 1795270339.955239,
+    "ast_hash": "dc2253bdba5b1490ee5898316cc706c2",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210511_create_attendances_table.php": {
+    "mtime": 1795269961.7707405,
+    "seen": 1795270339.955239,
+    "ast_hash": "3fa3e88796979b840f467e5b6df19d0e",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210511_create_shift_schedules_table.php": {
+    "mtime": 1795269961.9046783,
+    "seen": 1795270339.955239,
+    "ast_hash": "1be5093ce18b6381af3bd4c41f181646",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_210511_create_shift_swaps_table.php": {
+    "mtime": 1795269962.0364025,
+    "seen": 1795270339.955239,
+    "ast_hash": "bcab1df3f429c004a9370ebab3925b85",
+    "semantic_hash": ""
+  },
+  "database/seeders/DatabaseSeeder.php": {
+    "mtime": 1795270072.0730217,
+    "seen": 1795270339.955239,
+    "ast_hash": "259d685b537ef605c67aad052baa6a81",
+    "semantic_hash": ""
+  },
+  "database/seeders/EmployeeSeeder.php": {
+    "mtime": 1795270193.0847538,
+    "seen": 1795270339.955239,
+    "ast_hash": "230c6deb392726778835db52f30f7f79",
+    "semantic_hash": ""
+  },
+  "database/seeders/HolidaySeeder.php": {
+    "mtime": 1795270040.7565608,
+    "seen": 1795270339.955239,
+    "ast_hash": "f803d27e5862a31f3b85cd57500b5ab2",
+    "semantic_hash": ""
+  },
+  "database/seeders/LocationSeeder.php": {
+    "mtime": 1795270040.359844,
+    "seen": 1795270339.955239,
+    "ast_hash": "ffc78b44da2ba58d0dafa2b4d65b2667",
+    "semantic_hash": ""
+  },
+  "database/seeders/ShiftSeeder.php": {
+    "mtime": 1795270040.4921548,
+    "seen": 1795270339.955239,
+    "ast_hash": "2591ca625025f3faf563686d2157c99b",
+    "semantic_hash": ""
+  },
+  "database/seeders/SystemSettingSeeder.php": {
+    "mtime": 1795270040.6202996,
+    "seen": 1795270339.955239,
+    "ast_hash": "39dce119d2581ee7f8088d685b066378",
+    "semantic_hash": ""
+  },
+  "tests/Feature/KaryawanBackendTest.php": {
+    "mtime": 1795270234.0292342,
+    "seen": 1795270339.955239,
+    "ast_hash": "acde105f3d52fea62b8fb5e65ef5303f",
+    "semantic_hash": ""
+  },
+  "tests/TestCase.php": {
+    "mtime": 1795270233.888597,
+    "seen": 1795270339.955239,
+    "ast_hash": "7e567dc27e68d5b57bae16af07f68907",
     "semantic_hash": ""
   },
   "package-lock.json": {

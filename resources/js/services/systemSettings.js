@@ -27,6 +27,7 @@ export const DEFAULT_ATTENDANCE_SETTINGS = {
   earlyCheckInMinutes: 60,
   earlyDepartureToleranceMinutes: 0,
   weeklyMinHours: 40,
+  enableGeofence: true, // Master switch validasi radius geofence presensi mobile
   requireSelfie: true,
   preventMockGps: true,
   minOvertimeMinutes: 60,
@@ -225,10 +226,20 @@ export function getAttendanceSettings() {
   if (!isClient) return DEFAULT_ATTENDANCE_SETTINGS;
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
-    return raw ? JSON.parse(raw) : DEFAULT_ATTENDANCE_SETTINGS;
+    if (!raw) return DEFAULT_ATTENDANCE_SETTINGS;
+    const parsed = JSON.parse(raw);
+    return {
+      ...DEFAULT_ATTENDANCE_SETTINGS,
+      ...parsed,
+    };
   } catch {
     return DEFAULT_ATTENDANCE_SETTINGS;
   }
+}
+
+export function isGeofenceEnabled() {
+  const settings = getAttendanceSettings();
+  return settings.enableGeofence !== false;
 }
 
 export function saveAttendanceSettings(settings) {

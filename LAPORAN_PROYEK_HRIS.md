@@ -370,13 +370,17 @@ Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/j
 - **Sinkronisasi Otomatis ke Jadwal & Roster**: Tanggal libur resmi otomatis ditandai `LIBUR (Hari Libur Resmi)` di Roster Mingguan tanpa perlu ubah jadwal satu per satu.
 
 ### E. Tab 4: Geofencing & Lokasi Pabrik (`location`)
+- **Master Switch / Toggle Penonaktifan Geofence**:
+  - Disediakan kartu kontrol utama di bagian atas tab untuk mengaktifkan atau menonaktifkan validasi radius geofence secara global dengan 1-klik (`enableGeofence: true/false`).
+  - **Mode Dinonaktifkan (*Bypass Radius*)**: Seluruh karyawan dapat melakukan presensi mobile dari mana saja tanpa batasan radius meter pabrik (berguna untuk penugasan luar site, dinas khusus, atau kondisi darurat), namun koordinat GPS tetap terekam secara transparan.
+  - Kartu ringkasan KPI dan badge status di tab merefleksikan status secara dinamis: *Aktif (Radius Terkunci)* atau *Dinonaktifkan (Bebas Lokasi)*.
+  - Opsi toggle ini juga disinkronkan ke Tab 1 (Kebijakan Presensi & Kerja) serta database backend `system_settings`.
 - Konfigurasi titik radius presensi:
-  - **Lokasi Mariuk** (Pabrik Utama): Radius 120m, 6 personil terdaftar, koordinat GPS `-6.8797, 107.9254`.
-  - **Lokasi Cimalaka** (Pabrik Cabang): Radius 120m, 6 personil terdaftar, koordinat GPS `-6.8523, 107.9402`.
-  - **Head Office** (Kantor Pusat): Radius 80m, koordinat GPS `-6.9147, 107.6098`.
+  - **Lokasi Mariuk** (Site Subang): Radius 120m, 6 personil terdaftar, koordinat GPS `-6.48512, 107.82145`.
+  - **Lokasi Cimalaka** (Site Sumedang): Radius 120m, 6 personil terdaftar, koordinat GPS `-6.81234, 107.93512`.
 - **Fitur Modal Edit Parameter Geofence**:
   - Tombol aksi *Edit* (ikon pensil) pada setiap baris tabel membuka dialog `<Modal>` atomik.
-  - Memungkinkan penyesuaian nama lokasi, kategori titik (Pabrik Utama, Pabrik Cabang, Head Office, Gudang Logistik), koordinat latitude/longitude GPS, radius valid meter, dan alamat lengkap.
+  - Memungkinkan penyesuaian nama lokasi, kategori titik, koordinat GPS, radius meter, dan alamat lengkap.
 - Toggle status geofence (*Aktifkan* / *Nonaktifkan*) per lokasi operasional.
 
 ### F. Tab 5: Profil Perusahaan & Pemeliharaan Data (`maintenance`)

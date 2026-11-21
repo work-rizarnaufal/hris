@@ -418,14 +418,31 @@ export default function PengaturanSistem() {
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Geofence Presensi Mobile
                 </p>
-                <p className="text-2xl font-bold font-display text-amber-700 mt-1">
-                  {stats.activeLocations} <span className="text-sm font-normal text-slate-400">Titik Aktif</span>
-                </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Radius Default: 80 - 150m
-                </p>
+                {attendanceSettings.enableGeofence !== false ? (
+                  <>
+                    <p className="text-2xl font-bold font-display text-emerald-700 mt-1">
+                      {stats.activeLocations} <span className="text-sm font-normal text-slate-400">Titik Aktif</span>
+                    </p>
+                    <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                      Radius Aktif (80 - 150m)
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-2xl font-bold font-display text-amber-600 mt-1">
+                      Dinonaktifkan
+                    </p>
+                    <p className="text-[11px] text-amber-700 font-medium mt-0.5">
+                      Bebas Lokasi / Tanpa Batas
+                    </p>
+                  </>
+                )}
               </div>
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                attendanceSettings.enableGeofence !== false
+                  ? 'bg-emerald-50 text-emerald-600'
+                  : 'bg-amber-50 text-amber-600'
+              }`}>
                 <MapPin className="w-5 h-5" />
               </div>
             </CardContent>
@@ -681,6 +698,37 @@ export default function PengaturanSistem() {
                         setAttendanceSettings({
                           ...attendanceSettings,
                           preventMockGps: e.target.checked,
+                        })
+                      }
+                      className="w-4 h-4 rounded text-navy focus:ring-navy border-slate-300 cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold text-slate-800">
+                          Validasi Radius Geofence Lokasi
+                        </p>
+                        <Badge className={
+                          attendanceSettings.enableGeofence !== false
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-bold py-0'
+                            : 'bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-bold py-0'
+                        }>
+                          {attendanceSettings.enableGeofence !== false ? 'Aktif' : 'Nonaktif'}
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Batasi presensi mobile hanya dalam radius koordinat site Mariuk & Cimalaka (Nonaktifkan jika ada penugasan luar/WFH)
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={attendanceSettings.enableGeofence !== false}
+                      onChange={(e) =>
+                        setAttendanceSettings({
+                          ...attendanceSettings,
+                          enableGeofence: e.target.checked,
                         })
                       }
                       className="w-4 h-4 rounded text-navy focus:ring-navy border-slate-300 cursor-pointer"
@@ -1252,120 +1300,219 @@ export default function PengaturanSistem() {
 
         {/* TAB 3: GEOFENCING & LOKASI PABRIK */}
         {activeTab === 'location' && (
-          <Card className="border-slate-200 shadow-2xs">
-            <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#c4a266]" />
-                  Titik Lokasi & Radius Geofence Presensi Mobile
-                </CardTitle>
-                <CardDescription className="text-xs mt-0.5">
-                  Validasi presensi GPS smartphone hanya diizinkan dalam batas radius meter yang ditentukan.
-                </CardDescription>
-              </div>
+          <div className="space-y-4">
+            {/* Master Switch Banner Geofencing */}
+            <Card
+              className={`border transition-all ${
+                attendanceSettings.enableGeofence !== false
+                  ? 'border-emerald-200 bg-emerald-50/30'
+                  : 'border-amber-300 bg-amber-50/50'
+              }`}
+            >
+              <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div
+                    className={`p-2.5 rounded-xl shrink-0 ${
+                      attendanceSettings.enableGeofence !== false
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-amber-100 text-amber-700'
+                    }`}
+                  >
+                    {attendanceSettings.enableGeofence !== false ? (
+                      <CheckCircle2 className="w-6 h-6" />
+                    ) : (
+                      <AlertCircle className="w-6 h-6" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-sm font-bold text-slate-900">
+                        {attendanceSettings.enableGeofence !== false
+                          ? 'Validasi Geofence Aktif'
+                          : 'Validasi Geofence Dinonaktifkan (Bebas Lokasi)'}
+                      </h3>
+                      <Badge
+                        className={
+                          attendanceSettings.enableGeofence !== false
+                            ? 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold text-xs'
+                            : 'bg-amber-100 text-amber-900 border-amber-300 font-bold text-xs'
+                        }
+                      >
+                        {attendanceSettings.enableGeofence !== false ? 'Radius Terkunci' : 'Radius Nonaktif'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                      {attendanceSettings.enableGeofence !== false
+                        ? 'Karyawan hanya dapat melakukan presensi jika smartphone berada di dalam radius koordinat site resmi (Mariuk & Cimalaka).'
+                        : 'Karyawan dapat presensi dari mana saja tanpa batasan radius meter (koordinat GPS tetap terekam). Mode ini cocok untuk penugasan luar, WFH, atau saat darurat.'}
+                    </p>
+                  </div>
+                </div>
 
-              <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-xs font-semibold self-start sm:self-auto">
-                <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
-                Service Geofence Aktif (GPS Accurate)
-              </Badge>
-            </CardHeader>
+                <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
+                  <Button
+                    type="button"
+                    variant={attendanceSettings.enableGeofence !== false ? 'outline' : 'default'}
+                    size="sm"
+                    onClick={() => {
+                      const nextState = !(attendanceSettings.enableGeofence !== false);
+                      setAttendanceSettings((prev) => ({
+                        ...prev,
+                        enableGeofence: nextState,
+                      }));
+                      setAlertInfo({
+                        type: nextState ? 'success' : 'warning',
+                        message: nextState
+                          ? 'Validasi geofence diaktifkan kembali. Presensi wajib dalam radius lokasi.'
+                          : 'Validasi geofence dinonaktifkan. Seluruh karyawan dapat presensi bebas radius.',
+                      });
+                    }}
+                    className={`font-semibold cursor-pointer ${
+                      attendanceSettings.enableGeofence !== false
+                        ? 'border-rose-300 text-rose-700 hover:bg-rose-50 hover:border-rose-400'
+                        : 'bg-emerald-700 text-white hover:bg-emerald-800'
+                    }`}
+                  >
+                    {attendanceSettings.enableGeofence !== false ? (
+                      'Nonaktifkan Geofence'
+                    ) : (
+                      'Aktifkan Kembali Geofence'
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">Nama Lokasi Operasional</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[180px]">Koordinat GPS (Lat, Long)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Radius Valid (Meter)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Personil Terdaftar</TableHead>
-                    <TableHead className="text-center text-xs font-semibold text-slate-600 w-28">Status Geofence</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 min-w-[150px]">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
+            <Card className="border-slate-200 shadow-2xs">
+              <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#c4a266]" />
+                    Titik Lokasi & Radius Geofence Presensi Mobile
+                  </CardTitle>
+                  <CardDescription className="text-xs mt-0.5">
+                    Titik koordinat dan batas radius meter per lokasi operasional pabrik dan site.
+                  </CardDescription>
+                </div>
 
-                <TableBody>
-                  {locations.map((loc, idx) => (
-                    <TableRow key={loc.id} className="text-xs hover:bg-slate-50/70">
-                      <TableCell className="text-center font-medium text-slate-500">{idx + 1}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="font-bold text-navy">{loc.name}</p>
+                <Badge
+                  className={
+                    attendanceSettings.enableGeofence !== false
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200 text-xs font-semibold self-start sm:self-auto'
+                      : 'bg-amber-50 text-amber-800 border-amber-200 text-xs font-semibold self-start sm:self-auto'
+                  }
+                >
+                  {attendanceSettings.enableGeofence !== false ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                      Status Service: Aktif (GPS Accurate)
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="w-3.5 h-3.5 mr-1 text-amber-600" />
+                      Status Service: Dinonaktifkan (Bypass Radius)
+                    </>
+                  )}
+                </Badge>
+              </CardHeader>
+
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-slate-50/80 border-b border-slate-200">
+                      <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">Nama Lokasi Operasional</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-600 min-w-[180px]">Koordinat GPS (Lat, Long)</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">Radius Valid (Meter)</TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Personil Terdaftar</TableHead>
+                      <TableHead className="text-center text-xs font-semibold text-slate-600 w-28">Status Geofence</TableHead>
+                      <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 min-w-[150px]">Aksi</TableHead>
+                    </TableRow>
+                  </TableHeader>
+
+                  <TableBody>
+                    {locations.map((loc, idx) => (
+                      <TableRow key={loc.id} className="text-xs hover:bg-slate-50/70">
+                        <TableCell className="text-center font-medium text-slate-500">{idx + 1}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="font-bold text-navy">{loc.name}</p>
+                            <Badge
+                              className={
+                                loc.name.includes('Mariuk')
+                                  ? 'bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-bold px-1.5 py-0'
+                                  : loc.name.includes('Cimalaka')
+                                  ? 'bg-indigo-50 text-indigo-800 border-indigo-200 text-[10px] font-bold px-1.5 py-0'
+                                  : 'bg-slate-100 text-slate-700 border-slate-200 text-[10px] font-medium px-1.5 py-0'
+                              }
+                            >
+                              {loc.type || 'Pabrik'}
+                            </Badge>
+                          </div>
+                          <p className="text-[11px] text-slate-500">{loc.address}</p>
+                        </TableCell>
+                        <TableCell className="font-mono text-slate-700">
+                          {loc.latitude}, {loc.longitude}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min="20"
+                              max="500"
+                              step="10"
+                              value={loc.radiusMeters}
+                              onChange={(e) =>
+                                handleUpdateLocationRadius(loc.id, e.target.value)
+                              }
+                              className="h-8 text-xs bg-white text-slate-800 font-mono w-24"
+                            />
+                            <span className="text-xs text-slate-500">Meter</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-medium text-slate-700">
+                          {loc.assignedCount} Karyawan
+                        </TableCell>
+                        <TableCell className="text-center">
                           <Badge
                             className={
-                              loc.name.includes('Mariuk')
-                                ? 'bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-bold px-1.5 py-0'
-                                : loc.name.includes('Cimalaka')
-                                ? 'bg-indigo-50 text-indigo-800 border-indigo-200 text-[10px] font-bold px-1.5 py-0'
-                                : 'bg-slate-100 text-slate-700 border-slate-200 text-[10px] font-medium px-1.5 py-0'
+                              loc.status === 'Aktif'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold'
+                                : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold'
                             }
                           >
-                            {loc.type || 'Pabrik'}
+                            {loc.status}
                           </Badge>
-                        </div>
-                        <p className="text-[11px] text-slate-500">{loc.address}</p>
-                      </TableCell>
-                      <TableCell className="font-mono text-slate-700">
-                        {loc.latitude}, {loc.longitude}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="20"
-                            max="500"
-                            step="10"
-                            value={loc.radiusMeters}
-                            onChange={(e) =>
-                              handleUpdateLocationRadius(loc.id, e.target.value)
-                            }
-                            className="h-8 text-xs bg-white text-slate-800 font-mono w-24"
-                          />
-                          <span className="text-xs text-slate-500">Meter</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium text-slate-700">
-                        {loc.assignedCount} Karyawan
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge
-                          className={
-                            loc.status === 'Aktif'
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold'
-                              : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold'
-                          }
-                        >
-                          {loc.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right pr-4">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleOpenEditLocation(loc)}
-                            className="h-7 text-[11px] px-2 font-medium cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50 gap-1"
-                            title="Edit Parameter Geofence"
-                          >
-                            <Pencil className="w-3 h-3 text-[#c4a266]" />
-                            <span>Edit</span>
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleToggleLocationStatus(loc.id)}
-                            className="h-7 text-[11px] px-2 font-medium cursor-pointer"
-                          >
-                            {loc.status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan'}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                        </TableCell>
+                        <TableCell className="text-right pr-4">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenEditLocation(loc)}
+                              className="h-7 text-[11px] px-2 font-medium cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50 gap-1"
+                              title="Edit Parameter Geofence"
+                            >
+                              <Pencil className="w-3 h-3 text-[#c4a266]" />
+                              <span>Edit</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleLocationStatus(loc.id)}
+                              className="h-7 text-[11px] px-2 font-medium cursor-pointer"
+                            >
+                              {loc.status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan'}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* TAB 4: PROFIL PERUSAHAAN & PEMELIHARAAN */}
