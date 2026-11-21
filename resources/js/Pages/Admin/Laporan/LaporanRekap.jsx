@@ -62,15 +62,17 @@ const AVAILABLE_PERIODS = [
   { value: '2026-09', label: 'September 2026' },
 ];
 
-// Data Agregasi Evaluasi Kehadiran Karyawan (12 Karyawan HCGA)
+// Data Agregasi Evaluasi Kehadiran Karyawan (12 Karyawan HCGA: 6 Mariuk & 6 Cimalaka)
 const EVALUATION_DATASET = [
+  // --- LOKASI MARIUK ---
   {
     id: 1,
     name: 'Budi Santoso',
     nip: 'HC-0101',
     role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -82,58 +84,10 @@ const EVALUATION_DATASET = [
     alpaDays: 0,
     score: 100,
     status: 'Sangat Baik',
-    actionRecommendation: 'Pertahankan Performa (Nominasi Best Attendance)',
+    actionRecommendation: 'Pertahankan Performa (Nominasi Best Attendance Mariuk)',
     incidents: [
-      { date: '01 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:50 WIB (Jadwal 07:00)' },
-      { date: '03 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:48 WIB (Jadwal 07:00)' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    role: 'HCGA Specialist',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    workDays: 22,
-    presentDays: 22,
-    lateCount: 0,
-    totalLateMinutes: 0,
-    izinDays: 0,
-    sakitDays: 0,
-    cutiDays: 0,
-    leaveDays: 0,
-    alpaDays: 0,
-    score: 100,
-    status: 'Sangat Baik',
-    actionRecommendation: 'Pertahankan Performa (Nominasi Best Attendance)',
-    incidents: [
-      { date: '02 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 07:45 WIB (Jadwal 08:00)' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    role: 'Operator Forklift Utama',
-    division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    workDays: 22,
-    presentDays: 21,
-    lateCount: 2,
-    totalLateMinutes: 28,
-    izinDays: 0,
-    sakitDays: 0,
-    cutiDays: 1,
-    leaveDays: 1,
-    alpaDays: 0,
-    score: 91,
-    status: 'Disiplin Baik',
-    actionRecommendation: 'Bimbingan supervisor terkait ketepatan shift 2',
-    incidents: [
-      { date: '02 Nov 2026', type: 'Terlambat', detail: '18 Menit - Terkendala armada logistik' },
-      { date: '04 Nov 2026', type: 'Terlambat', detail: '10 Menit - Hujan deras kawasan Rungkut' },
-      { date: '10 Nov 2026', type: 'Cuti', detail: '1 Hari - Cuti Tahunan (Disetujui HCGA)' },
+      { date: '01 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:48 WIB (Shift Pagi 07:00)' },
+      { date: '03 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:50 WIB (Shift Pagi 07:00)' },
     ],
   },
   {
@@ -142,7 +96,8 @@ const EVALUATION_DATASET = [
     nip: 'HC-0104',
     role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
     workDays: 22,
     presentDays: 22,
     lateCount: 1,
@@ -156,7 +111,7 @@ const EVALUATION_DATASET = [
     status: 'Sangat Baik',
     actionRecommendation: 'Kepatuhan baik, toleransi keterlambatan wajar',
     incidents: [
-      { date: '03 Nov 2026', type: 'Terlambat', detail: '12 Menit - Pemeriksaan gerbang pabrik' },
+      { date: '03 Nov 2026', type: 'Terlambat', detail: '12 Menit - Pemeriksaan gerbang Mariuk' },
     ],
   },
   {
@@ -165,7 +120,8 @@ const EVALUATION_DATASET = [
     nip: 'HC-0105',
     role: 'Danru Keamanan & K3',
     division: 'Security & Safety',
-    location: 'Site Operasional (Gresik)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -177,36 +133,35 @@ const EVALUATION_DATASET = [
     alpaDays: 0,
     score: 100,
     status: 'Sangat Baik',
-    actionRecommendation: 'Keteladanan kedisiplinan tingkat regu keamanan',
+    actionRecommendation: 'Keteladanan kedisiplinan regu keamanan Mariuk',
     incidents: [
-      { date: '01 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:15 WIB (Serah terima piket)' },
+      { date: '01 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 18:45 WIB (Serah terima shift)' },
     ],
   },
   {
-    id: 6,
-    name: 'Rina Marlina',
-    nip: 'HC-0106',
-    role: 'Staf Administrasi Payroll',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
+    id: 3,
+    name: 'Ahmad Fauzi',
+    nip: 'HC-0103',
+    role: 'Operator Forklift Utama',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
     workDays: 22,
-    presentDays: 17,
-    lateCount: 0,
-    totalLateMinutes: 0,
+    presentDays: 21,
+    lateCount: 2,
+    totalLateMinutes: 28,
     izinDays: 0,
     sakitDays: 0,
-    cutiDays: 5,
-    leaveDays: 5,
+    cutiDays: 1,
+    leaveDays: 1,
     alpaDays: 0,
-    score: 93,
+    score: 91,
     status: 'Disiplin Baik',
-    actionRecommendation: 'Sedang menjalani cuti resmi terencana (Cuti Melahirkan)',
+    actionRecommendation: 'Bimbingan supervisor terkait ketepatan shift Mariuk',
     incidents: [
-      { date: '02 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-1)' },
-      { date: '03 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-2)' },
-      { date: '04 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-3)' },
-      { date: '05 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-4)' },
-      { date: '06 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-5)' },
+      { date: '02 Nov 2026', type: 'Terlambat', detail: '18 Menit - Terkendala armada logistik' },
+      { date: '04 Nov 2026', type: 'Terlambat', detail: '10 Menit - Hujan deras rute Mariuk' },
+      { date: '10 Nov 2026', type: 'Cuti', detail: '1 Hari - Cuti Tahunan (Disetujui HCGA)' },
     ],
   },
   {
@@ -215,7 +170,8 @@ const EVALUATION_DATASET = [
     nip: 'HC-0107',
     role: 'Teknisi Maintenance Mesin',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
     workDays: 22,
     presentDays: 20,
     lateCount: 4,
@@ -237,36 +193,13 @@ const EVALUATION_DATASET = [
     ],
   },
   {
-    id: 8,
-    name: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    role: 'Koordinator Gudang Bahan Baku',
-    division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    workDays: 22,
-    presentDays: 21,
-    lateCount: 1,
-    totalLateMinutes: 14,
-    izinDays: 0,
-    sakitDays: 1,
-    cutiDays: 0,
-    leaveDays: 1,
-    alpaDays: 0,
-    score: 94,
-    status: 'Disiplin Baik',
-    actionRecommendation: 'Kinerja stabil, koordinasi kehadiran rapi',
-    incidents: [
-      { date: '04 Nov 2026', type: 'Terlambat', detail: '14 Menit - Macet frontage Ahmad Yani' },
-      { date: '11 Nov 2026', type: 'Sakit', detail: '1 Hari (Surat Keterangan Dokter Terlampir)' },
-    ],
-  },
-  {
     id: 9,
     name: 'Joko Susilo',
     nip: 'HC-0109',
     role: 'Anggota Patroli Keamanan',
     division: 'Security & Safety',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
     workDays: 22,
     presentDays: 20,
     lateCount: 3,
@@ -278,7 +211,7 @@ const EVALUATION_DATASET = [
     alpaDays: 0,
     score: 82,
     status: 'Perlu Pembinaan',
-    actionRecommendation: 'Teguran lisan Danru dan evaluasi rotasi pos jaga',
+    actionRecommendation: 'Teguran lisan Danru dan evaluasi rotasi pos jaga Mariuk',
     incidents: [
       { date: '03 Nov 2026', type: 'Terlambat', detail: '15 Menit - Pergantian perlengkapan' },
       { date: '06 Nov 2026', type: 'Terlambat', detail: '20 Menit - Hujan lebat' },
@@ -287,62 +220,16 @@ const EVALUATION_DATASET = [
       { date: '13 Nov 2026', type: 'Terlambat', detail: '13 Menit' },
     ],
   },
+
+  // --- LOKASI CIMALAKA ---
   {
-    id: 10,
-    name: 'Dian Kusuma',
-    nip: 'HC-0110',
-    role: 'IT Support & Sistem HRIS',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    workDays: 22,
-    presentDays: 22,
-    lateCount: 1,
-    totalLateMinutes: 8,
-    izinDays: 0,
-    sakitDays: 0,
-    cutiDays: 0,
-    leaveDays: 0,
-    alpaDays: 0,
-    score: 97,
-    status: 'Sangat Baik',
-    actionRecommendation: 'Kedisiplinan sangat baik, responsivitas sistem prima',
-    incidents: [
-      { date: '05 Nov 2026', type: 'Terlambat', detail: '8 Menit (Toleransi sistem)' },
-    ],
-  },
-  {
-    id: 11,
-    name: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    role: 'Operator Mesin CNC Milling',
+    id: 2,
+    name: 'Siti Rahmawati',
+    nip: 'HC-0102',
+    role: 'Supervisor Operasional Site',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    workDays: 22,
-    presentDays: 21,
-    lateCount: 3,
-    totalLateMinutes: 42,
-    izinDays: 1,
-    sakitDays: 0,
-    cutiDays: 0,
-    leaveDays: 1,
-    alpaDays: 0,
-    score: 84,
-    status: 'Perlu Pembinaan',
-    actionRecommendation: 'Pengawasan kehadiran awal shift 1 mesin perkakas',
-    incidents: [
-      { date: '02 Nov 2026', type: 'Terlambat', detail: '14 Menit' },
-      { date: '04 Nov 2026', type: 'Terlambat', detail: '16 Menit' },
-      { date: '08 Nov 2026', type: 'Terlambat', detail: '12 Menit' },
-      { date: '10 Nov 2026', type: 'Izin', detail: '1 Hari - Keperluan keluarga mendesak' },
-    ],
-  },
-  {
-    id: 12,
-    name: 'Nurul Aini',
-    nip: 'HC-0112',
-    role: 'Petugas Inventory & Stok',
-    division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
     workDays: 22,
     presentDays: 22,
     lateCount: 0,
@@ -354,9 +241,137 @@ const EVALUATION_DATASET = [
     alpaDays: 0,
     score: 100,
     status: 'Sangat Baik',
-    actionRecommendation: 'Pertahankan Performa (Nominasi Best Attendance)',
+    actionRecommendation: 'Pertahankan Performa (Nominasi Best Supervisor Cimalaka)',
     incidents: [
-      { date: '01 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:55 WIB' },
+      { date: '02 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 06:45 WIB (Shift Pagi 07:00)' },
+    ],
+  },
+  {
+    id: 11,
+    name: 'Wahyu Hidayat',
+    nip: 'HC-0111',
+    role: 'Operator Mesin Produksi',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    workDays: 22,
+    presentDays: 21,
+    lateCount: 3,
+    totalLateMinutes: 42,
+    izinDays: 1,
+    sakitDays: 0,
+    cutiDays: 0,
+    leaveDays: 1,
+    alpaDays: 0,
+    score: 84,
+    status: 'Perlu Pembinaan',
+    actionRecommendation: 'Pengawasan kehadiran awal shift 12 jam Cimalaka',
+    incidents: [
+      { date: '02 Nov 2026', type: 'Terlambat', detail: '14 Menit' },
+      { date: '04 Nov 2026', type: 'Terlambat', detail: '16 Menit' },
+      { date: '08 Nov 2026', type: 'Terlambat', detail: '12 Menit' },
+      { date: '10 Nov 2026', type: 'Izin', detail: '1 Hari - Keperluan keluarga mendesak' },
+    ],
+  },
+  {
+    id: 10,
+    name: 'Dian Kusuma',
+    nip: 'HC-0110',
+    role: 'Petugas Keamanan Site',
+    division: 'Security & Safety',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    workDays: 22,
+    presentDays: 22,
+    lateCount: 1,
+    totalLateMinutes: 8,
+    izinDays: 0,
+    sakitDays: 0,
+    cutiDays: 0,
+    leaveDays: 0,
+    alpaDays: 0,
+    score: 97,
+    status: 'Sangat Baik',
+    actionRecommendation: 'Kedisiplinan sangat baik, penjagaan pos gerbang prima',
+    incidents: [
+      { date: '05 Nov 2026', type: 'Terlambat', detail: '8 Menit (Toleransi sistem)' },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Rina Marlina',
+    nip: 'HC-0106',
+    role: 'Koordinator Gudang & Logistik',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    workDays: 22,
+    presentDays: 17,
+    lateCount: 0,
+    totalLateMinutes: 0,
+    izinDays: 0,
+    sakitDays: 0,
+    cutiDays: 5,
+    leaveDays: 5,
+    alpaDays: 0,
+    score: 93,
+    status: 'Disiplin Baik',
+    actionRecommendation: 'Sedang menjalani cuti resmi terencana (Cuti Melahirkan)',
+    incidents: [
+      { date: '02 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-1)' },
+      { date: '03 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-2)' },
+      { date: '04 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-3)' },
+      { date: '05 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-4)' },
+      { date: '06 Nov 2026', type: 'Cuti', detail: 'Cuti Melahirkan (Hari ke-5)' },
+    ],
+  },
+  {
+    id: 8,
+    name: 'Maya Indah Lestari',
+    nip: 'HC-0108',
+    role: 'Operator QC Lapangan',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    workDays: 22,
+    presentDays: 21,
+    lateCount: 1,
+    totalLateMinutes: 14,
+    izinDays: 0,
+    sakitDays: 1,
+    cutiDays: 0,
+    leaveDays: 1,
+    alpaDays: 0,
+    score: 94,
+    status: 'Disiplin Baik',
+    actionRecommendation: 'Kinerja QC stabil, koordinasi kehadiran rapi',
+    incidents: [
+      { date: '04 Nov 2026', type: 'Terlambat', detail: '14 Menit - Macet rute Sumedang' },
+      { date: '11 Nov 2026', type: 'Sakit', detail: '1 Hari (Surat Keterangan Dokter Terlampir)' },
+    ],
+  },
+  {
+    id: 12,
+    name: 'Nurul Aini',
+    nip: 'HC-0112',
+    role: 'Petugas Inventory Stok',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    workDays: 22,
+    presentDays: 22,
+    lateCount: 0,
+    totalLateMinutes: 0,
+    izinDays: 0,
+    sakitDays: 0,
+    cutiDays: 0,
+    leaveDays: 0,
+    alpaDays: 0,
+    score: 100,
+    status: 'Sangat Baik',
+    actionRecommendation: 'Pertahankan Performa (Nominasi Best Attendance Cimalaka)',
+    incidents: [
+      { date: '01 Nov 2026', type: 'Tepat Waktu', detail: 'Hadir 18:48 WIB (Shift Malam)' },
     ],
   },
 ];
@@ -365,6 +380,7 @@ export default function LaporanRekap() {
   const [activeTab, setActiveTab] = useState('organisasi'); // 'organisasi' | 'individu'
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(1);
   const [selectedPeriod, setSelectedPeriod] = useState('2026-11');
+  const [selectedLocation, setSelectedLocation] = useState('ALL');
   const [selectedDivision, setSelectedDivision] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -383,6 +399,7 @@ export default function LaporanRekap() {
   // Filter Data
   const filteredData = useMemo(() => {
     return EVALUATION_DATASET.filter((emp) => {
+      const matchLocation = selectedLocation === 'ALL' || emp.location === selectedLocation;
       const matchDivision = selectedDivision === 'ALL' || emp.division === selectedDivision;
       const matchStatus = selectedStatus === 'ALL' || emp.status === selectedStatus;
       const matchSearch =
@@ -390,9 +407,9 @@ export default function LaporanRekap() {
         emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         emp.nip.toLowerCase().includes(searchQuery.toLowerCase()) ||
         emp.role.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchDivision && matchStatus && matchSearch;
+      return matchLocation && matchDivision && matchStatus && matchSearch;
     });
-  }, [selectedDivision, selectedStatus, searchQuery]);
+  }, [selectedLocation, selectedDivision, selectedStatus, searchQuery]);
 
   // Statistik Ringkasan Evaluasi
   const summaryStats = useMemo(() => {
@@ -501,6 +518,7 @@ export default function LaporanRekap() {
   };
 
   const resetFilters = () => {
+    setSelectedLocation('ALL');
     setSelectedDivision('ALL');
     setSelectedStatus('ALL');
     setSearchQuery('');
@@ -902,6 +920,17 @@ export default function LaporanRekap() {
             />
 
             <TableFilterGroup>
+              {/* Filter Lokasi */}
+              <TableSelect
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                title="Filter Lokasi Kerja"
+              >
+                <option value="ALL">Semua Lokasi</option>
+                <option value="Lokasi Mariuk">📍 Lokasi Mariuk</option>
+                <option value="Lokasi Cimalaka">📍 Lokasi Cimalaka</option>
+              </TableSelect>
+
               {/* Filter Divisi */}
               <TableSelect
                 value={selectedDivision}
@@ -930,7 +959,7 @@ export default function LaporanRekap() {
               </TableSelect>
 
               {/* Tombol Reset Filter */}
-              {(searchQuery || selectedDivision !== 'ALL' || selectedStatus !== 'ALL') && (
+              {(searchQuery || selectedLocation !== 'ALL' || selectedDivision !== 'ALL' || selectedStatus !== 'ALL') && (
                 <Button
                   variant="ghost"
                   size="sm"

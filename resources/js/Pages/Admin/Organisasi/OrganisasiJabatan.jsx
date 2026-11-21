@@ -97,10 +97,10 @@ export default function OrganisasiJabatan() {
                 Titik Lokasi Kerja
               </div>
               <div className="text-2xl font-bold font-display text-[#398872] mt-0.5">
-                3 <span className="text-xs font-normal text-slate-400">site</span>
+                2 <span className="text-xs font-normal text-slate-400">site</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-1">
-                Pabrik Sidoarjo, Gudang Rungkut, Kantor Pusat
+                Lokasi Mariuk (Subang) & Lokasi Cimalaka (Sumedang)
               </div>
             </div>
             <div className="w-9 h-9 rounded-lg bg-[#eef7f1] flex items-center justify-center text-[#398872] shrink-0">

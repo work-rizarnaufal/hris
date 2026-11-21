@@ -3,9 +3,23 @@ const isClient = typeof window !== 'undefined';
 
 const STORAGE_KEYS = {
   ATTENDANCE: 'hris_settings_attendance',
+  SHIFTS: 'hris_settings_shifts',
   HOLIDAYS: 'hris_settings_holidays',
   LOCATIONS: 'hris_settings_locations',
   COMPANY: 'hris_settings_company',
+};
+
+export const DEFAULT_SHIFT_SETTINGS = {
+  shiftPagiName: 'Shift Pagi (12 Jam)',
+  shiftPagiIn: '07:00',
+  shiftPagiOut: '19:00',
+  shiftMalamName: 'Shift Malam (12 Jam)',
+  shiftMalamIn: '19:00',
+  shiftMalamOut: '07:00',
+  tukarShiftHour: '07:00 Pagi & 19:00 Malam',
+  durationHours: 12,
+  operatingDaysPerWeek: 7, // 7 hari non-stop tanpa libur operasional
+  rotationModel: 'continuous_alternate', // Kelompok A & B bergantian setiap hari
 };
 
 export const DEFAULT_ATTENDANCE_SETTINGS = {
@@ -139,7 +153,7 @@ export const INITIAL_HOLIDAYS = [
     name: 'Maintenance Tahunan Turbin Utama Pabrik',
     category: 'Libur Khusus Pabrik',
     deductsLeave: false,
-    operationalNote: 'Lini produksi Sidoarjo libur operasional, kantor tetap buka',
+    operationalNote: 'Penyesuaian jadwal operasional lini Mariuk & Cimalaka',
   },
   {
     id: 14,
@@ -164,36 +178,25 @@ export const INITIAL_HOLIDAYS = [
 export const INITIAL_LOCATIONS = [
   {
     id: 1,
-    name: 'Pabrik A (Sidoarjo)',
-    type: 'Lini Manufaktur & Operasional Utama',
-    latitude: -7.447812,
-    longitude: 112.718319,
+    name: 'Lokasi Mariuk',
+    type: 'Site Operasional & Pabrik Mariuk',
+    latitude: -6.48512,
+    longitude: 107.82145,
     radiusMeters: 120,
-    assignedCount: 28,
+    assignedCount: 6,
     status: 'Aktif',
-    address: 'Kawasan Industri SIER Blok C-12, Waru, Sidoarjo',
+    address: 'Kawasan Industri & Operasional Mariuk, Subang',
   },
   {
     id: 2,
-    name: 'Site Operasional (Gresik)',
-    type: 'Depot Distribusi & Pengolahan Material',
-    latitude: -7.160105,
-    longitude: 112.653421,
-    radiusMeters: 150,
-    assignedCount: 12,
+    name: 'Lokasi Cimalaka',
+    type: 'Site Operasional & Gudang Cimalaka',
+    latitude: -6.81234,
+    longitude: 107.93512,
+    radiusMeters: 120,
+    assignedCount: 6,
     status: 'Aktif',
-    address: 'Kawasan Industri Maspion Unit V, Manyar, Gresik',
-  },
-  {
-    id: 3,
-    name: 'Kantor Utama (Surabaya)',
-    type: 'Head Office & Pusat Administrasi HCGA',
-    latitude: -7.257472,
-    longitude: 112.75209,
-    radiusMeters: 80,
-    assignedCount: 8,
-    status: 'Aktif',
-    address: 'Gedung Graha Nusantara Lt. 7, Jl. Pemuda No. 45, Surabaya',
+    address: 'Kawasan Operasional Cimalaka, Sumedang',
   },
 ];
 
@@ -286,9 +289,27 @@ export function saveCompanyProfile(profile) {
   }
 }
 
+export function getShiftSettings() {
+  if (!isClient) return DEFAULT_SHIFT_SETTINGS;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.SHIFTS);
+    return raw ? JSON.parse(raw) : DEFAULT_SHIFT_SETTINGS;
+  } catch {
+    return DEFAULT_SHIFT_SETTINGS;
+  }
+}
+
+export function saveShiftSettings(settings) {
+  if (isClient) {
+    localStorage.setItem(STORAGE_KEYS.SHIFTS, JSON.stringify(settings));
+    dispatchSyncEvent(STORAGE_KEYS.SHIFTS, settings);
+  }
+}
+
 export function resetAllSettings() {
   if (isClient) {
     localStorage.removeItem(STORAGE_KEYS.ATTENDANCE);
+    localStorage.removeItem(STORAGE_KEYS.SHIFTS);
     localStorage.removeItem(STORAGE_KEYS.HOLIDAYS);
     localStorage.removeItem(STORAGE_KEYS.LOCATIONS);
     localStorage.removeItem(STORAGE_KEYS.COMPANY);

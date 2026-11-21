@@ -4,9 +4,8 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@/com
 
 const TARGET_OPTIONS = [
   { value: 'ALL', label: 'Seluruh Karyawan Terjadwal' },
-  { value: 'Shift 1 (Pagi)', label: 'Shift 1: Pagi (07:00 - 15:00)' },
-  { value: 'Shift 2 (Siang)', label: 'Shift 2: Siang (15:00 - 23:00)' },
-  { value: 'Normal Office', label: 'Normal Office (08:00 - 17:00)' },
+  { value: 'Shift Pagi (12 Jam)', label: 'Shift Pagi: 12 Jam (07:00 - 19:00)' },
+  { value: 'Shift Malam (12 Jam)', label: 'Shift Malam: 12 Jam (19:00 - 07:00)' },
 ];
 
 export default function ModalPresensiMassal({

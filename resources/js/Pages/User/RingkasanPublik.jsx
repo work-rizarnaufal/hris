@@ -24,10 +24,10 @@ import {
 
 // Ringkasan divisi publik (teragregat & anonim tanpa identitas individu)
 const publicDivisionSummary = [
-  { name: 'Operasional & Lapangan (Pabrik Sidoarjo)', presentRate: '100%', status: 'Aktif Normal' },
-  { name: 'Security & Safety (Pos Pengamanan)', presentRate: '100%', status: 'Siaga Penuh' },
-  { name: 'Logistik & Gudang (Hub Rungkut)', presentRate: '100%', status: 'Aktif Normal' },
-  { name: 'Human Capital & GA (Kantor Surabaya)', presentRate: '100%', status: 'Operasional' },
+  { name: 'Operasional & Lapangan (Mariuk & Cimalaka)', presentRate: '100%', status: 'Aktif Normal' },
+  { name: 'Security & Safety (Pos Pengamanan 24 Jam)', presentRate: '100%', status: 'Siaga Penuh' },
+  { name: 'Logistik & Pergudangan (Mariuk & Cimalaka)', presentRate: '100%', status: 'Aktif Normal' },
+  { name: 'Roster 12 Jam (Operasional Non-Stop 24/7)', presentRate: '100%', status: 'Rotasi 2-Kelompok' },
 ];
 
 export default function RingkasanPublik() {

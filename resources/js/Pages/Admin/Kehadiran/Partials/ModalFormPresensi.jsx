@@ -12,12 +12,8 @@ const STATUS_OPTIONS = [
 ];
 
 const SHIFT_OPTIONS = [
-  { value: 'Shift 1 (07:00 - 15:00)', label: 'Shift 1: Pagi (07:00 - 15:00)', startTime: '07:00', endTime: '15:00' },
-  { value: 'Shift 2 (15:00 - 23:00)', label: 'Shift 2: Siang/Sore (15:00 - 23:00)', startTime: '15:00', endTime: '23:00' },
-  { value: 'Normal Office (08:00 - 17:00)', label: 'Normal Office: Reguler (08:00 - 17:00)', startTime: '08:00', endTime: '17:00' },
-  { value: 'Security Shift 1 (06:30 - 14:30)', label: 'Security Shift 1: Pagi (06:30 - 14:30)', startTime: '06:30', endTime: '14:30' },
-  { value: 'Security Shift 2 (14:30 - 22:30)', label: 'Security Shift 2: Siang (14:30 - 22:30)', startTime: '14:30', endTime: '22:30' },
-  { value: 'Shift Malam (20:00 - 04:00)', label: 'Shift Malam: Operasional (20:00 - 04:00)', startTime: '20:00', endTime: '04:00' },
+  { value: 'Shift Pagi (12 Jam)', label: 'Shift Pagi: 12 Jam (07:00 - 19:00)', startTime: '07:00', endTime: '19:00' },
+  { value: 'Shift Malam (12 Jam)', label: 'Shift Malam: 12 Jam (19:00 - 07:00)', startTime: '19:00', endTime: '07:00' },
 ];
 
 function getStartMinute(shiftStr) {
@@ -162,6 +158,7 @@ export default function ModalFormPresensi({
       nip: selectedEmp?.nip || initialData?.nip || '-',
       division: selectedEmp?.division || initialData?.division || '-',
       role: selectedEmp?.role || initialData?.role || '-',
+      location: selectedEmp?.location || initialData?.location || 'Lokasi Mariuk',
       date: formData.date,
       shift: formData.shift,
       status: formData.status,

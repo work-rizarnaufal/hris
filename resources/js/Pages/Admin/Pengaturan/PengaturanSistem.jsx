@@ -22,6 +22,7 @@ import {
   Sliders,
   Bell,
   Fingerprint,
+  ArrowLeftRight,
 } from 'lucide-react';
 import {
   Card,
@@ -49,6 +50,8 @@ import {
 import {
   getAttendanceSettings,
   saveAttendanceSettings,
+  getShiftSettings,
+  saveShiftSettings,
   getHolidays,
   saveHolidays,
   getLocations,
@@ -58,15 +61,19 @@ import {
   resetAllSettings,
   formatDateDMY,
   DEFAULT_ATTENDANCE_SETTINGS,
+  DEFAULT_SHIFT_SETTINGS,
   DEFAULT_COMPANY_PROFILE,
 } from '@/services/systemSettings.js';
 
 export default function PengaturanSistem() {
-  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'calendar' | 'location' | 'maintenance'
+  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'shifts' | 'calendar' | 'location' | 'maintenance'
   const [alertInfo, setAlertInfo] = useState(null);
 
   // State Konfigurasi Kehadiran & Parameter Kerja
   const [attendanceSettings, setAttendanceSettings] = useState(() => getAttendanceSettings());
+
+  // State Konfigurasi Shift & Jam Kerja Fleksibel 12 Jam
+  const [shiftSettings, setShiftSettings] = useState(() => getShiftSettings());
 
   // State Kalender Libur
   const [holidays, setHolidays] = useState(() => getHolidays());
@@ -115,12 +122,13 @@ export default function PengaturanSistem() {
   // Handle Simpan Semua Perubahan Pengaturan
   const handleSaveAll = () => {
     saveAttendanceSettings(attendanceSettings);
+    saveShiftSettings(shiftSettings);
     saveHolidays(holidays);
     saveLocations(locations);
     saveCompanyProfile(companyProfile);
     setAlertInfo({
       type: 'success',
-      message: 'Seluruh konfigurasi parameter sistem dan kebijakan HR berhasil disimpan & disinkronkan ke seluruh modul.',
+      message: 'Seluruh konfigurasi jam kerja 12 jam, parameter sistem, dan kebijakan HR berhasil disimpan & disinkronkan.',
     });
   };
 
@@ -128,12 +136,13 @@ export default function PengaturanSistem() {
   const handleResetDefaults = () => {
     resetAllSettings();
     setAttendanceSettings(DEFAULT_ATTENDANCE_SETTINGS);
+    setShiftSettings(DEFAULT_SHIFT_SETTINGS);
     setHolidays(getHolidays());
     setLocations(getLocations());
     setCompanyProfile(DEFAULT_COMPANY_PROFILE);
     setAlertInfo({
       type: 'warning',
-      message: 'Parameter kehadiran dan profil telah dikembalikan ke standar bawaan regulasi.',
+      message: 'Parameter kehadiran, shift, dan profil telah dikembalikan ke standar bawaan regulasi.',
     });
   };
 
@@ -406,6 +415,22 @@ export default function PengaturanSistem() {
           >
             <Clock className="w-4 h-4" />
             <span>Kebijakan Presensi & Kerja</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('shifts')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'shifts'
+                ? 'bg-navy text-white shadow-xs'
+                : 'text-slate-600 hover:text-navy hover:bg-slate-100'
+            }`}
+          >
+            <ArrowLeftRight className="w-4 h-4" />
+            <span>Jam Kerja & Shift 12 Jam</span>
+            <Badge className={activeTab === 'shifts' ? 'bg-white/20 text-white font-mono text-[10px]' : 'bg-slate-200 text-slate-700 text-[10px]'}>
+              12 Jam • 24/7
+            </Badge>
           </button>
 
           <button
@@ -778,7 +803,254 @@ export default function PengaturanSistem() {
           </div>
         )}
 
-        {/* TAB 2: KALENDER LIBUR & CUTI BERSAMA */}
+        {/* TAB 2: JAM KERJA & SHIFT 12 JAM FLEKSIBEL */}
+        {activeTab === 'shifts' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Card 1: Konfigurasi Jam Masuk/Pulang Shift 12 Jam */}
+            <Card className="border-slate-200 shadow-2xs">
+              <CardHeader className="p-4 sm:p-5 border-b border-slate-100">
+                <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#c4a266]" />
+                  Master Jam Kerja Shift 12 Jam
+                </CardTitle>
+                <CardDescription className="text-xs mt-0.5">
+                  Atur jam masuk, jam pulang, dan serah terima tugas (handover) untuk Shift Pagi dan Malam.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="p-4 sm:p-5 space-y-5">
+                {/* Shift Pagi */}
+                <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                      Pengaturan Shift 1 (Pagi)
+                    </span>
+                    <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 font-mono text-[10px]">
+                      12 Jam Siang
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-1">
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Label Shift
+                      </label>
+                      <Input
+                        type="text"
+                        value={shiftSettings.shiftPagiName}
+                        onChange={(e) =>
+                          setShiftSettings({ ...shiftSettings, shiftPagiName: e.target.value })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Jam Masuk Pagi
+                      </label>
+                      <Input
+                        type="time"
+                        value={shiftSettings.shiftPagiIn}
+                        onChange={(e) =>
+                          setShiftSettings({ ...shiftSettings, shiftPagiIn: e.target.value })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Jam Pulang Sore
+                      </label>
+                      <Input
+                        type="time"
+                        value={shiftSettings.shiftPagiOut}
+                        onChange={(e) =>
+                          setShiftSettings({ ...shiftSettings, shiftPagiOut: e.target.value })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800 font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shift Malam */}
+                <div className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-200/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                      Pengaturan Shift 2 (Malam)
+                    </span>
+                    <Badge className="bg-indigo-100 text-indigo-800 border-indigo-300 font-mono text-[10px]">
+                      12 Jam Malam (Overnight)
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-1">
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Label Shift
+                      </label>
+                      <Input
+                        type="text"
+                        value={shiftSettings.shiftMalamName}
+                        onChange={(e) =>
+                          setShiftSettings({ ...shiftSettings, shiftMalamName: e.target.value })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Jam Masuk Malam
+                      </label>
+                      <Input
+                        type="time"
+                        value={shiftSettings.shiftMalamIn}
+                        onChange={(e) =>
+                          setShiftSettings({ ...shiftSettings, shiftMalamIn: e.target.value })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Jam Pulang Pagi
+                      </label>
+                      <Input
+                        type="time"
+                        value={shiftSettings.shiftMalamOut}
+                        onChange={(e) =>
+                          setShiftSettings({ ...shiftSettings, shiftMalamOut: e.target.value })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800 font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Serah Terima Tugas */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Waktu Tukar Shift / Handover
+                    </label>
+                    <Input
+                      type="text"
+                      value={shiftSettings.tukarShiftHour}
+                      onChange={(e) =>
+                        setShiftSettings({ ...shiftSettings, tukarShiftHour: e.target.value })
+                      }
+                      className="h-9 text-xs bg-white text-slate-800"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Baku: Jam 07:00 pagi dan 19:00 malam
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Durasi Kerja per Shift (Jam)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min="8"
+                        max="14"
+                        value={shiftSettings.durationHours}
+                        onChange={(e) =>
+                          setShiftSettings({
+                            ...shiftSettings,
+                            durationHours: Number(e.target.value),
+                          })
+                        }
+                        className="h-9 text-xs bg-white text-slate-800 font-mono w-28"
+                      />
+                      <span className="text-xs text-slate-500">Jam per giliran dinas</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Card 2: Panduan Operasional Non-Stop & Lokasi Kerja */}
+            <Card className="border-slate-200 shadow-2xs">
+              <CardHeader className="p-4 sm:p-5 border-b border-slate-100">
+                <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
+                  <ArrowLeftRight className="w-4 h-4 text-[#c4a266]" />
+                  Aturan Operasional Non-Stop & Multi-Lokasi
+                </CardTitle>
+                <CardDescription className="text-xs mt-0.5">
+                  Pola kerja continuous 7 hari kerja tanpa libur operasional bagi Kelompok A & B.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="p-4 sm:p-5 space-y-4">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                  <p className="text-xs font-bold text-navy flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-gold"></span>
+                    Prinsip Operasional 24/7 (Non-Stop 7 Hari Kerja)
+                  </p>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Sistem operasional di <strong className="text-navy">Lokasi Mariuk</strong> dan{' '}
+                    <strong className="text-navy">Lokasi Cimalaka</strong> berjalan terus-menerus 7 hari per minggu (Senin sampai Minggu). Tidak ada hari libur pabrik/site. Karyawan menikmati libur (OFF) bergantian saat kelompoknya tidak bertugas.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Hari Operasional Pabrik / Site
+                    </label>
+                    <div className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center justify-between">
+                      <span className="text-xs font-medium text-slate-800">
+                        Operasional 7 Hari Penuh (Sabtu & Minggu Tetap Berjalan)
+                      </span>
+                      <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px] font-bold">
+                        AKTIF 24/7
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Model Rotasi Kelompok
+                    </label>
+                    <div className="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center justify-between">
+                      <span className="text-xs font-medium text-slate-800">
+                        Selang-Seling Berkelanjutan (Kelompok A ⇄ Kelompok B)
+                      </span>
+                      <Badge className="bg-navy text-white text-[10px] font-mono">
+                        ROLLING FAIR
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Kelompok A masuk Senin, Kelompok B masuk Selasa, bergantian seterusnya. Jatah hari Minggu didapat adil bergantian setiap 2 minggu.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Cakupan Lokasi Terdaftar
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-white text-center">
+                        <p className="text-xs font-bold text-navy">📍 Lokasi Mariuk</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">6 Personil Terdaftar</p>
+                      </div>
+                      <div className="p-2.5 rounded-lg border border-slate-200 bg-white text-center">
+                        <p className="text-xs font-bold text-navy">📍 Lokasi Cimalaka</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5">6 Personil Terdaftar</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* TAB 3: KALENDER LIBUR & CUTI BERSAMA */}
         {activeTab === 'calendar' && (
           <Card className="border-slate-200 shadow-2xs">
             <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">

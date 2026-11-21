@@ -55,9 +55,9 @@ export default function PanelRotasiGrup({
   );
   const [targetGroup, setTargetGroup] = useState('Grup A');
   const [shift1In, setShift1In] = useState('07:00');
-  const [shift1Out, setShift1Out] = useState('15:00');
-  const [shift2In, setShift2In] = useState('15:00');
-  const [shift2Out, setShift2Out] = useState('23:00');
+  const [shift1Out, setShift1Out] = useState('19:00');
+  const [shift2In, setShift2In] = useState('19:00');
+  const [shift2Out, setShift2Out] = useState('07:00');
   const [reason, setReason] = useState('');
 
   // Pisahkan personil operasional (yang ikut rotasi) dan staf kantor (non-shift)
@@ -131,32 +131,32 @@ export default function PanelRotasiGrup({
     setReason('');
   };
 
-  // Matriks Aturan Permanen 7 Hari (Senin s/d Minggu)
+  // Matriks Aturan Permanen 7 Hari (Senin s/d Minggu Non-Stop)
   const permanentScheduleRows = [
     {
       day: 'Senin',
       date: '02/11/2026',
-      grupAStatus: 'MASUK (2 Shift)',
+      grupAStatus: 'MASUK (Pagi & Malam)',
       grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
       grupBStatus: 'LIBUR (OFF)',
       grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
       officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A berdinas 2 shift (Pagi & Sore). Grup B libur otomatis.',
+      note: 'Grup A berdinas 2 shift 12 jam (Pagi & Malam). Grup B libur otomatis.',
     },
     {
       day: 'Selasa',
       date: '03/11/2026',
       grupAStatus: 'LIBUR (OFF)',
       grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (2 Shift)',
+      grupBStatus: 'MASUK (Pagi & Malam)',
       grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
       officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A otomatis libur paska dinas Senin. Giliran Grup B masuk 2 shift.',
+      note: 'Grup A otomatis libur paska dinas Senin. Giliran Grup B masuk 2 shift 12 jam.',
     },
     {
       day: 'Rabu',
       date: '04/11/2026',
-      grupAStatus: 'MASUK (2 Shift)',
+      grupAStatus: 'MASUK (Pagi & Malam)',
       grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
       grupBStatus: 'LIBUR (OFF)',
       grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
@@ -168,7 +168,7 @@ export default function PanelRotasiGrup({
       date: '05/11/2026',
       grupAStatus: 'LIBUR (OFF)',
       grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (2 Shift)',
+      grupBStatus: 'MASUK (Pagi & Malam)',
       grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
       officeStatus: 'MASUK (08:00 - 17:00)',
       note: 'Grup B kembali berdinas operasional. Grup A libur.',
@@ -176,7 +176,7 @@ export default function PanelRotasiGrup({
     {
       day: 'Jumat',
       date: '06/11/2026',
-      grupAStatus: 'MASUK (2 Shift)',
+      grupAStatus: 'MASUK (Pagi & Malam)',
       grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
       grupBStatus: 'LIBUR (OFF)',
       grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
@@ -188,20 +188,20 @@ export default function PanelRotasiGrup({
       date: '07/11/2026',
       grupAStatus: 'LIBUR (OFF)',
       grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (2 Shift)',
+      grupBStatus: 'MASUK (Pagi & Malam)',
       grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
       officeStatus: 'LIBUR (OFF)',
-      note: 'Grup B berdinas operasional. Grup A & Staf Kantor libur akhir pekan.',
+      note: 'Grup B berdinas operasional. Grup A libur.',
     },
     {
       day: 'Minggu',
       date: '08/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
+      grupAStatus: 'MASUK (Pagi & Malam)',
+      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
       grupBStatus: 'LIBUR (OFF)',
       grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
       officeStatus: 'LIBUR (OFF)',
-      note: 'Seluruh lini operasional dan kantor libur terjadwal mingguan.',
+      note: 'Operasional 7 hari non-stop: Grup A bertugas di Minggu 1; bergantian dengan Grup B di Minggu 2.',
     },
   ];
 
@@ -212,17 +212,17 @@ export default function PanelRotasiGrup({
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-0.5 rounded bg-[#c4a266]/20 border border-[#c4a266]/40 text-[#c4a266] text-[10px] font-bold uppercase tracking-wider">
-              Aturan Operasional Permanen
+              Aturan Operasional Permanen 24/7
             </span>
             <Badge className="bg-white/10 text-white text-[10px] font-medium border-white/10">
-              1 Hari 2 Shift (Pagi & Sore) • 2 Grup (A & B)
+              Shift 12 Jam (Pagi 07:00-19:00 & Malam 19:00-07:00) • 2 Kelompok (A & B)
             </Badge>
           </div>
           <h3 className="text-base font-bold font-display mt-2 text-white">
-            Pusat Penugasan & Rotasi Roster Grup A & Grup B
+            Pusat Penugasan & Rotasi Roster Grup A & Grup B (Mariuk & Cimalaka)
           </h3>
           <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            Operasional berjalan <strong>2 shift per hari (Pagi & Sore)</strong>. Grup A dan Grup B bertugas secara selang-seling: jika <strong>Grup A masuk hari Senin</strong>, maka otomatis <strong>hari Selasa libur (OFF)</strong>, demikian sebaliknya untuk <strong>Grup B</strong>. Hari Minggu seluruh personil libur operasional.
+            Operasional berjalan <strong>non-stop 7 hari per minggu (24/7)</strong> dengan <strong>2 shift 12 jam (Pagi & Malam)</strong>. Kelompok A dan B bertugas secara selang-seling setiap hari: jika <strong>Kelompok A masuk hari Senin</strong>, maka otomatis <strong>hari Selasa libur (OFF)</strong>, demikian sebaliknya untuk <strong>Kelompok B</strong>. Jatah libur hari Minggu bergantian adil setiap 2 minggu.
           </p>
         </div>
 

@@ -12,21 +12,16 @@ const DIVISIONS = [
 ];
 
 const LOCATIONS = [
-  'Pabrik A (Sidoarjo)',
-  'Kantor Utama (Surabaya)',
-  'Gudang B (Rungkut)',
-  'Site Operasional (Gresik)',
+  'Lokasi Mariuk',
+  'Lokasi Cimalaka',
 ];
 
-const GROUPS = ['Grup A', 'Grup B', 'Non-Shift'];
+const GROUPS = ['Grup A', 'Grup B'];
 
 const SCHEDULE_CATEGORIES = [
-  { label: 'Shift 1 (Pagi: 07:00 - 15:00)', in: '07:00', out: '15:00', cat: 'Shift 1 (Pagi)' },
-  { label: 'Shift 2 (Siang: 15:00 - 23:00)', in: '15:00', out: '23:00', cat: 'Shift 2 (Siang)' },
-  { label: 'Normal Office (08:00 - 17:00)', in: '08:00', out: '17:00', cat: 'Normal Office' },
-  { label: 'Security Shift 1 (06:30 - 14:30)', in: '06:30', out: '14:30', cat: 'Shift 1 (Pagi)' },
-  { label: 'Security Shift 2 (14:30 - 22:30)', in: '14:30', out: '22:30', cat: 'Shift 2 (Siang)' },
-  { label: 'Fleksibel Operasional', in: '08:30', out: '17:30', cat: 'Fleksibel' },
+  { label: 'Shift Pagi (12 Jam: 07:00 - 19:00)', in: '07:00', out: '19:00', cat: 'Shift Pagi (12 Jam)' },
+  { label: 'Shift Malam (12 Jam: 19:00 - 07:00)', in: '19:00', out: '07:00', cat: 'Shift Malam (12 Jam)' },
+  { label: 'Fleksibel Operasional', in: '08:00', out: '17:00', cat: 'Fleksibel' },
 ];
 
 export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData }) {
@@ -39,9 +34,9 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
     division: DIVISIONS[0],
     location: LOCATIONS[0],
     group: GROUPS[0],
-    scheduleCategory: 'Shift 1 (Pagi)',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
     checkInTime: '07:00',
-    checkOutTime: '15:00',
+    checkOutTime: '19:00',
     status: 'Aktif',
   });
 
@@ -56,9 +51,9 @@ export default function ModalFormKaryawan({ isOpen, onClose, onSave, initialData
         division: initialData.division || DIVISIONS[0],
         location: initialData.location || LOCATIONS[0],
         group: initialData.group || GROUPS[0],
-        scheduleCategory: initialData.scheduleCategory || 'Shift 1 (Pagi)',
+        scheduleCategory: initialData.scheduleCategory || 'Shift Pagi (12 Jam)',
         checkInTime: initialData.checkInTime || '07:00',
-        checkOutTime: initialData.checkOutTime || '15:00',
+        checkOutTime: initialData.checkOutTime || '19:00',
         status: initialData.status || 'Aktif',
       });
     } else {

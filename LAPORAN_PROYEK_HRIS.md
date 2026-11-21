@@ -45,7 +45,9 @@
 11. [Standarisasi Seluruh Halaman Staging / Roadmap](#11-standarisasi-seluruh-halaman-staging--roadmap)
 12. [Implementasi Universal Hidden Scrollbar](#12-implementasi-universal-hidden-scrollbar)
 13. [Hasil Audit Rekayasa & Higienitas Kode](#13-hasil-audit-rekayasa--higienitas-kode)
-14. [Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)](#14-rencana-aksi-sesi-selanjutnya-roadmap-backend--db)
+14. [Arsitektur Multi-Lokasi (Mariuk & Cimalaka) & Shift 12 Jam Non-Stop 24/7](#14-arsitektur-multi-lokasi-mariuk--cimalaka--shift-12-jam-non-stop-247)
+15. [Knowledge Graph Project (Graphify) & Visualisasi Arsitektur](#15-knowledge-graph-project-graphify--visualisasi-arsitektur)
+16. [Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)](#16-rencana-aksi-sesi-selanjutnya-roadmap-backend--db)
 
 ---
 
@@ -428,7 +430,62 @@ Pembersihan menyeluruh telah dieksekusi dengan kepatuhan penuh pada skill `antis
 
 ---
 
-## 14. Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)
+## 14. Arsitektur Multi-Lokasi (Mariuk & Cimalaka) & Shift 12 Jam Non-Stop 24/7
+
+Berdasarkan kebutuhan operasional nyata perusahaan, sistem telah distandarisasi untuk mendukung operasi pabrik dan site non-stop:
+
+### A. Pembagian 2 Lokasi Kerja Resmi & Dataset Karyawan
+Sistem memisahkan operasional menjadi 2 lokasi resmi dengan basis 12 personel aktif (6 personel per lokasi):
+1. **Lokasi Mariuk** (Subang):
+   - `Budi Santoso` (HC-0101, Kelompok A, Shift Pagi)
+   - `Dewi Anggraini` (HC-0104, Kelompok A, Shift Pagi)
+   - `Hendra Wijaya` (HC-0105, Kelompok A, Shift Malam)
+   - `Ahmad Fauzi` (HC-0103, Kelompok B, Shift Pagi)
+   - `Eko Prasetyo` (HC-0107, Kelompok B, Shift Pagi)
+   - `Joko Susilo` (HC-0109, Kelompok B, Shift Malam)
+2. **Lokasi Cimalaka** (Sumedang):
+   - `Siti Rahmawati` (HC-0102, Kelompok A, Shift Pagi)
+   - `Wahyu Hidayat` (HC-0111, Kelompok A, Shift Pagi)
+   - `Dian Kusuma` (HC-0110, Kelompok A, Shift Malam)
+   - `Rina Marlina` (HC-0106, Kelompok B, Shift Pagi)
+   - `Maya Indah Lestari` (HC-0108, Kelompok B, Shift Pagi)
+   - `Nurul Aini` (HC-0112, Kelompok B, Shift Malam)
+
+### B. Shift Kerja 12 Jam & Operasional Non-Stop 7 Hari (24/7)
+- **Shift Pagi**: `07:00 – 19:00 WIB` (12 Jam kerja).
+- **Shift Malam**: `19:00 – 07:00 WIB` (12 Jam kerja).
+- **Tukar Shift (Handover)**: Tepat pukul `07:00 WIB` dan `19:00 WIB`.
+- **Roster 7 Hari Tanpa Libur Pabrik**:
+  - Operasional berjalan 7 hari penuh setiap minggu tanpa hari libur operasional bersama (Sabtu dan Minggu tetap beroperasi penuh).
+  - Kelompok A masuk hari Senin, Kelompok B hari Selasa, Kelompok A hari Rabu, Kelompok B hari Kamis, dan seterusnya bergulir adil sehingga giliran dinas hari Minggu berganti setiap 2 minggu.
+
+### C. Panel Konfigurasi Fleksibel Shift 12 Jam (`PengaturanSistem.jsx`)
+- Disediakan tab khusus **"Jam Kerja & Shift 12 Jam"** pada [`PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx) yang terhubung ke service reaktif [`systemSettings.js`](resources/js/services/systemSettings.js).
+- Administrator dapat mengubah nama shift, jam masuk, jam pulang, toleransi keterlambatan, dan jam handover sewaktu-waktu secara fleksibel tanpa mengubah kode sumber.
+- Perubahan tersinkronisasi otomatis secara instan ke seluruh antarmuka aplikasi via event bus `hris:settings-updated`.
+
+---
+
+## 15. Knowledge Graph Project (Graphify) & Visualisasi Arsitektur
+
+### A. Graphify Knowledge Graph
+Proyek telah dipetakan secara mendalam ke dalam graph pengetahuan AST (*Abstract Syntax Tree*) menggunakan `graphify`:
+- **Jumlah Node**: 338 komponen, rute, model, dan modul utilitas.
+- **Jumlah Edge**: 1010 relasi pemanggilan dan dependensi antar file.
+- **Komunitas Arsitektur**: 39 komunitas fungsional terisolasi.
+- **Aset Visual & Laporan**:
+  - [`graphify-out/graph.html`](graphify-out/graph.html): Visualisasi interaktif berbasis D3 force-directed graph.
+  - [`graphify-out/GRAPH_REPORT.md`](graphify-out/GRAPH_REPORT.md): Laporan struktur dependensi dan komunitas arsitektur.
+  - [`graphify-out/graph.json`](graphify-out/graph.json): Data graph mesin untuk navigasi agen (`graphify query`, `graphify path`).
+
+### B. Keputusan Retensi `LAPORAN_PROYEK_HRIS.md`
+**Berkas `LAPORAN_PROYEK_HRIS.md` TIDAK BOLEH DIHAPUS**:
+1. `graphify` memetakan relasi kode sintaktis teknis, sedangkan `LAPORAN_PROYEK_HRIS.md` mencatat **konteks keputusan bisnis, arsitektur non-fungsional, handover catatan proyek, dan pedoman kerja agen (`AGENTS.md`)**.
+2. Berkas ini berfungsi sebagai *single source of truth* operasional bagi manajemen dan pengembang manusia maupun agen AI di masa mendatang.
+
+---
+
+## 16. Rencana Aksi Sesi Selanjutnya (Roadmap Backend & DB)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 

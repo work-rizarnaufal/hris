@@ -50,162 +50,165 @@ import {
 import ModalFormPresensi from './Partials/ModalFormPresensi.jsx';
 import ModalPresensiMassal from './Partials/ModalPresensiMassal.jsx';
 
-// Data Induk Karyawan HCGA (Sinkron dengan DataKaryawan)
+// Data Induk Karyawan HCGA (Sinkron Mariuk & Cimalaka)
 const MASTER_EMPLOYEES = [
+  // --- LOKASI MARIUK (6 Personil) ---
   {
     id: 1,
     name: 'Budi Santoso',
     nip: 'HC-0101',
     role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
     group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
     checkInTime: '07:00',
-    checkOutTime: '15:00',
+    checkOutTime: '19:00',
     status: 'Aktif',
   },
   {
     id: 2,
-    name: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    role: 'HCGA Specialist',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
-    status: 'Aktif',
-  },
-  {
-    id: 3,
-    name: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    role: 'Operator Forklift Utama',
-    division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '15:00',
-    checkOutTime: '23:00',
-    status: 'Aktif',
-  },
-  {
-    id: 4,
     name: 'Dewi Anggraini',
     nip: 'HC-0104',
     role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
     group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
     checkInTime: '07:00',
-    checkOutTime: '15:00',
+    checkOutTime: '19:00',
     status: 'Aktif',
   },
   {
-    id: 5,
+    id: 3,
     name: 'Hendra Wijaya',
     nip: 'HC-0105',
     role: 'Danru Keamanan & K3',
     division: 'Security & Safety',
-    location: 'Site Operasional (Gresik)',
+    location: 'Lokasi Mariuk',
     group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '06:30',
-    checkOutTime: '14:30',
+    scheduleCategory: 'Shift Malam (12 Jam)',
+    checkInTime: '19:00',
+    checkOutTime: '07:00',
     status: 'Aktif',
   },
   {
-    id: 6,
-    name: 'Rina Marlina',
-    nip: 'HC-0106',
-    role: 'Staf Administrasi Payroll',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
-    status: 'Cuti',
+    id: 4,
+    name: 'Ahmad Fauzi',
+    nip: 'HC-0103',
+    role: 'Operator Forklift Utama',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
+    checkInTime: '07:00',
+    checkOutTime: '19:00',
+    status: 'Aktif',
   },
   {
-    id: 7,
+    id: 5,
     name: 'Eko Prasetyo',
     nip: 'HC-0107',
     role: 'Teknisi Maintenance Mesin',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
     group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '15:00',
-    checkOutTime: '23:00',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
+    checkInTime: '07:00',
+    checkOutTime: '19:00',
     status: 'Aktif',
   },
   {
-    id: 8,
-    name: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    role: 'Koordinator Gudang Bahan Baku',
-    division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
-    status: 'Aktif',
-  },
-  {
-    id: 9,
+    id: 6,
     name: 'Joko Susilo',
     nip: 'HC-0109',
     role: 'Anggota Patroli Keamanan',
     division: 'Security & Safety',
-    location: 'Pabrik A (Sidoarjo)',
+    location: 'Lokasi Mariuk',
     group: 'Grup B',
-    scheduleCategory: 'Shift 2 (Siang)',
-    checkInTime: '14:30',
-    checkOutTime: '22:30',
+    scheduleCategory: 'Shift Malam (12 Jam)',
+    checkInTime: '19:00',
+    checkOutTime: '07:00',
+    status: 'Aktif',
+  },
+
+  // --- LOKASI CIMALAKA (6 Personil) ---
+  {
+    id: 7,
+    name: 'Siti Rahmawati',
+    nip: 'HC-0102',
+    role: 'Supervisor Operasional Site',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
+    checkInTime: '07:00',
+    checkOutTime: '19:00',
+    status: 'Aktif',
+  },
+  {
+    id: 8,
+    name: 'Wahyu Hidayat',
+    nip: 'HC-0111',
+    role: 'Operator Mesin Produksi',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
+    checkInTime: '07:00',
+    checkOutTime: '19:00',
+    status: 'Aktif',
+  },
+  {
+    id: 9,
+    name: 'Dian Kusuma',
+    nip: 'HC-0110',
+    role: 'Petugas Keamanan Site',
+    division: 'Security & Safety',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    scheduleCategory: 'Shift Malam (12 Jam)',
+    checkInTime: '19:00',
+    checkOutTime: '07:00',
     status: 'Aktif',
   },
   {
     id: 10,
-    name: 'Dian Kusuma',
-    nip: 'HC-0110',
-    role: 'IT Support & Sistem HRIS',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    group: 'Non-Shift',
-    scheduleCategory: 'Normal Office',
-    checkInTime: '08:00',
-    checkOutTime: '17:00',
+    name: 'Rina Marlina',
+    nip: 'HC-0106',
+    role: 'Koordinator Gudang & Logistik',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
+    checkInTime: '07:00',
+    checkOutTime: '19:00',
     status: 'Aktif',
   },
   {
     id: 11,
-    name: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    role: 'Operator Mesin CNC Milling',
+    name: 'Maya Indah Lestari',
+    nip: 'HC-0108',
+    role: 'Operator QC Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    scheduleCategory: 'Shift Pagi (12 Jam)',
     checkInTime: '07:00',
-    checkOutTime: '15:00',
-    status: 'Aktif',
+    checkOutTime: '19:00',
+    status: 'Cuti',
   },
   {
     id: 12,
     name: 'Nurul Aini',
     nip: 'HC-0112',
-    role: 'Petugas Inventory & Stok',
+    role: 'Petugas Inventory Stok',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    group: 'Grup A',
-    scheduleCategory: 'Shift 1 (Pagi)',
-    checkInTime: '07:00',
-    checkOutTime: '15:00',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    scheduleCategory: 'Shift Malam (12 Jam)',
+    checkInTime: '19:00',
+    checkOutTime: '07:00',
     status: 'Aktif',
   },
 ];
@@ -222,8 +225,9 @@ const getTodayDateString = () => {
 
 const DEFAULT_DATE = getTodayDateString();
 
-// Data Awal Presensi Operasional
+// Data Awal Presensi Operasional (12 Personil: 6 Mariuk & 6 Cimalaka)
 const INITIAL_ATTENDANCES = [
+  // --- LOKASI MARIUK ---
   {
     id: 101,
     employeeId: 1,
@@ -231,174 +235,198 @@ const INITIAL_ATTENDANCES = [
     nip: 'HC-0101',
     division: 'Operasional & Lapangan',
     role: 'Senior Operator Lapangan',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
     date: DEFAULT_DATE,
-    shift: 'Shift 1 (07:00 - 15:00)',
+    shift: 'Shift Pagi (07:00 - 19:00)',
     status: 'Hadir',
-    checkIn: '06:51',
-    checkOut: '15:05',
+    checkIn: '06:48',
+    checkOut: '19:05',
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
-    notes: 'Shift pagi berjalan lancar',
+    notes: 'Shift pagi 12 jam berjalan lancar',
   },
   {
     id: 102,
     employeeId: 2,
-    employeeName: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    division: 'Human Capital & GA',
-    role: 'HCGA Specialist',
-    date: DEFAULT_DATE,
-    shift: 'Normal Office (08:00 - 17:00)',
-    status: 'Hadir',
-    checkIn: '07:48',
-    checkOut: '17:10',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Tugas rekrutmen internal',
-  },
-  {
-    id: 103,
-    employeeId: 3,
-    employeeName: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    division: 'Logistik & Gudang',
-    role: 'Operator Forklift Utama',
-    date: DEFAULT_DATE,
-    shift: 'Shift 2 (15:00 - 23:00)',
-    status: 'Terlambat',
-    checkIn: '15:18',
-    checkOut: '23:05',
-    lateMinutes: 18,
-    deviation: '+18m',
-    notes: 'Kendala macet jalur Rungkut',
-  },
-  {
-    id: 104,
-    employeeId: 4,
     employeeName: 'Dewi Anggraini',
     nip: 'HC-0104',
     division: 'Operasional & Lapangan',
     role: 'Quality Assurance Inspector',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
     date: DEFAULT_DATE,
-    shift: 'Shift 1 (07:00 - 15:00)',
+    shift: 'Shift Pagi (07:00 - 19:00)',
     status: 'Hadir',
-    checkIn: '06:55',
-    checkOut: '15:00',
+    checkIn: '06:52',
+    checkOut: '19:00',
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
-    notes: 'Inspeksi jalur produksi A',
+    notes: 'Inspeksi QC lini Mariuk',
   },
   {
-    id: 105,
-    employeeId: 5,
+    id: 103,
+    employeeId: 3,
     employeeName: 'Hendra Wijaya',
     nip: 'HC-0105',
     division: 'Security & Safety',
     role: 'Danru Keamanan & K3',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
     date: DEFAULT_DATE,
-    shift: 'Security Shift 1 (06:30 - 14:30)',
+    shift: 'Shift Malam (19:00 - 07:00)',
     status: 'Hadir',
-    checkIn: '06:20',
-    checkOut: '14:35',
+    checkIn: '18:45',
+    checkOut: '07:05',
     lateMinutes: 0,
     deviation: 'Tepat Waktu',
-    notes: 'Serah terima pos jaga pagi',
+    notes: 'Serah terima pos jaga Mariuk jam 19:00',
+  },
+  {
+    id: 104,
+    employeeId: 4,
+    employeeName: 'Ahmad Fauzi',
+    nip: 'HC-0103',
+    division: 'Logistik & Gudang',
+    role: 'Operator Forklift Utama',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    date: DEFAULT_DATE,
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    status: 'Terlambat',
+    checkIn: '07:18',
+    checkOut: '19:05',
+    lateMinutes: 18,
+    deviation: '+18m',
+    notes: 'Terkendala armada di rute Mariuk',
+  },
+  {
+    id: 105,
+    employeeId: 5,
+    employeeName: 'Eko Prasetyo',
+    nip: 'HC-0107',
+    division: 'Operasional & Lapangan',
+    role: 'Teknisi Maintenance Mesin',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    date: DEFAULT_DATE,
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    status: 'Hadir',
+    checkIn: '06:50',
+    checkOut: '19:00',
+    lateMinutes: 0,
+    deviation: 'Tepat Waktu',
+    notes: 'Maintenance preventif mesin Mariuk',
   },
   {
     id: 106,
     employeeId: 6,
+    employeeName: 'Joko Susilo',
+    nip: 'HC-0109',
+    division: 'Security & Safety',
+    role: 'Anggota Patroli Keamanan',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    date: DEFAULT_DATE,
+    shift: 'Shift Malam (19:00 - 07:00)',
+    status: 'Hadir',
+    checkIn: '18:50',
+    checkOut: '07:00',
+    lateMinutes: 0,
+    deviation: 'Tepat Waktu',
+    notes: 'Patroli perimeter malam Mariuk',
+  },
+
+  // --- LOKASI CIMALAKA ---
+  {
+    id: 107,
+    employeeId: 7,
+    employeeName: 'Siti Rahmawati',
+    nip: 'HC-0102',
+    division: 'Operasional & Lapangan',
+    role: 'Supervisor Operasional Site',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    date: DEFAULT_DATE,
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    status: 'Hadir',
+    checkIn: '06:45',
+    checkOut: '19:00',
+    lateMinutes: 0,
+    deviation: 'Tepat Waktu',
+    notes: 'Supervisi operasional harian Cimalaka',
+  },
+  {
+    id: 108,
+    employeeId: 8,
+    employeeName: 'Wahyu Hidayat',
+    nip: 'HC-0111',
+    division: 'Operasional & Lapangan',
+    role: 'Operator Mesin Produksi',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    date: DEFAULT_DATE,
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    status: 'Hadir',
+    checkIn: '06:55',
+    checkOut: '19:02',
+    lateMinutes: 0,
+    deviation: 'Tepat Waktu',
+    notes: 'Operasional lini mesin Cimalaka',
+  },
+  {
+    id: 109,
+    employeeId: 9,
+    employeeName: 'Dian Kusuma',
+    nip: 'HC-0110',
+    division: 'Security & Safety',
+    role: 'Petugas Keamanan Site',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    date: DEFAULT_DATE,
+    shift: 'Shift Malam (19:00 - 07:00)',
+    status: 'Hadir',
+    checkIn: '18:55',
+    checkOut: '07:00',
+    lateMinutes: 0,
+    deviation: 'Tepat Waktu',
+    notes: 'Jaga pos gerbang utama Cimalaka',
+  },
+  {
+    id: 110,
+    employeeId: 10,
     employeeName: 'Rina Marlina',
     nip: 'HC-0106',
-    division: 'Human Capital & GA',
-    role: 'Staf Administrasi Payroll',
+    division: 'Logistik & Gudang',
+    role: 'Koordinator Gudang & Logistik',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
     date: DEFAULT_DATE,
-    shift: 'Normal Office (08:00 - 17:00)',
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    status: 'Hadir',
+    checkIn: '06:58',
+    checkOut: '19:00',
+    lateMinutes: 0,
+    deviation: 'Tepat Waktu',
+    notes: 'Inflow & outflow logistik Cimalaka',
+  },
+  {
+    id: 111,
+    employeeId: 11,
+    employeeName: 'Maya Indah Lestari',
+    nip: 'HC-0108',
+    division: 'Operasional & Lapangan',
+    role: 'Operator QC Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    date: DEFAULT_DATE,
+    shift: 'Shift Pagi (07:00 - 19:00)',
     status: 'Cuti',
     checkIn: '-',
     checkOut: '-',
     lateMinutes: 0,
     deviation: '-',
-    notes: 'Cuti tahunan (Disetujui HR)',
-  },
-  {
-    id: 107,
-    employeeId: 7,
-    employeeName: 'Eko Prasetyo',
-    nip: 'HC-0107',
-    division: 'Operasional & Lapangan',
-    role: 'Teknisi Maintenance Mesin',
-    date: DEFAULT_DATE,
-    shift: 'Shift 2 (15:00 - 23:00)',
-    status: 'Hadir',
-    checkIn: '14:50',
-    checkOut: '23:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Maintenance preventif mesin 3',
-  },
-  {
-    id: 108,
-    employeeId: 8,
-    employeeName: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    division: 'Logistik & Gudang',
-    role: 'Koordinator Gudang Bahan Baku',
-    date: DEFAULT_DATE,
-    shift: 'Normal Office (08:00 - 17:00)',
-    status: 'Hadir',
-    checkIn: '07:55',
-    checkOut: '17:02',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Pemeriksaan stok harian',
-  },
-  {
-    id: 109,
-    employeeId: 9,
-    employeeName: 'Joko Susilo',
-    nip: 'HC-0109',
-    division: 'Security & Safety',
-    role: 'Anggota Patroli Keamanan',
-    date: DEFAULT_DATE,
-    shift: 'Security Shift 2 (14:30 - 22:30)',
-    status: 'Hadir',
-    checkIn: '14:25',
-    checkOut: '22:35',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Patroli perimeter site B',
-  },
-  {
-    id: 110,
-    employeeId: 10,
-    employeeName: 'Dian Kusuma',
-    nip: 'HC-0110',
-    division: 'Human Capital & GA',
-    role: 'IT Support & Sistem HRIS',
-    date: DEFAULT_DATE,
-    shift: 'Normal Office (08:00 - 17:00)',
-    status: 'Terlambat',
-    checkIn: '08:24',
-    checkOut: '17:00',
-    lateMinutes: 24,
-    deviation: '+24m',
-    notes: 'Penanganan server lokal kantor',
-  },
-  {
-    id: 111,
-    employeeId: 11,
-    employeeName: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    division: 'Operasional & Lapangan',
-    role: 'Operator Mesin CNC Milling',
-    date: DEFAULT_DATE,
-    shift: 'Shift 1 (07:00 - 15:00)',
-    status: 'Alpha',
-    checkIn: '-',
-    checkOut: '-',
-    lateMinutes: 0,
-    deviation: '-',
-    notes: 'Tanpa konfirmasi kehadiran',
+    notes: 'Cuti resmi terencana',
   },
   {
     id: 112,
@@ -406,15 +434,17 @@ const INITIAL_ATTENDANCES = [
     employeeName: 'Nurul Aini',
     nip: 'HC-0112',
     division: 'Logistik & Gudang',
-    role: 'Petugas Inventory & Stok',
+    role: 'Petugas Inventory Stok',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
     date: DEFAULT_DATE,
-    shift: 'Shift 1 (07:00 - 15:00)',
-    status: 'Sakit',
-    checkIn: '-',
-    checkOut: '-',
+    shift: 'Shift Malam (19:00 - 07:00)',
+    status: 'Hadir',
+    checkIn: '18:48',
+    checkOut: '07:00',
     lateMinutes: 0,
-    deviation: '-',
-    notes: 'Surat keterangan sakit faskes',
+    deviation: 'Tepat Waktu',
+    notes: 'Stock opname shift malam Cimalaka',
   },
 ];
 
@@ -425,6 +455,7 @@ export default function CatatanKehadiran() {
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterLocation, setFilterLocation] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterDivision, setFilterDivision] = useState('ALL');
   const [filterShift, setFilterShift] = useState('ALL');
@@ -518,31 +549,35 @@ export default function CatatanKehadiran() {
         rec.nip.toLowerCase().includes(q) ||
         rec.role.toLowerCase().includes(q);
 
-      // 2. Filter Status
+      // 2. Filter Lokasi
+      const matchLocation = filterLocation === 'ALL' || rec.location === filterLocation;
+
+      // 3. Filter Status
       const matchStatus = filterStatus === 'ALL' || rec.status === filterStatus;
 
-      // 3. Filter Divisi
+      // 4. Filter Divisi
       const matchDivision = filterDivision === 'ALL' || rec.division === filterDivision;
 
-      // 4. Filter Shift
+      // 5. Filter Shift 12 Jam
       const matchShift =
         filterShift === 'ALL' ||
-        (filterShift === 'Shift 1' && rec.shift.includes('Shift 1')) ||
-        (filterShift === 'Shift 2' && rec.shift.includes('Shift 2')) ||
-        (filterShift === 'Normal' && rec.shift.includes('Normal'));
+        (filterShift === 'Pagi' && rec.shift.toLowerCase().includes('pagi')) ||
+        (filterShift === 'Malam' && rec.shift.toLowerCase().includes('malam'));
 
-      return matchQuery && matchStatus && matchDivision && matchShift;
+      return matchQuery && matchLocation && matchStatus && matchDivision && matchShift;
     });
-  }, [currentDayAttendances, searchQuery, filterStatus, filterDivision, filterShift]);
+  }, [currentDayAttendances, searchQuery, filterLocation, filterStatus, filterDivision, filterShift]);
 
   const hasActiveFilters =
     searchQuery.trim() !== '' ||
+    filterLocation !== 'ALL' ||
     filterStatus !== 'ALL' ||
     filterDivision !== 'ALL' ||
     filterShift !== 'ALL';
 
   const handleResetFilters = () => {
     setSearchQuery('');
+    setFilterLocation('ALL');
     setFilterStatus('ALL');
     setFilterDivision('ALL');
     setFilterShift('ALL');
@@ -590,11 +625,12 @@ export default function CatatanKehadiran() {
       nip: emp.nip,
       division: emp.division,
       role: emp.role,
+      location: emp.location || 'Lokasi Mariuk',
       date,
-      shift: emp.scheduleCategory || 'Shift 1 (07:00 - 15:00)',
+      shift: emp.scheduleCategory || 'Shift Pagi (12 Jam)',
       status: 'Hadir',
       checkIn: checkInTime,
-      checkOut: emp.checkOutTime || '15:00',
+      checkOut: emp.checkOutTime || '19:00',
       lateMinutes: 0,
       deviation: 'Tepat Waktu',
       notes: 'Presensi massal operasional',
@@ -626,6 +662,7 @@ export default function CatatanKehadiran() {
       'Nama Karyawan': rec.employeeName,
       Jabatan: rec.role,
       Divisi: rec.division,
+      'Lokasi Kerja': rec.location || '-',
       'Shift Kerja': rec.shift,
       'Jam Masuk': rec.checkIn,
       'Jam Pulang': rec.checkOut,
@@ -723,7 +760,7 @@ export default function CatatanKehadiran() {
               )}
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Roster Kerja: Shift 1 (07:00–15:00) · Normal (08:00–17:00) · Shift 2 (15:00–23:00)
+              Roster 12 Jam (24/7): Shift Pagi (07:00–19:00) & Shift Malam (19:00–07:00) · Lokasi Mariuk & Cimalaka
             </p>
           </div>
         </div>
@@ -883,6 +920,17 @@ export default function CatatanKehadiran() {
           />
 
           <TableFilterGroup>
+            {/* Filter Lokasi Kerja */}
+            <TableSelect
+              value={filterLocation}
+              onChange={(e) => setFilterLocation(e.target.value)}
+              title="Filter Lokasi Kerja"
+            >
+              <option value="ALL">Semua Lokasi (Mariuk & Cimalaka)</option>
+              <option value="Lokasi Mariuk">📍 Lokasi Mariuk</option>
+              <option value="Lokasi Cimalaka">📍 Lokasi Cimalaka</option>
+            </TableSelect>
+
             {/* Filter Status */}
             <TableSelect
               value={filterStatus}
@@ -911,16 +959,15 @@ export default function CatatanKehadiran() {
               <option value="Security & Safety">Security & Safety</option>
             </TableSelect>
 
-            {/* Filter Shift */}
+            {/* Filter Shift 12 Jam */}
             <TableSelect
               value={filterShift}
               onChange={(e) => setFilterShift(e.target.value)}
               title="Filter Shift"
             >
               <option value="ALL">Semua Shift</option>
-              <option value="Shift 1">Shift 1 (Pagi)</option>
-              <option value="Shift 2">Shift 2 (Siang)</option>
-              <option value="Normal">Normal Office</option>
+              <option value="Pagi">Shift Pagi (07:00 - 19:00)</option>
+              <option value="Malam">Shift Malam (19:00 - 07:00)</option>
             </TableSelect>
 
             {/* Reset Button */}
@@ -1035,6 +1082,10 @@ export default function CatatanKehadiran() {
                       {/* 3. Divisi & Lokasi */}
                       <TableCell>
                         <div className="text-xs text-slate-700 font-medium">{rec.division}</div>
+                        <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>{rec.location || 'Lokasi Mariuk'}</span>
+                        </div>
                       </TableCell>
 
                       {/* 4. Shift Terjadwal */}

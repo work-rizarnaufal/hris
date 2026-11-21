@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import {
   Users,
@@ -44,102 +44,190 @@ import {
   Text,
 } from '@/components/ui';
 
-// Data tren kehadiran 6 hari kerja terakhir (sinkron dengan basis 12 personel operasional)
+// Data tren kehadiran 7 hari kerja terakhir (sinkron dengan roster operasional 24/7 non-stop)
 const weeklyTrendData = [
-  { day: 'Senin', hadir: 11, terlambat: 1, izin: 0 },
-  { day: 'Selasa', hadir: 12, terlambat: 0, izin: 0 },
-  { day: 'Rabu', hadir: 11, terlambat: 1, izin: 0 },
-  { day: 'Kamis', hadir: 12, terlambat: 0, izin: 0 },
-  { day: 'Jumat', hadir: 10, terlambat: 1, izin: 1 },
-  { day: 'Sabtu', hadir: 11, terlambat: 1, izin: 0 },
+  { day: 'Senin', hadir: 6, terlambat: 0, izin: 0 },
+  { day: 'Selasa', hadir: 5, terlambat: 1, izin: 0 },
+  { day: 'Rabu', hadir: 6, terlambat: 0, izin: 0 },
+  { day: 'Kamis', hadir: 6, terlambat: 0, izin: 0 },
+  { day: 'Jumat', hadir: 5, terlambat: 1, izin: 0 },
+  { day: 'Sabtu', hadir: 6, terlambat: 0, izin: 0 },
+  { day: 'Minggu', hadir: 6, terlambat: 0, izin: 0 },
 ];
 
-// Data log presensi terkini hari ini (sinkron dengan master 12 karyawan HCGA)
-const recentAttendance = [
+// Data log presensi terkini hari ini (12 personel: 6 Lokasi Mariuk & 6 Lokasi Cimalaka)
+const masterRecentAttendance = [
+  // --- LOKASI MARIUK (6 Personel) ---
   {
     id: 1,
     nip: 'HC-0101',
     name: 'Budi Santoso',
     role: 'Senior Operator Lapangan',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    shift: 'Shift 1 (07:00 - 15:00)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
+    shift: 'Shift Pagi (07:00 - 19:00)',
     time: '06:48 WIB',
     status: 'Hadir',
     statusClass: 'status-hadir',
   },
   {
-    id: 5,
-    nip: 'HC-0105',
-    name: 'Hendra Wijaya',
-    role: 'Koordinator Keamanan Pabrik',
-    division: 'Security & Safety',
-    location: 'Pabrik A (Sidoarjo)',
-    shift: 'Shift 1 (07:00 - 15:00)',
-    time: '06:38 WIB',
-    status: 'Hadir',
-    statusClass: 'status-hadir',
-  },
-  {
     id: 2,
-    nip: 'HC-0102',
-    name: 'Siti Rahmawati',
-    role: 'HCGA Specialist',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    shift: 'Office (08:00 - 17:00)',
-    time: '07:42 WIB',
-    status: 'Hadir',
-    statusClass: 'status-hadir',
-  },
-  {
-    id: 4,
     nip: 'HC-0104',
     name: 'Dewi Anggraini',
     role: 'Quality Assurance Inspector',
     division: 'Operasional & Lapangan',
-    location: 'Pabrik A (Sidoarjo)',
-    shift: 'Shift 1 (07:00 - 15:00)',
-    time: '06:55 WIB',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    time: '06:52 WIB',
     status: 'Hadir',
     statusClass: 'status-hadir',
   },
   {
     id: 3,
+    nip: 'HC-0105',
+    name: 'Hendra Wijaya',
+    role: 'Danru Keamanan & K3',
+    division: 'Security & Safety',
+    location: 'Lokasi Mariuk',
+    group: 'Grup A',
+    shift: 'Shift Malam (19:00 - 07:00)',
+    time: '18:45 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 4,
     nip: 'HC-0103',
     name: 'Ahmad Fauzi',
     role: 'Operator Forklift Utama',
     division: 'Logistik & Gudang',
-    location: 'Gudang B (Rungkut)',
-    shift: 'Shift 2 (15:00 - 23:00)',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    shift: 'Shift Pagi (07:00 - 19:00)',
     time: '07:18 WIB',
     status: 'Terlambat (18m)',
     statusClass: 'status-terlambat',
   },
   {
+    id: 5,
+    nip: 'HC-0107',
+    name: 'Eko Prasetyo',
+    role: 'Teknisi Maintenance Mesin',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    time: '06:50 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
     id: 6,
+    nip: 'HC-0109',
+    name: 'Joko Susilo',
+    role: 'Anggota Patroli Keamanan',
+    division: 'Security & Safety',
+    location: 'Lokasi Mariuk',
+    group: 'Grup B',
+    shift: 'Shift Malam (19:00 - 07:00)',
+    time: '18:50 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+
+  // --- LOKASI CIMALAKA (6 Personel) ---
+  {
+    id: 7,
+    nip: 'HC-0102',
+    name: 'Siti Rahmawati',
+    role: 'Supervisor Operasional Site',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    time: '06:45 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 8,
+    nip: 'HC-0111',
+    name: 'Wahyu Hidayat',
+    role: 'Operator Mesin Produksi',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    time: '06:55 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 9,
+    nip: 'HC-0110',
+    name: 'Dian Kusuma',
+    role: 'Petugas Keamanan Site',
+    division: 'Security & Safety',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup A',
+    shift: 'Shift Malam (19:00 - 07:00)',
+    time: '18:55 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 10,
     nip: 'HC-0106',
     name: 'Rina Marlina',
-    role: 'Staf Administrasi Payroll',
-    division: 'Human Capital & GA',
-    location: 'Kantor Utama (Surabaya)',
-    shift: 'Office (08:00 - 17:00)',
+    role: 'Koordinator Gudang & Logistik',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    shift: 'Shift Pagi (07:00 - 19:00)',
+    time: '06:58 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
+  },
+  {
+    id: 11,
+    nip: 'HC-0108',
+    name: 'Maya Indah Lestari',
+    role: 'Operator QC Lapangan',
+    division: 'Operasional & Lapangan',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    shift: 'Shift Pagi (07:00 - 19:00)',
     time: '—',
-    status: 'Izin Resmi',
-    statusClass: 'status-izin',
+    status: 'Cuti Resmi',
+    statusClass: 'status-cuti',
+  },
+  {
+    id: 12,
+    nip: 'HC-0112',
+    name: 'Nurul Aini',
+    role: 'Petugas Inventory Stok',
+    division: 'Logistik & Gudang',
+    location: 'Lokasi Cimalaka',
+    group: 'Grup B',
+    shift: 'Shift Malam (19:00 - 07:00)',
+    time: '18:48 WIB',
+    status: 'Hadir',
+    statusClass: 'status-hadir',
   },
 ];
 
-// Ringkasan performa divisi (berdasarkan pembagian 12 personel aktif)
-const divisionSummary = [
-  { name: 'Operasional & Lapangan', total: 4, present: 4, late: 0, percent: 100 },
+// Ringkasan performa divisi (berdasarkan 12 personel operasional)
+const masterDivisionSummary = [
+  { name: 'Operasional & Lapangan', total: 6, present: 5, late: 0, percent: 83 },
   { name: 'Security & Safety', total: 3, present: 3, late: 0, percent: 100 },
-  { name: 'Logistik & Gudang', total: 3, present: 3, late: 1, percent: 100 },
-  { name: 'Human Capital & GA', total: 2, present: 1, late: 0, percent: 50 },
+  { name: 'Logistik & Gudang', total: 3, present: 2, late: 1, percent: 100 },
 ];
 
 export default function Beranda() {
   const now = new Date();
+  const [selectedLocation, setSelectedLocation] = useState('ALL'); // 'ALL' | 'Lokasi Mariuk' | 'Lokasi Cimalaka'
 
   // Format tanggal formal Indonesia
   const currentDateFormatted = useMemo(() => {
@@ -152,38 +240,50 @@ export default function Beranda() {
     }).format(now);
   }, []);
 
-  // Deteksi status jadwal shift rotasi 2-grup hari ini
+  // Deteksi status jadwal shift rotasi 2-kelompok non-stop 7 hari (24/7)
   const shiftStatusToday = useMemo(() => {
-    const day = now.getDay(); // 0 = Minggu, 1 = Senin, ..., 5 = Jumat, 6 = Sabtu
-    if (day === 0) {
-      return {
-        label: 'Hari Minggu — Libur Bersama Operasional',
-        desc: 'Seluruh lini operasional pabrik dan staf kantor libur reguler (OFF).',
-        activeGroup: 'Semua Lini Libur',
-        badgeVariant: 'secondary',
-        badgeText: 'Reguler OFF',
-      };
-    }
+    // Pola bergulir kontinu 7 hari: Kelompok A Senin, B Selasa, A Rabu, B Kamis, A Jumat, B Sabtu, A Minggu...
+    const startRef = new Date('2026-01-05T00:00:00Z'); // Acuan Senin Kelompok A
+    const todayUtc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    const diffDays = Math.floor((todayUtc - startRef) / (1000 * 60 * 60 * 24));
+    const isGroupA = Math.abs(diffDays) % 2 === 0;
 
-    // Pola Baku HRIS: Senin, Rabu, Jumat = Grup A dinas | Selasa, Kamis, Sabtu = Grup B dinas
-    if (day === 1 || day === 3 || day === 5) {
-      return {
-        label: 'Grup Operasional A (Dinas Aktif)',
-        desc: 'Shift 1 (07:00 - 15:00 WIB) & Shift 2 (15:00 - 23:00 WIB) • Grup B Libur Pasca-Dinas (OFF) • Kantor Normal Office (08:00 - 17:00 WIB)',
-        activeGroup: 'Grup A',
-        badgeVariant: 'default',
-        badgeText: 'Pola Roster Grup A',
-      };
-    }
+    const activeGroup = isGroupA ? 'Kelompok A' : 'Kelompok B';
+    const offGroup = isGroupA ? 'Kelompok B' : 'Kelompok A';
 
     return {
-      label: 'Grup Operasional B (Dinas Aktif)',
-      desc: 'Shift 1 (07:00 - 15:00 WIB) & Shift 2 (15:00 - 23:00 WIB) • Grup A Libur Pasca-Dinas (OFF) • Kantor Normal Office (08:00 - 17:00 WIB)',
-      activeGroup: 'Grup B',
+      label: `${activeGroup} (Dinas Operasional 24/7)`,
+      desc: `Shift Pagi (07:00 - 19:00 WIB) & Shift Malam (19:00 - 07:00 WIB) • Lokasi Mariuk & Cimalaka • ${offGroup} Istirahat Pasca-Dinas (OFF) • Handover jam 07:00 & 19:00`,
+      activeGroup,
       badgeVariant: 'default',
-      badgeText: 'Pola Roster Grup B',
+      badgeText: `Operasional 24/7 • ${activeGroup}`,
     };
   }, []);
+
+  // Filter log presensi sesuai lokasi kerja yang dipilih
+  const filteredRecentAttendance = useMemo(() => {
+    if (selectedLocation === 'ALL') return masterRecentAttendance;
+    return masterRecentAttendance.filter((item) => item.location === selectedLocation);
+  }, [selectedLocation]);
+
+  // Statistik Dinamis berdasarkan Lokasi
+  const stats = useMemo(() => {
+    const totalStaff = selectedLocation === 'ALL' ? 12 : 6;
+    const records = filteredRecentAttendance;
+    const presentCount = records.filter((r) => r.status === 'Hadir').length;
+    const lateCount = records.filter((r) => r.status.includes('Terlambat')).length;
+    const leaveCount = records.filter((r) => r.status.includes('Cuti') || r.status.includes('Izin')).length;
+    const totalActiveDuty = presentCount + lateCount;
+    const attendanceRate = totalStaff > 0 ? Math.round((totalActiveDuty / totalStaff) * 100) : 0;
+
+    return {
+      totalStaff,
+      presentCount,
+      lateCount,
+      leaveCount,
+      attendanceRate,
+    };
+  }, [filteredRecentAttendance, selectedLocation]);
 
   return (
     <>
@@ -195,7 +295,19 @@ export default function Beranda() {
         title="Ringkasan Operasional & Kehadiran"
         subtitle={`Monitoring kedisiplinan dan absensi harian area kerja operasional — ${currentDateFormatted}.`}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Filter Lokasi Cepat */}
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="h-9 px-3 text-xs font-semibold rounded-md border border-slate-200 bg-white text-slate-700 hover:border-navy focus:outline-none focus:ring-1 focus:ring-navy transition-all cursor-pointer shadow-xs"
+              title="Pilih Lokasi Kerja Operasional"
+            >
+              <option value="ALL">🌐 Semua Lokasi (Mariuk & Cimalaka)</option>
+              <option value="Lokasi Mariuk">📍 Lokasi Mariuk (6 Personil)</option>
+              <option value="Lokasi Cimalaka">📍 Lokasi Cimalaka (6 Personil)</option>
+            </select>
+
             <Link
               href="/kehadiran"
               className="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-md text-xs font-semibold bg-[#10273f] text-white hover:bg-[#1a3a5c] shadow-xs transition-colors"
@@ -221,10 +333,10 @@ export default function Beranda() {
           <CardContent className="p-5 flex items-start justify-between">
             <div>
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
-                Total Personel Aktif
+                Total Personel {selectedLocation !== 'ALL' ? selectedLocation.replace('Lokasi ', '') : 'Aktif'}
               </div>
               <div className="text-3xl font-bold font-display text-navy">
-                12 <span className="text-sm font-normal text-slate-400">orang</span>
+                {stats.totalStaff} <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
@@ -245,11 +357,11 @@ export default function Beranda() {
                 Tingkat Kehadiran
               </div>
               <div className="text-3xl font-bold font-display text-[#398872]">
-                91.7%
+                {stats.attendanceRate}%
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#398872]" />
-                <span>11 dari 12 personel hadir dinas</span>
+                <span>{stats.presentCount + stats.lateCount} dari {stats.totalStaff} personel dinas</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#eef7f1] flex items-center justify-center text-[#398872] shrink-0">
@@ -266,11 +378,11 @@ export default function Beranda() {
                 Terlambat Masuk
               </div>
               <div className="text-3xl font-bold font-display text-[#ac8848]">
-                1 <span className="text-sm font-normal text-slate-400">orang</span>
+                {stats.lateCount} <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-[#ac8848]" />
-                <span>Ahmad Fauzi (18m terlambat)</span>
+                <span>{stats.lateCount > 0 ? 'Terdapat deviasi toleransi' : 'Semua tepat waktu'}</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#fcf6e9] flex items-center justify-center text-[#ac8848] shrink-0">
@@ -287,11 +399,11 @@ export default function Beranda() {
                 Tidak Hadir (Legalitas)
               </div>
               <div className="text-3xl font-bold font-display text-[#1d3046]">
-                1 <span className="text-sm font-normal text-slate-400">orang</span>
+                {stats.leaveCount} <span className="text-sm font-normal text-slate-400">orang</span>
               </div>
               <div className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-sky-500 inline-block" />
-                <span>1 Izin Resmi, 0 Sakit, 0 Alpha</span>
+                <span>{stats.leaveCount > 0 ? `${stats.leaveCount} Cuti Resmi / Izin` : 'Nihil ketidakhadiran'}</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-xl bg-[#eff5fa] flex items-center justify-center text-[#698eb0] shrink-0">
@@ -464,7 +576,7 @@ export default function Beranda() {
             <CardDescription className="text-xs">Rasio kehadiran harian per unit kerja</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {divisionSummary.map((div) => (
+            {masterDivisionSummary.map((div) => (
               <div key={div.name} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-medium text-slate-700">{div.name}</span>
@@ -524,7 +636,7 @@ export default function Beranda() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentAttendance.map((item) => (
+              {filteredRecentAttendance.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">

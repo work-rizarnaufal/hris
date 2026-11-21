@@ -132,7 +132,7 @@ export default function Login() {
           {/* Bagian Bawah: Footer & Keamanan */}
           <div className="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
             <span>Standar Keamanan ISO 27001</span>
-            <span>WIB (UTC+7) • Sidoarjo & Surabaya</span>
+            <span>WIB (UTC+7) • Mariuk & Cimalaka</span>
           </div>
         </div>
 

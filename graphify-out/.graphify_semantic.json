@@ -1,0 +1,62 @@
+{
+  "nodes": [
+    {
+      "id": "LAPORAN_PROYEK_HRIS",
+      "label": "LAPORAN_PROYEK_HRIS.md",
+      "type": "document",
+      "source_file": "LAPORAN_PROYEK_HRIS.md",
+      "description": "Dokumentasi handover komprehensif, standar arsitektur, dan riwayat rekayasa sistem HRIS",
+      "_origin": "semantic"
+    },
+    {
+      "id": "AGENTS_MD",
+      "label": "AGENTS.md",
+      "type": "document",
+      "source_file": "AGENTS.md",
+      "description": "Instruksi kerja dan mandat arsitektur bagi AI Agent di repositori HRIS",
+      "_origin": "semantic"
+    },
+    {
+      "id": "RULE_ANTISLOP_PONYTAIL",
+      "label": "Aturan Antislop & Ponytail",
+      "type": "document",
+      "source_file": ".agents/rules/antislop-ponytail.md",
+      "description": "Panduan rekayasa pragmatis, eliminasi slop, dan YAGNI ladder",
+      "_origin": "semantic"
+    },
+    {
+      "id": "README_PROJECT",
+      "label": "README.md",
+      "type": "document",
+      "source_file": "README.md",
+      "description": "Ikhtisar proyek dan petunjuk setup HRIS Laravel Inertia",
+      "_origin": "semantic"
+    }
+  ],
+  "edges": [
+    {
+      "source": "AGENTS_MD",
+      "target": "LAPORAN_PROYEK_HRIS",
+      "relation": "mandates_recording_in",
+      "confidence": "EXTRACTED",
+      "_origin": "semantic"
+    },
+    {
+      "source": "AGENTS_MD",
+      "target": "RULE_ANTISLOP_PONYTAIL",
+      "relation": "enforces",
+      "confidence": "EXTRACTED",
+      "_origin": "semantic"
+    },
+    {
+      "source": "LAPORAN_PROYEK_HRIS",
+      "target": "README_PROJECT",
+      "relation": "documents_project",
+      "confidence": "EXTRACTED",
+      "_origin": "semantic"
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
