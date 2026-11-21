@@ -21,13 +21,14 @@
 >    - Jangan pernah menulis kode yang tidak mutlak diperlukan saat ini.
 >    - Maksimalkan penggunaan ulang (*reuse*) utilitas, token `theme.js`, dan komponen UI yang sudah ada.
 >    - Menghasilkan patch terkecil yang benar tanpa mengorbankan keamanan, validasi, dan integritas data.
-> 3. **Mandatory Atomic UI Consistency (Konsistensi Komponen Atomik)**:
->    - Seluruh halaman **WAJIB** menggunakan komponen atomik dari [`resources/js/components/ui/`](resources/js/components/ui/) (`Table`, `Card`, `Badge`, `Button`, `Modal`, `Toast`, `Input`, `PageHeader`, dll).
+> 3. **Mandatory Atomic UI Consistency & Design System ([`DESIGN.md`](DESIGN.md))**:
+>    - Seluruh halaman **WAJIB** merujuk dan mematuhi spesifikasi desain tunggal pada [`DESIGN.md`](DESIGN.md).
+>    - Seluruh elemen antarmuka **WAJIB** menggunakan komponen atomik dari [`resources/js/components/ui/`](resources/js/components/ui/) (`Table`, `Card`, `Badge`, `Button`, `Modal`, `Toast`, `Input`, `PageHeader`, dll).
 >    - **Dilarang keras** membuat alert, dialog modal, atau tabel floating ad-hoc inline di masing-masing file halaman.
 > 4. **Kebijakan Git Push (Strictly Manual)**:
 >    - **Dilarang keras menjalankan `git push` otomatis** ke remote repository tanpa instruksi atau konfirmasi eksplisit dari USER. Seluruh push remote wajib manual.
 >
-> *(Aturan ini juga dikunci pada [`.agents/rules/antislop-ponytail.md`](.agents/rules/antislop-ponytail.md) dan [`AGENTS.md`](AGENTS.md)).*
+> *(Aturan ini juga dikunci pada [`DESIGN.md`](DESIGN.md), [`.agents/rules/antislop-ponytail.md`](.agents/rules/antislop-ponytail.md), dan [`AGENTS.md`](AGENTS.md)).*
 
 ---
 
@@ -140,9 +141,9 @@ Navigasi sidebar telah ditata mengikuti 7 domain standar HRIS enterprise:
 
 ---
 
-## 3. Standar Desain Sistem Komponen Atomik UI
+## 3. Standar Desain Sistem Komponen Atomik UI & DESIGN.md
 
-Komponen antarmuka pengguna telah terstandarisasi di direktori [`resources/js/components/ui/`](resources/js/components/ui/):
+Spesifikasi desain sistem lengkap dan token mesin telah dikunci pada dokumen pedoman tunggal **[`DESIGN.md`](DESIGN.md)** di root repositori. Seluruh komponen antarmuka pengguna telah terstandarisasi di direktori [`resources/js/components/ui/`](resources/js/components/ui/):
 
 1. **[`modal.jsx`](resources/js/components/ui/modal.jsx)**:
    - `<Modal>`: Kontainer dialog modern dengan *backdrop blur*, *ESC key close*, *outside-click close*, *body scroll lock*, dan varian ukuran (`sm`, `md`, `lg`, `xl`, `2xl`, `full`).
