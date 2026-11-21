@@ -210,17 +210,51 @@ const INITIAL_EMPLOYEES = [
   },
 ];
 
+const normalizeEmployee = (emp) => {
+  const locName = typeof emp.location === 'object'
+    ? (emp.location?.name || (emp.location_id === 2 ? 'Lokasi Cimalaka' : 'Lokasi Mariuk'))
+    : (emp.location || (emp.location_id === 2 ? 'Lokasi Cimalaka' : 'Lokasi Mariuk'));
+
+  const shiftName = typeof emp.shift === 'object'
+    ? (emp.shift?.name || emp.scheduleCategory || 'Shift Pagi (12 Jam)')
+    : (emp.scheduleCategory || emp.shift || 'Shift Pagi (12 Jam)');
+
+  const inTime = typeof emp.shift === 'object' && emp.shift?.start_time
+    ? emp.shift.start_time.slice(0, 5)
+    : (emp.checkInTime || '07:00');
+
+  const outTime = typeof emp.shift === 'object' && emp.shift?.end_time
+    ? emp.shift.end_time.slice(0, 5)
+    : (emp.checkOutTime || '19:00');
+
+  return {
+    ...emp,
+    id: emp.id,
+    name: emp.name || '',
+    nip: emp.nip || '',
+    biometricPin: String(emp.biometric_pin || emp.biometricPin || ''),
+    role: emp.role || emp.role_title || 'Staff Operasional Lapangan',
+    division: emp.division || 'Operasional & Lapangan',
+    location: locName,
+    group: emp.group || emp.shift_group || 'Grup A',
+    scheduleCategory: shiftName,
+    checkInTime: inTime,
+    checkOutTime: outTime,
+    status: emp.status || 'Aktif',
+  };
+};
+
 export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
   const [employees, setEmployees] = useState(() => {
     if (initialDbEmployees && initialDbEmployees.length > 0) {
-      return initialDbEmployees;
+      return initialDbEmployees.map(normalizeEmployee);
     }
-    return INITIAL_EMPLOYEES;
+    return INITIAL_EMPLOYEES.map(normalizeEmployee);
   });
 
   useEffect(() => {
     if (initialDbEmployees && initialDbEmployees.length > 0) {
-      setEmployees(initialDbEmployees);
+      setEmployees(initialDbEmployees.map(normalizeEmployee));
     }
   }, [initialDbEmployees]);
   const locationList = useMemo(() => getLocations(), []);
@@ -254,12 +288,19 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
 
   // Filtered List
   const filteredEmployees = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
     return employees.filter((emp) => {
+      const name = String(emp.name || '').toLowerCase();
+      const nip = String(emp.nip || '').toLowerCase();
+      const role = String(emp.role || '').toLowerCase();
+      const pin = String(emp.biometricPin || '').toLowerCase();
+
       const matchQuery =
-        !searchQuery.trim() ||
-        emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.nip.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.role.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        name.includes(q) ||
+        nip.includes(q) ||
+        role.includes(q) ||
+        pin.includes(q);
 
       const matchLocation = filterLocation === 'ALL' || emp.location === filterLocation;
       const matchDivision = filterDivision === 'ALL' || emp.division === filterDivision;
@@ -593,7 +634,7 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
                       <TableCell>
                         <div className="person">
                           <div className="avatar small font-bold text-slate-700 bg-slate-100 border border-slate-200">
-                            {emp.name.slice(0, 2).toUpperCase()}
+                            {String(emp.name || 'KR').slice(0, 2).toUpperCase()}
                           </div>
                           <div>
                             <strong
@@ -604,7 +645,7 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
                               {emp.name}
                             </strong>
                             <Text variant="caption" color="muted">
-                              {emp.nip} • {emp.role}
+                              {emp.nip} {emp.biometricPin ? `(PIN: ${emp.biometricPin})` : ''} • {emp.role}
                             </Text>
                           </div>
                         </div>
@@ -621,14 +662,18 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <Badge
                             className={
-                              emp.location?.includes('Mariuk')
+                              String(emp.location || '').includes('Mariuk')
                                 ? 'bg-amber-50 text-amber-800 border-amber-200 text-[11px] font-semibold'
-                                : emp.location?.includes('Cimalaka')
+                                : String(emp.location || '').includes('Cimalaka')
                                 ? 'bg-indigo-50 text-indigo-800 border-indigo-200 text-[11px] font-semibold'
                                 : 'bg-slate-100 text-slate-700 border-slate-200 text-[11px]'
                             }
                           >
-                            {emp.location?.includes('Mariuk') ? 'Mariuk' : emp.location?.includes('Cimalaka') ? 'Cimalaka' : emp.location}
+                            {String(emp.location || '').includes('Mariuk')
+                              ? 'Mariuk'
+                              : String(emp.location || '').includes('Cimalaka')
+                              ? 'Cimalaka'
+                              : (emp.location || '-')}
                           </Badge>
                         </div>
                       </TableCell>

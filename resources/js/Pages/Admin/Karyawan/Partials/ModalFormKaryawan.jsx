@@ -175,7 +175,7 @@ export default function ModalFormKaryawan({
     onClose();
   };
 
-  const isMariuk = formData.location.includes('Mariuk');
+  const isMariuk = String(formData.location || '').includes('Mariuk');
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">

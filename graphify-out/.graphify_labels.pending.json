@@ -1,6 +1,7 @@
 {
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
   "5": "lucide-react",
+  "6": "systemSettings.js",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
   "13": "cn",
   "39": "Anti-Slop (Full Specification)",
@@ -8,7 +9,7 @@
   "41": "PengaturanSistem.jsx",
   "42": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
   "43": "Illuminate\\Database\\Seeder",
-  "44": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
+  "44": "FingerprintImportService.php",
   "45": "Employee",
   "46": "User",
   "48": "Location",
