@@ -1,18 +1,19 @@
 {
+  "0": "react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "web.php",
-  "5": "lucide-react",
+  "4": "Illuminate\\Http\\Request",
+  "5": "web.php",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
   "13": "cn",
   "39": "Anti-Slop (Full Specification)",
   "40": "Ponytail (Companion Pragmatism Skill)",
   "41": "PengaturanSistem.jsx",
-  "42": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
+  "42": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "43": "Illuminate\\Database\\Seeder",
-  "45": "Employee",
-  "46": "User",
+  "44": "App\\Http\\Controllers\\Admin\\PengaturanController",
+  "45": "App\\Http\\Controllers\\Admin\\KaryawanController",
+  "46": "HandleInertiaRequests.php",
   "48": "Location",
-  "49": "App\\Models\\Location",
-  "52": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory"
+  "52": "App\\Models\\Employee"
 }

@@ -64,7 +64,7 @@ class KehadiranController extends Controller
                 'check_out_time' => $validated['check_out_time'] ?? null,
                 'status' => $validated['status'],
                 'late_minutes' => $validated['late_minutes'] ?? 0,
-                'work_duration_hours' => ($validated['check_in_time'] && $validated['check_out_time']) ? 12.0 : 0,
+                'work_duration_hours' => ($validated['check_in_time'] && $validated['check_out_time']) ? 8.0 : 0,
                 'location_id' => $employee?->location_id,
                 'method' => 'manual_admin',
                 'notes' => 'Manual Admin: '.$validated['notes'],
@@ -72,6 +72,56 @@ class KehadiranController extends Controller
         );
 
         return back()->with('success', "Catatan presensi manual untuk {$employee?->name} berhasil disimpan.");
+    }
+
+    /**
+     * Catat presensi massal cepat untuk sejumlah karyawan.
+     */
+    public function storeMass(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'date' => ['required', 'date'],
+            'check_in_time' => ['required', 'string'],
+            'employee_ids' => ['required', 'array'],
+            'employee_ids.*' => ['exists:employees,id'],
+        ]);
+
+        $employees = Employee::whereIn('id', $validated['employee_ids'])->get();
+
+        foreach ($employees as $employee) {
+            $shift = $employee->shift;
+            $checkOut = $shift?->end_time ? substr($shift->end_time, 0, 5) : '17:00';
+
+            Attendance::updateOrCreate(
+                [
+                    'employee_id' => $employee->id,
+                    'date' => $validated['date'],
+                ],
+                [
+                    'check_in_time' => $validated['check_in_time'],
+                    'check_out_time' => $checkOut,
+                    'status' => 'hadir',
+                    'late_minutes' => 0,
+                    'work_duration_hours' => 8.0,
+                    'location_id' => $employee->location_id,
+                    'method' => 'manual_admin',
+                    'notes' => 'Presensi Massal Admin',
+                ]
+            );
+        }
+
+        return back()->with('success', "Berhasil mencatat presensi massal untuk {$employees->count()} karyawan.");
+    }
+
+    /**
+     * Hapus catatan presensi.
+     */
+    public function destroy(Attendance $attendance): RedirectResponse
+    {
+        $name = $attendance->employee?->name ?? 'Karyawan';
+        $attendance->delete();
+
+        return back()->with('success', "Catatan presensi untuk {$name} berhasil dihapus.");
     }
 
     /**

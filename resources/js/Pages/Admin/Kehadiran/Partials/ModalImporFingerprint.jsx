@@ -57,29 +57,34 @@ export default function ModalImporFingerprint({
   // Demo scan generator untuk pengujian instan
   const handleLoadDemoLog = () => {
     const isMariuk = Number(selectedLocationId) === 1;
-    const targetPins = isMariuk ? ['101', '104', '105', '103', '107', '109'] : ['202', '211', '210', '206', '208', '212'];
+    const realPins = locationEmployees
+      .map((e) => String(e.biometricPin || e.biometric_pin || e.id))
+      .filter((p) => p && p !== '-');
+    const targetPins = realPins.length >= 4
+      ? realPins
+      : (isMariuk ? ['1', '2', '3', '4'] : ['5', '6', '7', '8']);
     const today = new Date().toISOString().slice(0, 10);
 
     const demoScans = [
-      // Karyawan 1: Hadir Tepat Waktu (Pagi)
-      { pin: targetPins[0], timestamp: `${today} 06:48:10` },
-      { pin: targetPins[0], timestamp: `${today} 06:48:30` }, // double tap
-      { pin: targetPins[0], timestamp: `${today} 19:04:15` },
+      // Karyawan 1: Hadir Tepat Waktu (Shift Pagi: 08:00 - 17:00)
+      { pin: targetPins[0], timestamp: `${today} 07:48:10` },
+      { pin: targetPins[0], timestamp: `${today} 07:48:30` }, // double tap diabaikan
+      { pin: targetPins[0], timestamp: `${today} 17:04:15` },
 
-      // Karyawan 2: Terlambat 18 menit (Pagi, lewat toleransi 15m)
-      { pin: targetPins[1], timestamp: `${today} 07:18:22` },
-      { pin: targetPins[1], timestamp: `${today} 19:10:00` },
+      // Karyawan 2: Terlambat (Shift Pagi, masuk 08:22 lewat batas toleransi 08:15)
+      { pin: targetPins[1], timestamp: `${today} 08:22:10` },
+      { pin: targetPins[1], timestamp: `${today} 17:10:00` },
 
-      // Karyawan 3: Anomali (Lupa tap pulang)
-      { pin: targetPins[2], timestamp: `${today} 06:55:00` },
+      // Karyawan 3: Anomali Single Punch (Lupa tap pulang)
+      { pin: targetPins[2], timestamp: `${today} 07:55:00` },
 
       // Karyawan 4: Hadir Tepat Waktu
-      { pin: targetPins[3], timestamp: `${today} 06:58:12` },
-      { pin: targetPins[3], timestamp: `${today} 19:02:40` },
+      { pin: targetPins[3], timestamp: `${today} 07:58:12` },
+      { pin: targetPins[3], timestamp: `${today} 17:02:40` },
 
-      // Unmapped PIN (misal teknisi mendaftarkan PIN baru 999 di mesin)
-      { pin: '999', timestamp: `${today} 07:02:15` },
-      { pin: '999', timestamp: `${today} 19:05:00` },
+      // Unmapped PIN (misal teknisi mendaftarkan PIN baru 9999 di mesin)
+      { pin: '9999', timestamp: `${today} 07:52:15` },
+      { pin: '9999', timestamp: `${today} 17:05:00` },
     ];
 
     setFileInfo({
@@ -108,17 +113,35 @@ export default function ModalImporFingerprint({
           const data = new Uint8Array(evt.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+          const rawObjects = XLSX.utils.sheet_to_json(firstSheet);
 
           const extracted = [];
-          for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (!row || row.length === 0) continue;
-            // Kolom umum: PIN/No (index 0 atau 1), Time (index 1 atau 2)
-            const pin = String(row[0] || row[1] || '').trim();
-            const time = String(row[1] || row[2] || '').trim();
-            if (pin && time) {
-              extracted.push({ pin, timestamp: time });
+          if (rawObjects.length > 0 && ('ID' in rawObjects[0] || 'id' in rawObjects[0] || 'Tanggal Absensi' in rawObjects[0])) {
+            rawObjects.forEach((row) => {
+              const pin = String(row['ID'] ?? row['id'] ?? row['PIN'] ?? row['pin'] ?? '').trim();
+              const date = String(row['Tanggal Absensi'] ?? row['tanggal'] ?? row['Date'] ?? '').trim();
+              const time = String(row['Jam Absensi'] ?? row['jam'] ?? row['Time'] ?? '').trim();
+              const kantor = String(row['Kantor'] ?? row['kantor'] ?? '').trim();
+              if (pin && (date || time)) {
+                extracted.push({
+                  pin,
+                  timestamp: `${date} ${time}`.trim(),
+                  kantor,
+                  tipe: row['Tipe Absensi'] || '',
+                  verifikasi: row['Verifikasi'] || 'Sidik Jari',
+                });
+              }
+            });
+          } else {
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            for (let i = 1; i < rows.length; i++) {
+              const row = rows[i];
+              if (!row || row.length === 0) continue;
+              const pin = String(row[0] || row[1] || '').trim();
+              const time = String(row[1] || row[2] || '').trim();
+              if (pin && time) {
+                extracted.push({ pin, timestamp: time });
+              }
             }
           }
           parseScansClient(extracted);
@@ -159,7 +182,7 @@ export default function ModalImporFingerprint({
 
     setTimeout(() => {
       const empMap = {};
-      locationEmployees.forEach((emp) => {
+      employees.forEach((emp) => {
         const pin = String(emp.biometricPin || emp.biometric_pin || emp.nip.replace(/\D/g, ''));
         empMap[pin] = emp;
       });
@@ -199,40 +222,98 @@ export default function ModalImporFingerprint({
           }
         });
 
-        const dateStr = deduped[0].toISOString().slice(0, 10);
-        const firstIn = deduped[0].toTimeString().slice(0, 5);
-        const lastOut = deduped.length > 1 ? deduped[deduped.length - 1].toTimeString().slice(0, 5) : null;
+        // Grouping into duty shifts (Pagi: 07:00-18:00, Malam: 19:00-06:00)
+        const dailyDuty = {};
 
-        // Toleransi keterlambatan 15 menit (Pagi 07:15)
-        const [inH, inM] = firstIn.split(':').map(Number);
-        const inMinutes = inH * 60 + inM;
-        const targetMinutes = 7 * 60; // 07:00
-        const diff = inMinutes - targetMinutes;
-        const isLate = diff > 15;
-        const lateMinutes = isLate ? diff : 0;
+        deduped.forEach((t) => {
+          const timeStr = t.toTimeString().slice(0, 5);
 
-        const record = {
-          employeeId: emp.id,
-          employeeName: emp.name,
-          nip: emp.nip,
-          pin,
-          location: emp.location || (selectedLocationId === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
-          date: dateStr,
-          shift: 'Shift Pagi (12 Jam)',
-          checkIn: firstIn,
-          checkOut: lastOut || '-',
-          lateMinutes,
-          status: isLate ? 'Terlambat' : 'Hadir',
-          isAnomaly: !lastOut,
-          anomalyReason: !lastOut ? 'Lupa Tap Pulang (Missing Out)' : null,
-          method: 'fingerprint',
-        };
+          if (timeStr <= '06:30') {
+            // Pulang shift malam kemarin
+            const prev = new Date(t);
+            prev.setDate(prev.getDate() - 1);
+            const prevDate = prev.toISOString().slice(0, 10);
+            if (!dailyDuty[prevDate]) dailyDuty[prevDate] = { in: [], out: [], shift: 'MALAM' };
+            dailyDuty[prevDate].out.push(t);
+          } else if (timeStr >= '18:30') {
+            // Masuk shift malam hari ini
+            const dutyDate = t.toISOString().slice(0, 10);
+            if (!dailyDuty[dutyDate]) dailyDuty[dutyDate] = { in: [], out: [], shift: 'MALAM' };
+            dailyDuty[dutyDate].in.push(t);
+          } else {
+            // Shift pagi (buka 07:00, kerja 08:00 - 17:00, tutup 18:00)
+            const dutyDate = t.toISOString().slice(0, 10);
+            if (!dailyDuty[dutyDate]) dailyDuty[dutyDate] = { in: [], out: [], shift: 'PAGI' };
+            if (timeStr < '14:00') {
+              dailyDuty[dutyDate].in.push(t);
+            } else {
+              dailyDuty[dutyDate].out.push(t);
+            }
+          }
+        });
 
-        if (record.isAnomaly) {
-          anomalies.push(record);
-        } else {
-          ready.push(record);
-        }
+        Object.entries(dailyDuty).forEach(([dateStr, duty]) => {
+          const firstIn = duty.in.length > 0 ? duty.in[0].toTimeString().slice(0, 5) : null;
+          const lastOut = duty.out.length > 0 ? duty.out[duty.out.length - 1].toTimeString().slice(0, 5) : null;
+          const isNight = duty.shift === 'MALAM';
+          const shiftTitle = isNight ? 'Shift Malam (20:00 - 05:00)' : 'Shift Pagi (08:00 - 17:00)';
+
+          let isAnomaly = false;
+          let anomalyReason = null;
+          let status = 'Hadir';
+
+          if (firstIn && !lastOut) {
+            if (isNight) {
+              isAnomaly = false;
+              status = 'Sedang Berdinas';
+              anomalyReason = 'Sedang Berdinas (Menunggu Scan Pulang 05:00 - 06:00)';
+            } else {
+              isAnomaly = true;
+              anomalyReason = 'Lupa Tap Pulang (Missing Out)';
+            }
+          } else if (!firstIn && lastOut) {
+            isAnomaly = true;
+            anomalyReason = 'Lupa Tap Masuk (Missing In)';
+          }
+
+          // Hitung keterlambatan (target Pagi 08:00, target Malam 20:00, toleransi 15 menit)
+          let lateMinutes = 0;
+          if (firstIn) {
+            const [inH, inM] = firstIn.split(':').map(Number);
+            const inMinutes = inH * 60 + inM;
+            const targetMinutes = isNight ? 20 * 60 : 8 * 60;
+            const diff = inMinutes - targetMinutes;
+            if (diff > 15) {
+              lateMinutes = diff;
+              if (status !== 'Sedang Berdinas') {
+                status = 'Terlambat';
+              }
+            }
+          }
+
+          const record = {
+            employeeId: emp.id,
+            employeeName: emp.name,
+            nip: emp.nip,
+            pin,
+            location: emp.location || (selectedLocationId === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+            date: dateStr,
+            shift: shiftTitle,
+            checkIn: firstIn || '-',
+            checkOut: lastOut || '-',
+            lateMinutes,
+            status,
+            isAnomaly,
+            anomalyReason,
+            method: 'fingerprint',
+          };
+
+          if (record.isAnomaly) {
+            anomalies.push(record);
+          } else {
+            ready.push(record);
+          }
+        });
       });
 
       setPreviewResult({

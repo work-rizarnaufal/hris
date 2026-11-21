@@ -242,10 +242,24 @@ Lokasi: [`resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx`](resources/js/Page
 
 Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx)
 
+- **Sinkronisasi Penuh Database SQLite & Backend Controller**:
+  - Seluruh data presensi terhubung langsung ke model `Attendance`, `Employee`, `Location`, dan `Shift` via `KehadiranController.php`.
+  - CRUD manual presensi (`POST /kehadiran/manual`), presensi massal (`POST /kehadiran/mass`), dan hapus presensi (`DELETE /kehadiran/{id}`) terhubung menggunakan Inertia router.
+- **Implementasi Aturan Shift 9 Jam (8 Jam Kerja Efektif + 1 Jam Istirahat)**:
+  - **Shift Pagi**: Jam kerja operasional `08:00 - 17:00 WIB`. Jendela absen dibuka mulai `07:00 WIB` dan ditutup pada `18:00 WIB`.
+  - **Shift Malam**: Jam kerja operasional `20:00 - 05:00 WIB` (lintas hari). Jendela absen dibuka mulai `19:00 WIB` dan ditutup pada `06:00 WIB` pagi hari berikutnya.
+  - Toleransi keterlambatan dikonfigurasi dinamis (default: 15 menit).
+- **Integrasi Impor Mesin Biometric Fingerprint Fisik (`FingerprintImportService.php`)**:
+  - Mendukung format ekstraksi mesin fingerprint 9 kolom (`Cloud ID`, `ID/PIN`, `Nama`, `Tanggal Absensi`, `Jam Absensi`, `Verifikasi`, `Tipe Absensi`, `Jabatan`, `Kantor`).
+  - Pemisahan site otomatis (`MARIUK` vs `CIMALAKA`).
+  - Algoritma deduplikasi scan ganda dalam 5 menit, pengelompokan time-window cerdas (masuk & pulang), serta deteksi anomali single punch (lupa tap masuk/pulang).
+  - Alur commit langsung ke database via `POST /kehadiran/commit-fingerprint`.
+- **Komponen Atomik `<TablePagination>`**:
+  - Dilengkapi kontrol navigasi halaman cerdas dengan ellipsis, pilihan ukuran baris (`10, 25, 50, 100`), dan penomoran baris kontinu `(currentPage - 1) * perPage + index + 1`.
+  - Ukuran font dan tombol diperbesar sesuai preferensi operasional (`text-xs sm:text-sm`).
+  - Otomatis reset ke halaman 1 saat filter pencarian, lokasi, divisi, status, atau tanggal diubah.
 - **Navigasi Tanggal Cepat**: Navigasi harian (kemarin, besok, date-picker kalender, tombol *Hari Ini*), lengkap dengan format bahasa Indonesia.
 - **5 Kartu KPI Real-time**: Total Jadwal, Tepat Waktu (dengan persentase), Terlambat (dengan total akumulasi menit keterlambatan), Izin/Sakit/Cuti, dan Alpha/Mangkir.
-- **Tabel Log Presensi**:
-  - Kolom: No, Karyawan (NIP & Jabatan), Divisi & Lokasi, Shift Terjadwal, Jam Masuk, Jam Pulang, Keterlambatan, Status Kehadiran (`.status-hadir`, `.status-terlambat`, dll.), Keterangan, dan Aksi.
 - **Fitur Aksi**:
   - **Catat / Ubah Presensi (`ModalFormPresensi.jsx`)**: Menggunakan modal atomik, auto-detect shift karyawan, kalkulasi live menit terlambat berdasarkan jam masuk, dan pengubahan status otomatis.
   - **Presensi Massal Cepat (`ModalPresensiMassal.jsx`)**: 1-klik tandai seluruh atau per-shift karyawan terjadwal sebagai *Hadir Tepat Waktu*.

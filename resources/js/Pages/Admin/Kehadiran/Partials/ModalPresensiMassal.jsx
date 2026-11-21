@@ -14,21 +14,21 @@ export default function ModalPresensiMassal({
   const [shifts, setShifts] = useState(() => getShiftSettings());
   const [targetGroup, setTargetGroup] = useState('ALL');
   const [date, setDate] = useState(currentDate);
-  const [checkInTime, setCheckInTime] = useState(() => getShiftSettings().shiftPagiIn || '07:00');
+  const [checkInTime, setCheckInTime] = useState(() => getShiftSettings().shiftPagiIn || '08:00');
   const [onlyUnrecorded, setOnlyUnrecorded] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       const current = getShiftSettings();
       setShifts(current);
-      setCheckInTime(current.shiftPagiIn || '07:00');
+      setCheckInTime(current.shiftPagiIn || '08:00');
     }
   }, [isOpen]);
 
   const targetOptions = useMemo(() => [
     { value: 'ALL', label: 'Seluruh Karyawan Terjadwal' },
-    { value: 'Shift Pagi (12 Jam)', label: `${shifts.shiftPagiName} (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})` },
-    { value: 'Shift Malam (12 Jam)', label: `${shifts.shiftMalamName} (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})` },
+    { value: 'Shift Pagi (08:00 - 17:00)', label: `${shifts.shiftPagiName} (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})` },
+    { value: 'Shift Malam (20:00 - 05:00)', label: `${shifts.shiftMalamName} (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})` },
   ], [shifts]);
 
   // Filter affected employees

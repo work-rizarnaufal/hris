@@ -59,25 +59,25 @@ export default function ModalFormKaryawan({
     const s = getShiftSettings();
     return [
       {
-        label: `${s.shiftPagiName}: 12 Jam (${s.shiftPagiIn} - ${s.shiftPagiOut})`,
-        cat: 'Shift Pagi (12 Jam)',
+        label: `${s.shiftPagiName} (${s.shiftPagiIn} - ${s.shiftPagiOut})`,
+        cat: 'Shift Pagi (08:00 - 17:00)',
         in: s.shiftPagiIn,
         out: s.shiftPagiOut,
-        desc: 'Operasional siang 24/7 non-stop',
+        desc: 'Buka absen masuk 07:00, tutup absen pulang 18:00',
       },
       {
-        label: `${s.shiftMalamName}: 12 Jam (${s.shiftMalamIn} - ${s.shiftMalamOut})`,
-        cat: 'Shift Malam (12 Jam)',
+        label: `${s.shiftMalamName} (${s.shiftMalamIn} - ${s.shiftMalamOut})`,
+        cat: 'Shift Malam (20:00 - 05:00)',
         in: s.shiftMalamIn,
         out: s.shiftMalamOut,
-        desc: 'Operasional malam 24/7 non-stop',
+        desc: 'Buka absen masuk 19:00, tutup absen pulang 06:00 (lintas hari)',
       },
       {
-        label: 'Fleksibel Operasional (08:00 - 17:00)',
-        cat: 'Fleksibel',
+        label: 'Non-Shift Kantor (08:00 - 17:00)',
+        cat: 'Non-Shift Kantor (08:00 - 17:00)',
         in: '08:00',
         out: '17:00',
-        desc: 'Staf pendukung kantor & GA',
+        desc: 'Staf pendukung administrasi & kantor',
       },
     ];
   }, [isOpen]);

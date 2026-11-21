@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,7 +66,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
             'scans' => [
                 ['pin' => '27', 'timestamp' => '2026-11-21 06:48:00'],
                 ['pin' => '27', 'timestamp' => '2026-11-21 06:48:30'], // duplicate scan < 5 min
-                ['pin' => '27', 'timestamp' => '2026-11-21 19:05:00'],
+                ['pin' => '27', 'timestamp' => '2026-11-21 17:15:00'],
                 ['pin' => '30', 'timestamp' => '2026-11-21 07:22:00'], // anomaly single punch
                 ['pin' => '9999', 'timestamp' => '2026-11-21 07:00:00'], // unmapped PIN
             ],
@@ -85,7 +86,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
         $this->assertNotEmpty($json['ready']);
         $this->assertEquals('27', $json['ready'][0]['pin']);
         $this->assertEquals('06:48', $json['ready'][0]['check_in_time']);
-        $this->assertEquals('19:05', $json['ready'][0]['check_out_time']);
+        $this->assertEquals('17:15', $json['ready'][0]['check_out_time']);
 
         $this->assertNotEmpty($json['anomalies']);
         $this->assertEquals('30', $json['anomalies'][0]['pin']);
@@ -107,7 +108,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
                 'location_id' => $mariuk->id,
                 'date' => '2026-11-21',
                 'check_in_time' => '06:48',
-                'check_out_time' => '19:05',
+                'check_out_time' => '17:15',
                 'status' => 'Hadir',
                 'late_minutes' => 0,
                 'notes' => 'Impor log mesin sidik jari Mariuk',
@@ -125,7 +126,7 @@ class FingerprintAndManualAttendanceTest extends TestCase
             'import_batch_id' => 'BATCH-TEST-MARIUK-01',
             'method' => 'fingerprint',
             'check_in_time' => '06:48',
-            'check_out_time' => '19:05',
+            'check_out_time' => '17:15',
         ]);
     }
 
@@ -147,5 +148,54 @@ class FingerprintAndManualAttendanceTest extends TestCase
 
         $employee->refresh();
         $this->assertEquals('8888', $employee->biometric_pin);
+    }
+
+    public function test_admin_can_record_mass_attendance(): void
+    {
+        $this->seed();
+
+        $employees = Employee::take(3)->get();
+        $employeeIds = $employees->pluck('id')->toArray();
+
+        $response = $this->post('/kehadiran/mass', [
+            'date' => '2026-11-22',
+            'check_in_time' => '08:00',
+            'employee_ids' => $employeeIds,
+        ]);
+
+        $response->assertSessionHas('success');
+
+        foreach ($employeeIds as $id) {
+            $this->assertDatabaseHas('attendances', [
+                'employee_id' => $id,
+                'date' => '2026-11-22 00:00:00',
+                'status' => 'hadir',
+                'check_in_time' => '08:00',
+                'method' => 'manual_admin',
+            ]);
+        }
+    }
+
+    public function test_admin_can_delete_attendance_record(): void
+    {
+        $this->seed();
+
+        $employee = Employee::first();
+
+        $attendance = Attendance::create([
+            'employee_id' => $employee->id,
+            'date' => '2026-11-22',
+            'status' => 'hadir',
+            'check_in_time' => '08:00',
+            'check_out_time' => '17:00',
+            'method' => 'manual_admin',
+        ]);
+
+        $response = $this->delete('/kehadiran/'.$attendance->id);
+
+        $response->assertSessionHas('success');
+        $this->assertDatabaseMissing('attendances', [
+            'id' => $attendance->id,
+        ]);
     }
 }

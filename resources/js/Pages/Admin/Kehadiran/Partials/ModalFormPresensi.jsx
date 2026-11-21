@@ -34,16 +34,16 @@ export function getDynamicShiftOptions() {
   return [
     {
       value: `Shift Pagi (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
-      label: `${shifts.shiftPagiName}: 12 Jam (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
-      startTime: shifts.shiftPagiIn,
-      endTime: shifts.shiftPagiOut,
+      label: `${shifts.shiftPagiName} (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
+      startTime: shifts.shiftPagiIn || '08:00',
+      endTime: shifts.shiftPagiOut || '17:00',
       type: 'Pagi',
     },
     {
       value: `Shift Malam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
-      label: `${shifts.shiftMalamName}: 12 Jam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
-      startTime: shifts.shiftMalamIn,
-      endTime: shifts.shiftMalamOut,
+      label: `${shifts.shiftMalamName} (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
+      startTime: shifts.shiftMalamIn || '20:00',
+      endTime: shifts.shiftMalamOut || '05:00',
       type: 'Malam',
     },
   ];
@@ -51,17 +51,17 @@ export function getDynamicShiftOptions() {
 
 export const SHIFT_OPTIONS = [
   {
-    value: 'Shift Pagi (07:00 - 19:00)',
-    label: 'Shift Pagi: 12 Jam (07:00 - 19:00)',
-    startTime: '07:00',
-    endTime: '19:00',
+    value: 'Shift Pagi (08:00 - 17:00)',
+    label: 'Shift Pagi (08:00 - 17:00)',
+    startTime: '08:00',
+    endTime: '17:00',
     type: 'Pagi',
   },
   {
-    value: 'Shift Malam (19:00 - 07:00)',
-    label: 'Shift Malam: 12 Jam (19:00 - 07:00)',
-    startTime: '19:00',
-    endTime: '07:00',
+    value: 'Shift Malam (20:00 - 05:00)',
+    label: 'Shift Malam (20:00 - 05:00)',
+    startTime: '20:00',
+    endTime: '05:00',
     type: 'Malam',
   },
 ];
@@ -70,7 +70,7 @@ export function resolveShiftConfig(shiftStr) {
   const options = getDynamicShiftOptions();
   if (!shiftStr) return options[0];
   const s = String(shiftStr).toLowerCase();
-  if (s.includes('malam') || s.includes(options[1].startTime) || s.includes('19:00')) {
+  if (s.includes('malam') || s.includes(options[1].startTime) || s.includes('20:00') || s.includes('19:00')) {
     return options[1];
   }
   return options[0];
@@ -94,8 +94,8 @@ export function calculateTardiness(checkInTime, shiftStr) {
   let diff = 0;
 
   if (shiftConfig.type === 'Malam') {
-    // Shift Malam starts at 19:00 (1140 min).
-    // If checking in past midnight (e.g., 00:00 - 06:59), add 24 hours (1440 min).
+    // Shift Malam starts at 20:00 (1200 min).
+    // If checking in past midnight (e.g., 00:00 - 06:00), add 24 hours (1440 min).
     if (checkInMinute < 12 * 60) {
       const adjustedMinute = checkInMinute + 24 * 60;
       diff = adjustedMinute - shiftStartMinute;
@@ -103,7 +103,7 @@ export function calculateTardiness(checkInTime, shiftStr) {
       diff = checkInMinute - shiftStartMinute;
     }
   } else {
-    // Shift Pagi starts at 07:00 (420 min).
+    // Shift Pagi starts at 08:00 (480 min).
     diff = checkInMinute - shiftStartMinute;
   }
 

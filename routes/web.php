@@ -37,6 +37,8 @@ Route::get('/organisasi', function () {
 
 Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('admin.kehadiran');
 Route::post('/kehadiran/manual', [KehadiranController::class, 'storeManual'])->name('admin.kehadiran.manual');
+Route::post('/kehadiran/mass', [KehadiranController::class, 'storeMass'])->name('admin.kehadiran.mass');
+Route::delete('/kehadiran/{attendance}', [KehadiranController::class, 'destroy'])->name('admin.kehadiran.destroy');
 Route::post('/kehadiran/preview-fingerprint', [KehadiranController::class, 'previewFingerprint'])->name('admin.kehadiran.previewFingerprint');
 Route::post('/kehadiran/commit-fingerprint', [KehadiranController::class, 'commitFingerprint'])->name('admin.kehadiran.commitFingerprint');
 Route::post('/kehadiran/link-biometric-pin', [KehadiranController::class, 'linkBiometricPin'])->name('admin.kehadiran.linkBiometricPin');

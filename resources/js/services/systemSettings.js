@@ -10,15 +10,20 @@ const STORAGE_KEYS = {
 };
 
 export const DEFAULT_SHIFT_SETTINGS = {
-  shiftPagiName: 'Shift Pagi (12 Jam)',
-  shiftPagiIn: '07:00',
-  shiftPagiOut: '19:00',
-  shiftMalamName: 'Shift Malam (12 Jam)',
-  shiftMalamIn: '19:00',
-  shiftMalamOut: '07:00',
-  tukarShiftHour: '07:00 Pagi & 19:00 Malam',
-  durationHours: 12,
-  operatingDaysPerWeek: 7, // 7 hari non-stop tanpa libur operasional
+  shiftPagiName: 'Shift Pagi (08:00 - 17:00)',
+  shiftPagiIn: '08:00',
+  shiftPagiOut: '17:00',
+  shiftPagiOpenIn: '07:00',
+  shiftPagiCloseOut: '18:00',
+  shiftMalamName: 'Shift Malam (20:00 - 05:00)',
+  shiftMalamIn: '20:00',
+  shiftMalamOut: '05:00',
+  shiftMalamOpenIn: '19:00',
+  shiftMalamCloseOut: '06:00',
+  tukarShiftHour: '08:00 Pagi & 20:00 Malam',
+  durationHours: 9,
+  effectiveWorkHours: 8,
+  operatingDaysPerWeek: 7, // 7 hari operasional roster
   rotationModel: 'continuous_alternate', // Kelompok A & B bergantian setiap hari
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import { getShiftSettings } from '@/services/systemSettings.js';
 import {
@@ -48,174 +48,15 @@ import {
   TableSearch,
   TableFilterGroup,
   TableSelect,
+  TablePagination,
   Toast,
 } from '@/components/ui';
 import ModalFormPresensi from './Partials/ModalFormPresensi.jsx';
 import ModalPresensiMassal from './Partials/ModalPresensiMassal.jsx';
 import ModalImporFingerprint from './Partials/ModalImporFingerprint.jsx';
 
-// Data Induk Karyawan HCGA (Sinkron Mariuk & Cimalaka)
-const MASTER_EMPLOYEES = [
-  // --- LOKASI MARIUK (6 Personil) ---
-  {
-    id: 1,
-    name: 'Budi Santoso',
-    nip: 'HC-0101',
-    role: 'Senior Operator Lapangan',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 2,
-    name: 'Dewi Anggraini',
-    nip: 'HC-0104',
-    role: 'Quality Assurance Inspector',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 3,
-    name: 'Hendra Wijaya',
-    nip: 'HC-0105',
-    role: 'Danru Keamanan & K3',
-    division: 'Security & Safety',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-  {
-    id: 4,
-    name: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    role: 'Operator Forklift Utama',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 5,
-    name: 'Eko Prasetyo',
-    nip: 'HC-0107',
-    role: 'Teknisi Maintenance Mesin',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 6,
-    name: 'Joko Susilo',
-    nip: 'HC-0109',
-    role: 'Anggota Patroli Keamanan',
-    division: 'Security & Safety',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-
-  // --- LOKASI CIMALAKA (6 Personil) ---
-  {
-    id: 7,
-    name: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    role: 'Supervisor Operasional Site',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 8,
-    name: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    role: 'Operator Mesin Produksi',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 9,
-    name: 'Dian Kusuma',
-    nip: 'HC-0110',
-    role: 'Petugas Keamanan Site',
-    division: 'Security & Safety',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-  {
-    id: 10,
-    name: 'Rina Marlina',
-    nip: 'HC-0106',
-    role: 'Koordinator Gudang & Logistik',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 11,
-    name: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    role: 'Operator QC Lapangan',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Cuti',
-  },
-  {
-    id: 12,
-    name: 'Nurul Aini',
-    nip: 'HC-0112',
-    role: 'Petugas Inventory Stok',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-];
+// Master data fallback kosong
+const MASTER_EMPLOYEES = [];
 
 // Tanggal hari ini standar WIB (YYYY-MM-DD)
 const getTodayDateString = () => {
@@ -229,228 +70,8 @@ const getTodayDateString = () => {
 
 const DEFAULT_DATE = getTodayDateString();
 
-// Data Awal Presensi Operasional (12 Personil: 6 Mariuk & 6 Cimalaka)
-const INITIAL_ATTENDANCES = [
-  // --- LOKASI MARIUK ---
-  {
-    id: 101,
-    employeeId: 1,
-    employeeName: 'Budi Santoso',
-    nip: 'HC-0101',
-    division: 'Operasional & Lapangan',
-    role: 'Senior Operator Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Hadir',
-    checkIn: '06:48',
-    checkOut: '19:05',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Shift pagi 12 jam berjalan lancar',
-  },
-  {
-    id: 102,
-    employeeId: 2,
-    employeeName: 'Dewi Anggraini',
-    nip: 'HC-0104',
-    division: 'Operasional & Lapangan',
-    role: 'Quality Assurance Inspector',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Hadir',
-    checkIn: '06:52',
-    checkOut: '19:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Inspeksi QC lini Mariuk',
-  },
-  {
-    id: 103,
-    employeeId: 3,
-    employeeName: 'Hendra Wijaya',
-    nip: 'HC-0105',
-    division: 'Security & Safety',
-    role: 'Danru Keamanan & K3',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    date: DEFAULT_DATE,
-    shift: 'Shift Malam (19:00 - 07:00)',
-    status: 'Hadir',
-    checkIn: '18:45',
-    checkOut: '07:05',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Serah terima pos jaga Mariuk jam 19:00',
-  },
-  {
-    id: 104,
-    employeeId: 4,
-    employeeName: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    division: 'Logistik & Gudang',
-    role: 'Operator Forklift Utama',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Terlambat',
-    checkIn: '07:18',
-    checkOut: '19:05',
-    lateMinutes: 18,
-    deviation: '+18m',
-    notes: 'Terkendala armada di rute Mariuk',
-  },
-  {
-    id: 105,
-    employeeId: 5,
-    employeeName: 'Eko Prasetyo',
-    nip: 'HC-0107',
-    division: 'Operasional & Lapangan',
-    role: 'Teknisi Maintenance Mesin',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Hadir',
-    checkIn: '06:50',
-    checkOut: '19:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Maintenance preventif mesin Mariuk',
-  },
-  {
-    id: 106,
-    employeeId: 6,
-    employeeName: 'Joko Susilo',
-    nip: 'HC-0109',
-    division: 'Security & Safety',
-    role: 'Anggota Patroli Keamanan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    date: DEFAULT_DATE,
-    shift: 'Shift Malam (19:00 - 07:00)',
-    status: 'Hadir',
-    checkIn: '18:50',
-    checkOut: '07:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Patroli perimeter malam Mariuk',
-  },
-
-  // --- LOKASI CIMALAKA ---
-  {
-    id: 107,
-    employeeId: 7,
-    employeeName: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    division: 'Operasional & Lapangan',
-    role: 'Supervisor Operasional Site',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Hadir',
-    checkIn: '06:45',
-    checkOut: '19:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Supervisi operasional harian Cimalaka',
-  },
-  {
-    id: 108,
-    employeeId: 8,
-    employeeName: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    division: 'Operasional & Lapangan',
-    role: 'Operator Mesin Produksi',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Hadir',
-    checkIn: '06:55',
-    checkOut: '19:02',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Operasional lini mesin Cimalaka',
-  },
-  {
-    id: 109,
-    employeeId: 9,
-    employeeName: 'Dian Kusuma',
-    nip: 'HC-0110',
-    division: 'Security & Safety',
-    role: 'Petugas Keamanan Site',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    date: DEFAULT_DATE,
-    shift: 'Shift Malam (19:00 - 07:00)',
-    status: 'Hadir',
-    checkIn: '18:55',
-    checkOut: '07:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Jaga pos gerbang utama Cimalaka',
-  },
-  {
-    id: 110,
-    employeeId: 10,
-    employeeName: 'Rina Marlina',
-    nip: 'HC-0106',
-    division: 'Logistik & Gudang',
-    role: 'Koordinator Gudang & Logistik',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Hadir',
-    checkIn: '06:58',
-    checkOut: '19:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Inflow & outflow logistik Cimalaka',
-  },
-  {
-    id: 111,
-    employeeId: 11,
-    employeeName: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    division: 'Operasional & Lapangan',
-    role: 'Operator QC Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    date: DEFAULT_DATE,
-    shift: 'Shift Pagi (07:00 - 19:00)',
-    status: 'Cuti',
-    checkIn: '-',
-    checkOut: '-',
-    lateMinutes: 0,
-    deviation: '-',
-    notes: 'Cuti resmi terencana',
-  },
-  {
-    id: 112,
-    employeeId: 12,
-    employeeName: 'Nurul Aini',
-    nip: 'HC-0112',
-    division: 'Logistik & Gudang',
-    role: 'Petugas Inventory Stok',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    date: DEFAULT_DATE,
-    shift: 'Shift Malam (19:00 - 07:00)',
-    status: 'Hadir',
-    checkIn: '18:48',
-    checkOut: '07:00',
-    lateMinutes: 0,
-    deviation: 'Tepat Waktu',
-    notes: 'Stock opname shift malam Cimalaka',
-  },
-];
+// Data Awal Presensi Kosong
+const INITIAL_ATTENDANCES = [];
 
 export default function CatatanKehadiran({
   dbEmployees = [],
@@ -470,14 +91,15 @@ export default function CatatanKehadiran({
         role: emp.role || emp.position || '-',
         division: emp.division || '-',
         location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+        location_id: emp.location_id,
         group: emp.group || 'Grup A',
-        scheduleCategory: emp.shift?.name || 'Shift Pagi (12 Jam)',
-        checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : '07:00',
-        checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : '19:00',
+        scheduleCategory: emp.shift?.name || 'Shift Pagi (08:00 - 17:00)',
+        checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : '08:00',
+        checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : '17:00',
         status: emp.status || 'Aktif',
       }));
     }
-    return MASTER_EMPLOYEES;
+    return [];
   }, [dbEmployees]);
 
   const initialAttendancesList = useMemo(() => {
@@ -490,10 +112,11 @@ export default function CatatanKehadiran({
         division: att.employee?.division || '-',
         role: att.employee?.role || '-',
         location: att.location?.name || (att.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+        location_id: att.location_id,
         group: att.employee?.group || 'Grup A',
         date: typeof att.date === 'string' ? att.date.slice(0, 10) : new Date(att.date).toISOString().slice(0, 10),
-        shift: att.shift || 'Shift Pagi (12 Jam)',
-        status: att.status,
+        shift: att.shift || att.employee?.shift?.name || 'Shift Pagi (08:00 - 17:00)',
+        status: att.status ? (att.status.charAt(0).toUpperCase() + att.status.slice(1).toLowerCase()) : 'Hadir',
         checkIn: att.check_in_time ? att.check_in_time.slice(0, 5) : '-',
         checkOut: att.check_out_time ? att.check_out_time.slice(0, 5) : '-',
         lateMinutes: att.late_minutes || 0,
@@ -502,11 +125,19 @@ export default function CatatanKehadiran({
         method: att.method || 'fingerprint',
       }));
     }
-    return INITIAL_ATTENDANCES.map((a) => ({ ...a, method: a.method || 'fingerprint' }));
+    return [];
   }, [dbAttendances]);
 
   const [attendances, setAttendances] = useState(initialAttendancesList);
-  const [employees] = useState(initialEmployeesList);
+  const employees = initialEmployeesList;
+
+  useEffect(() => {
+    setAttendances(initialAttendancesList);
+  }, [initialAttendancesList]);
+
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -650,6 +281,18 @@ export default function CatatanKehadiran({
     setFilterShift('ALL');
   };
 
+  // Reset pagination on filter/search/date change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDate, searchQuery, filterLocation, filterStatus, filterDivision, filterShift]);
+
+  const totalFiltered = filteredAttendances.length;
+  const totalPages = Math.ceil(totalFiltered / perPage) || 1;
+  const paginatedAttendances = useMemo(() => {
+    const start = (currentPage - 1) * perPage;
+    return filteredAttendances.slice(start, start + perPage);
+  }, [filteredAttendances, currentPage, perPage]);
+
   // CRUD Actions
   const handleOpenAdd = () => {
     setEditingData(null);
@@ -662,84 +305,94 @@ export default function CatatanKehadiran({
   };
 
   const handleSaveRecord = (recordData) => {
-    setAttendances((prev) => {
-      const index = prev.findIndex(
-        (a) => a.id === recordData.id || (a.employeeId === recordData.employeeId && a.date === recordData.date)
-      );
-      if (index >= 0) {
-        const copy = [...prev];
-        copy[index] = { ...copy[index], ...recordData, method: recordData.method || 'manual_admin' };
-        return copy;
-      }
-      return [{ ...recordData, method: recordData.method || 'manual_admin' }, ...prev];
+    const payload = {
+      employee_id: recordData.employeeId,
+      date: recordData.date,
+      check_in_time: recordData.checkIn && recordData.checkIn !== '-' ? recordData.checkIn : null,
+      check_out_time: recordData.checkOut && recordData.checkOut !== '-' ? recordData.checkOut : null,
+      status: recordData.status,
+      late_minutes: recordData.lateMinutes || 0,
+      notes: recordData.notes || 'Input manual admin',
+    };
+
+    router.post('/kehadiran/manual', payload, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showAlert(`Catatan presensi untuk ${recordData.employeeName} berhasil disimpan.`);
+        setIsFormOpen(false);
+      },
+      onError: (err) => {
+        showAlert('Gagal menyimpan presensi: ' + Object.values(err).join(', '), 'error');
+      },
     });
-    showAlert(`Catatan presensi untuk ${recordData.employeeName} berhasil disimpan.`);
   };
 
   const handleFingerprintImportSuccess = (importedRecords) => {
     if (!importedRecords || importedRecords.length === 0) return;
 
-    setAttendances((prev) => {
-      let updated = [...prev];
-      importedRecords.forEach((newRec) => {
-        const idx = updated.findIndex(
-          (a) => a.employeeId === newRec.employeeId && a.date === newRec.date
-        );
-        const recordWithId = {
-          ...newRec,
-          id: newRec.id || Date.now() + newRec.employeeId,
-          deviation: newRec.lateMinutes > 0 ? `+${newRec.lateMinutes}m` : 'Tepat Waktu',
-          method: 'fingerprint',
-        };
-        if (idx >= 0) {
-          updated[idx] = { ...updated[idx], ...recordWithId };
-        } else {
-          updated.unshift(recordWithId);
-        }
-      });
-      return updated;
-    });
+    const payloadRecords = importedRecords.map((r) => ({
+      employee_id: r.employeeId || r.employee_id,
+      date: r.date,
+      check_in_time: (r.checkIn && r.checkIn !== '-') ? r.checkIn : (r.check_in_time || null),
+      check_out_time: (r.checkOut && r.checkOut !== '-') ? r.checkOut : (r.check_out_time || null),
+      status: r.status ? r.status.toLowerCase() : 'hadir',
+      late_minutes: r.lateMinutes ?? r.late_minutes ?? 0,
+      work_duration_hours: (r.checkIn && r.checkOut && r.checkIn !== '-' && r.checkOut !== '-') ? 8.0 : 0,
+      location_id: r.location_id || (r.location?.includes('Mariuk') ? 1 : 2),
+      anomaly_reason: r.anomalyReason || r.anomaly_reason || null,
+    }));
 
-    showAlert(`Berhasil mengimpor ${importedRecords.length} log presensi biometric fingerprint.`);
+    if (importedRecords[0]?.date) {
+      setSelectedDate(importedRecords[0].date);
+    }
+
+    router.post('/kehadiran/commit-fingerprint', {
+      batch_id: `FP-${Date.now()}`,
+      records: payloadRecords,
+    }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showAlert(`Berhasil menyimpan ${importedRecords.length} log presensi biometric fingerprint ke database.`);
+        setIsFingerprintOpen(false);
+      },
+      onError: (err) => {
+        showAlert('Gagal menyimpan log presensi fingerprint: ' + Object.values(err).join(', '), 'error');
+      },
+    });
   };
 
   const handleDeleteRecord = (id, name) => {
     if (confirm(`Hapus catatan kehadiran untuk ${name}?`)) {
-      setAttendances((prev) => prev.filter((a) => a.id !== id));
-      showAlert(`Catatan kehadiran ${name} berhasil dihapus.`, 'warning');
+      router.delete(`/kehadiran/${id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+          showAlert(`Catatan kehadiran ${name} berhasil dihapus.`, 'warning');
+        },
+        onError: () => {
+          showAlert(`Gagal menghapus catatan kehadiran ${name}.`, 'error');
+        },
+      });
     }
   };
 
   // Presensi Massal
   const handleExecuteMass = ({ date, employees: targetEmps, checkInTime }) => {
-    const newRecords = targetEmps.map((emp) => ({
-      id: Date.now() + emp.id,
-      employeeId: emp.id,
-      employeeName: emp.name,
-      nip: emp.nip,
-      division: emp.division,
-      role: emp.role,
-      location: emp.location || 'Lokasi Mariuk',
+    if (!targetEmps || targetEmps.length === 0) return;
+
+    router.post('/kehadiran/mass', {
       date,
-      shift: emp.scheduleCategory || 'Shift Pagi (12 Jam)',
-      status: 'Hadir',
-      checkIn: checkInTime,
-      checkOut: emp.checkOutTime || '19:00',
-      lateMinutes: 0,
-      deviation: 'Tepat Waktu',
-      notes: 'Presensi massal operasional',
-    }));
-
-    setAttendances((prev) => {
-      // Hilangkan data lama untuk karyawan & tanggal yang sama
-      const targetEmpIds = new Set(targetEmps.map((e) => e.id));
-      const remaining = prev.filter(
-        (a) => !(targetEmpIds.has(a.employeeId) && a.date === date)
-      );
-      return [...newRecords, ...remaining];
+      check_in_time: checkInTime,
+      employee_ids: targetEmps.map((e) => e.id),
+    }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showAlert(`Berhasil mencatat presensi massal untuk ${targetEmps.length} karyawan.`);
+        setIsMassOpen(false);
+      },
+      onError: (err) => {
+        showAlert('Gagal mencatat presensi massal: ' + Object.values(err).join(', '), 'error');
+      },
     });
-
-    showAlert(`Berhasil mencatat presensi massal untuk ${targetEmps.length} karyawan.`);
   };
 
   // Ekspor Excel via SheetJS
@@ -862,7 +515,7 @@ export default function CatatanKehadiran({
               )}
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Roster 12 Jam (24/7): {shiftSettings.shiftPagiName} ({shiftSettings.shiftPagiIn}–{shiftSettings.shiftPagiOut}) & {shiftSettings.shiftMalamName} ({shiftSettings.shiftMalamIn}–{shiftSettings.shiftMalamOut}) · Lokasi Mariuk & Cimalaka
+              Roster 9 Jam: {shiftSettings.shiftPagiName} ({shiftSettings.shiftPagiIn}–{shiftSettings.shiftPagiOut}) & {shiftSettings.shiftMalamName} ({shiftSettings.shiftMalamIn}–{shiftSettings.shiftMalamOut}) · Lokasi Mariuk & Cimalaka
             </p>
           </div>
         </div>
@@ -1181,7 +834,7 @@ export default function CatatanKehadiran({
                   </div>
                 </TableEmpty>
               ) : (
-                filteredAttendances.map((rec, index) => {
+                paginatedAttendances.map((rec, index) => {
                   const isLate = rec.status === 'Terlambat';
                   const isPresent = rec.status === 'Hadir';
 
@@ -1192,7 +845,7 @@ export default function CatatanKehadiran({
                     >
                       {/* 1. No */}
                       <TableCell className="text-center text-xs text-slate-400 font-mono">
-                        {index + 1}
+                        {(currentPage - 1) * perPage + index + 1}
                       </TableCell>
 
                       {/* 2. Karyawan */}
@@ -1332,13 +985,28 @@ export default function CatatanKehadiran({
               )}
             </TableBody>
           </Table>
+
+          {/* Atomic Table Pagination */}
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalRows={totalFiltered}
+            perPage={perPage}
+            onPageChange={setCurrentPage}
+            onPerPageChange={(newPerPage) => {
+              setPerPage(newPerPage);
+              setCurrentPage(1);
+            }}
+          />
         </CardContent>
 
         {/* Footer Info Card */}
         <div className="p-4 bg-slate-50/60 border-t border-slate-100 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span>
-            Menampilkan <strong>{filteredAttendances.length}</strong> dari{' '}
-            <strong>{currentDayAttendances.length}</strong> catatan presensi terdaftar.
+            Menampilkan <strong>{totalFiltered > 0 ? (currentPage - 1) * perPage + 1 : 0}</strong>–
+            <strong>{Math.min(currentPage * perPage, totalFiltered)}</strong> dari{' '}
+            <strong>{totalFiltered}</strong> hasil filter (
+            <strong>{currentDayAttendances.length}</strong> total presensi hari ini).
           </span>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5">
