@@ -33,6 +33,7 @@ class AttendanceSeeder extends Seeder
 
         if (! empty($allRecords)) {
             Attendance::where('import_batch_id', 'BATCH-INITIAL-REAL-LOG')->delete();
+            Attendance::where('import_batch_id', 'BATCH-INITIAL-REAL-LOG')->delete();
             $service->commitRecords($allRecords, 'BATCH-INITIAL-REAL-LOG');
         }
     }

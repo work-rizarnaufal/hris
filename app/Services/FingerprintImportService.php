@@ -51,9 +51,16 @@ class FingerprintImportService
                 continue;
             }
 
+            $type = trim((string) ($scan['Tipe Absensi'] ?? $scan['type'] ?? ''));
+
             try {
                 $carbon = Carbon::parse($ts);
-                $scansByPin[$pin][] = $carbon;
+                $scansByPin[$pin][] = [
+                    'carbon' => $carbon,
+                    'time' => $carbon->format('H:i'),
+                    'type' => $type,
+                    'timestamp' => $carbon->timestamp,
+                ];
             } catch (\Exception $e) {
                 // Ignore invalid date format
             }
@@ -63,31 +70,31 @@ class FingerprintImportService
         $anomalies = [];
         $unmappedPins = [];
 
-        foreach ($scansByPin as $pin => $timestamps) {
+        foreach ($scansByPin as $pin => $items) {
             $employee = $empByPin[$pin] ?? null;
 
             if (! $employee) {
                 $unmappedPins[] = [
                     'pin' => $pin,
-                    'total_scans' => count($timestamps),
-                    'sample_scan' => $timestamps[0]->format('Y-m-d H:i:s'),
+                    'total_scans' => count($items),
+                    'sample_scan' => $items[0]['carbon']->format('Y-m-d H:i:s'),
                 ];
 
                 continue;
             }
 
             // Deduplicate scans: ignore duplicate scans within 5 minutes (300 seconds)
-            usort($timestamps, fn ($a, $b) => $a->timestamp <=> $b->timestamp);
+            usort($items, fn ($a, $b) => $a['timestamp'] <=> $b['timestamp']);
             $deduped = [];
-            foreach ($timestamps as $t) {
+            foreach ($items as $item) {
                 if (empty($deduped)) {
-                    $deduped[] = $t;
+                    $deduped[] = $item;
 
                     continue;
                 }
                 $last = $deduped[count($deduped) - 1];
-                if (($t->timestamp - $last->timestamp) >= 300) {
-                    $deduped[] = $t;
+                if (($item['timestamp'] - $last['timestamp']) >= 300) {
+                    $deduped[] = $item;
                 }
             }
 
@@ -130,20 +137,22 @@ class FingerprintImportService
 
         // Kelompokkan timestamps per tanggal kalender scan
         $byDate = [];
-        foreach ($timestamps as $t) {
-            $byDate[$t->format('Y-m-d')][] = $t;
+        foreach ($timestamps as $item) {
+            $t = $item['carbon'];
+            $byDate[$t->format('Y-m-d')][] = $item;
         }
 
-        foreach ($byDate as $dateStr => $dayTimestamps) {
-            usort($dayTimestamps, fn ($a, $b) => $a->timestamp <=> $b->timestamp);
+        foreach ($byDate as $dateStr => $dayItems) {
+            usort($dayItems, fn ($a, $b) => $a['timestamp'] <=> $b['timestamp']);
 
             // 1. Scan dini hari (<= 06:15): Pulang dinas Shift Malam kemarin jika tidak ada scan pagi
-            $earlyMorningOuts = array_filter($dayTimestamps, fn ($t) => $t->format('H:i') <= '06:15');
-            $hasDaytimeScans = ! empty(array_filter($dayTimestamps, fn ($t) => $t->format('H:i') > '06:15' && $t->format('H:i') < '14:00'));
+            $earlyMorningOuts = array_filter($dayItems, fn ($item) => $item['time'] <= '06:15');
+            $hasDaytimeScans = ! empty(array_filter($dayItems, fn ($item) => $item['time'] > '06:15' && $item['time'] < '14:00'));
 
             if (! empty($earlyMorningOuts) && ! $hasDaytimeScans) {
                 $prevDate = Carbon::parse($dateStr)->subDay()->format('Y-m-d');
-                $lastOut = end($earlyMorningOuts)->format('H:i');
+                $lastOutItem = end($earlyMorningOuts);
+                $lastOut = $lastOutItem['time'];
 
                 $records[] = [
                     'employee_id' => $employee->id,
@@ -167,18 +176,18 @@ class FingerprintImportService
             }
 
             // 2. Scan pada hari aktif (> 06:15)
-            $activeScans = array_values(array_filter($dayTimestamps, fn ($t) => $t->format('H:i') > '06:15'));
+            $activeScans = array_values(array_filter($dayItems, fn ($item) => $item['time'] > '06:15'));
             if (empty($activeScans)) {
                 continue;
             }
 
-            $morningScans = array_values(array_filter($activeScans, fn ($t) => $t->format('H:i') < '14:00'));
-            $departureScans = array_values(array_filter($activeScans, fn ($t) => $t->format('H:i') >= '14:00'));
-            $isEveningOnly = empty($morningScans) && ! empty($departureScans) && ($departureScans[0]->format('H:i') >= '18:30');
+            $morningScans = array_values(array_filter($activeScans, fn ($item) => $item['time'] < '14:00'));
+            $departureScans = array_values(array_filter($activeScans, fn ($item) => $item['time'] >= '14:00'));
+            $isEveningOnly = empty($morningScans) && ! empty($departureScans) && ($departureScans[0]['time'] >= '18:30');
 
             if ($isEveningOnly) {
                 // Masuk dinas Shift Malam hari ini (menunggu scan pulang besok pagi)
-                $firstIn = $departureScans[0]->format('H:i');
+                $firstIn = $departureScans[0]['time'];
                 [$inH, $inM] = explode(':', $firstIn);
                 $inMin = ((int) $inH * 60) + (int) $inM;
                 $targetMin = 20 * 60; // 20:00 WIB
@@ -206,8 +215,20 @@ class FingerprintImportService
                 ];
             } else {
                 // Shift Pagi (08:00 - 17:00)
-                $firstIn = ! empty($morningScans) ? $morningScans[0]->format('H:i') : null;
-                $lastOut = ! empty($departureScans) ? end($departureScans)->format('H:i') : null;
+                $firstIn = ! empty($morningScans) ? $morningScans[0]['time'] : null;
+
+                // Prioritaskan scan yang secara eksplisit bertipe 'Absensi Pulang'
+                $explicitOutScans = array_values(array_filter($departureScans, fn ($item) => str_contains(strtolower($item['type']), 'pulang')));
+                $lastOut = null;
+                if (! empty($explicitOutScans)) {
+                    $lastOut = end($explicitOutScans)['time'];
+                } elseif (! empty($departureScans)) {
+                    $lastOut = end($departureScans)['time'];
+                }
+
+                // Cek apakah ada scan masuk malam lanjutan
+                $nightInScans = array_values(array_filter($departureScans, fn ($item) => $item['time'] >= '18:30' && str_contains(strtolower($item['type']), 'masuk')));
+                $nightInNote = ! empty($nightInScans) ? ' (Tercatat Tap Masuk Malam: '.end($nightInScans)['time'].')' : '';
 
                 $late = 0;
                 $status = 'hadir';
@@ -225,12 +246,12 @@ class FingerprintImportService
                 $anomalyReason = null;
                 if ($firstIn && ! $lastOut) {
                     $isAnomaly = true;
-                    $anomalyReason = 'Lupa Scan Pulang (Missing Out)';
+                    $anomalyReason = 'Lupa Scan Pulang (Missing Out)'.$nightInNote;
                 } elseif (! $firstIn && $lastOut) {
                     $isAnomaly = true;
-                    $anomalyReason = 'Lupa Scan Masuk (Missing In)';
-                } elseif (! empty($departureScans) && end($departureScans)->format('H:i') >= '18:30') {
-                    $anomalyReason = 'Hadir (Termasuk lembur dinas sore/malam s/d '.$lastOut.')';
+                    $anomalyReason = 'Lupa Scan Masuk (Missing In)'.$nightInNote;
+                } else {
+                    $anomalyReason = 'Hadir Lengkap (Masuk '.$firstIn.', Pulang '.$lastOut.')'.$nightInNote;
                 }
 
                 $records[] = [
@@ -278,6 +299,7 @@ class FingerprintImportService
                     'check_in_time' => $row['check_in_time'] ?? null,
                     'check_out_time' => $row['check_out_time'] ?? null,
                     'status' => $row['status'] ?? 'hadir',
+                    'shift' => $row['shift_name'] ?? null,
                     'late_minutes' => $row['late_minutes'] ?? 0,
                     'work_duration_hours' => $row['work_duration_hours'] ?? 0,
                     'location_id' => $row['location_id'] ?? null,

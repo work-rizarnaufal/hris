@@ -1,8 +1,8 @@
 {
   "0": "@inertiajs/react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "App\\Http\\Controllers\\Admin\\KehadiranController",
-  "5": "web.php",
+  "4": "FingerprintImportService.php",
+  "5": "User",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
   "13": "cn",
@@ -11,10 +11,8 @@
   "41": "PengaturanSistem.jsx",
   "42": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "43": "Illuminate\\Database\\Seeder",
-  "44": "App\\Http\\Controllers\\Admin\\PengaturanController",
-  "45": "App\\Http\\Controllers\\Admin\\KaryawanController",
-  "46": "HandleInertiaRequests.php",
+  "44": "Illuminate\\Http\\Request",
   "47": "sidebar.jsx",
   "48": "Location",
-  "52": "App\\Models\\Employee"
+  "52": "App\\Models\\Shift"
 }

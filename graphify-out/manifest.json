@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795281892.2342799,
-    "seen": 1795283155.4860735,
-    "ast_hash": "e0cb7e35181b3e5bb061d1ffed8f1682",
+    "mtime": 1795283195.1722612,
+    "seen": 1795284806.2120507,
+    "ast_hash": "3632a1618d0b1ac34f7263a5233d9f3c",
     "semantic_hash": ""
   },
   "README.md": {
@@ -570,9 +570,9 @@
     "semantic_hash": ""
   },
   "app/Models/Attendance.php": {
-    "mtime": 1795272597.7084274,
-    "seen": 1795273395.922694,
-    "ast_hash": "2d17561a22f54a606f817e369c3edbf5",
+    "mtime": 1795284595.6648521,
+    "seen": 1795284806.2120507,
+    "ast_hash": "9089b87b20fa8c4b5ebbfe52ad4c273d",
     "semantic_hash": ""
   },
   "app/Models/Employee.php": {
@@ -726,15 +726,15 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/KehadiranController.php": {
-    "mtime": 1795281381.4563503,
-    "seen": 1795281866.7137282,
-    "ast_hash": "548f1ec46278f8bd3cd0c057d933c8f7",
+    "mtime": 1795284763.1265688,
+    "seen": 1795284806.2120507,
+    "ast_hash": "8d7017d6a1ef16e95bc9bd55075dfd46",
     "semantic_hash": ""
   },
   "app/Services/FingerprintImportService.php": {
-    "mtime": 1795282400.2422223,
-    "seen": 1795283155.4847665,
-    "ast_hash": "3e6e26ca6d4c926dcf62f3007d5593ac",
+    "mtime": 1795284717.421904,
+    "seen": 1795284806.2120507,
+    "ast_hash": "2f5a0573f6bdf63c00d7b9a96fa770e8",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx": {
@@ -768,9 +768,15 @@
     "semantic_hash": ""
   },
   "database/seeders/AttendanceSeeder.php": {
-    "mtime": 1795282407.2817583,
-    "seen": 1795283155.4847665,
-    "ast_hash": "d861caefe68bb42c50cdf2ffff2234ae",
+    "mtime": 1795284782.311473,
+    "seen": 1795284806.2120507,
+    "ast_hash": "d14d798058c683c28182500eedd137b7",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_22_010938_add_shift_to_attendances_table.php": {
+    "mtime": 1795284585.8964016,
+    "seen": 1795284806.2120507,
+    "ast_hash": "12e9fb7fa50f24236ce1ec5508a0d254",
     "semantic_hash": ""
   },
   "package-lock.json": {
