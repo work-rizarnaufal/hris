@@ -197,7 +197,7 @@ const TablePagination = React.forwardRef(({
     <div
       ref={ref}
       className={cn(
-        'p-3.5 border-t border-slate-200/80 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600',
+        'p-4 border-t border-slate-200/80 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 text-xs sm:text-sm text-slate-600',
         className
       )}
       {...props}
@@ -213,12 +213,12 @@ const TablePagination = React.forwardRef(({
 
         {/* Pilihan Baris per Halaman */}
         {onItemsPerPageChange && (
-          <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200">
-            <span className="text-[11px] text-slate-500">Tampilkan:</span>
+          <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
+            <span className="text-xs sm:text-sm text-slate-500 font-medium">Tampilkan:</span>
             <select
               value={itemsPerPage}
               onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-              className="h-7 text-xs bg-white border border-slate-200 rounded-md px-2 py-0.5 text-slate-700 font-medium focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer transition-all"
+              className="h-8 text-xs sm:text-sm bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 font-medium focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer transition-all shadow-2xs"
             >
               {perPageOptions.map((opt) => (
                 <option key={opt} value={opt}>
@@ -232,15 +232,15 @@ const TablePagination = React.forwardRef(({
 
       {/* Navigasi Nomor Halaman */}
       {totalPages > 1 && (
-        <div className="flex items-center gap-1 self-center sm:self-auto">
+        <div className="flex items-center gap-1.5 self-center sm:self-auto">
           <button
             type="button"
             disabled={currentPage <= 1}
             onClick={() => onPageChange(currentPage - 1)}
-            className="h-7.5 px-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs font-medium hover:bg-slate-50 hover:text-navy disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1 shadow-2xs"
+            className="h-8.5 px-3 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs sm:text-sm font-medium hover:bg-slate-50 hover:text-navy disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5 shadow-2xs"
             title="Halaman Sebelumnya"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Sebelumnya</span>
           </button>
 
@@ -248,7 +248,7 @@ const TablePagination = React.forwardRef(({
             {getPageNumbers().map((p, idx) => {
               if (p === '...') {
                 return (
-                  <span key={`ellipsis-${idx}`} className="px-1.5 text-slate-400 text-xs">
+                  <span key={`ellipsis-${idx}`} className="px-1.5 text-slate-400 text-xs sm:text-sm">
                     ...
                   </span>
                 );
@@ -260,7 +260,7 @@ const TablePagination = React.forwardRef(({
                   type="button"
                   onClick={() => onPageChange(p)}
                   className={cn(
-                    'w-7.5 h-7.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center',
+                    'min-w-[34px] h-8.5 px-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center',
                     isActive
                       ? 'bg-navy text-white shadow-xs'
                       : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs'
@@ -276,11 +276,11 @@ const TablePagination = React.forwardRef(({
             type="button"
             disabled={currentPage >= totalPages}
             onClick={() => onPageChange(currentPage + 1)}
-            className="h-7.5 px-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs font-medium hover:bg-slate-50 hover:text-navy disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1 shadow-2xs"
+            className="h-8.5 px-3 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs sm:text-sm font-medium hover:bg-slate-50 hover:text-navy disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5 shadow-2xs"
             title="Halaman Berikutnya"
           >
             <span className="hidden sm:inline">Berikutnya</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       )}
