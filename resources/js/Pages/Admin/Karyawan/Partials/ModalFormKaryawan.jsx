@@ -21,6 +21,7 @@ import {
   Button,
   Input,
 } from '@/components/ui';
+import { getLocations, getShiftSettings } from '@/services/systemSettings.js';
 
 const DIVISIONS = [
   'Operasional & Lapangan',
@@ -31,38 +32,9 @@ const DIVISIONS = [
   'Keuangan & Akuntansi',
 ];
 
-const LOCATIONS = [
-  { value: 'Lokasi Mariuk', label: '📍 Lokasi Mariuk (Pabrik 1)', badgeColor: 'amber' },
-  { value: 'Lokasi Cimalaka', label: '📍 Lokasi Cimalaka (Pabrik 2)', badgeColor: 'indigo' },
-];
-
 const GROUPS = [
   { value: 'Grup A', label: 'Grup A (Rotasi Hari Ganjil)', desc: 'Senin, Rabu, Jumat, Minggu' },
   { value: 'Grup B', label: 'Grup B (Rotasi Hari Genap)', desc: 'Selasa, Kamis, Sabtu' },
-];
-
-const SCHEDULE_PRESETS = [
-  {
-    label: 'Shift Pagi: 12 Jam (07:00 - 19:00)',
-    cat: 'Shift Pagi (12 Jam)',
-    in: '07:00',
-    out: '19:00',
-    desc: 'Operasional siang 24/7 non-stop',
-  },
-  {
-    label: 'Shift Malam: 12 Jam (19:00 - 07:00)',
-    cat: 'Shift Malam (12 Jam)',
-    in: '19:00',
-    out: '07:00',
-    desc: 'Operasional malam 24/7 non-stop',
-  },
-  {
-    label: 'Fleksibel Operasional (08:00 - 17:00)',
-    cat: 'Fleksibel',
-    in: '08:00',
-    out: '17:00',
-    desc: 'Staf pendukung kantor & GA',
-  },
 ];
 
 export default function ModalFormKaryawan({
@@ -73,33 +45,75 @@ export default function ModalFormKaryawan({
 }) {
   const isEditing = Boolean(initialData?.id);
 
+  const availableLocations = useMemo(() => {
+    const locs = getLocations();
+    return locs.map((loc) => ({
+      value: loc.name,
+      label: `📍 ${loc.name} (${loc.type || 'Pabrik'})`,
+      badgeColor: loc.name.includes('Mariuk') ? 'amber' : loc.name.includes('Cimalaka') ? 'indigo' : 'slate',
+    }));
+  }, [isOpen]);
+
+  const schedulePresets = useMemo(() => {
+    const s = getShiftSettings();
+    return [
+      {
+        label: `${s.shiftPagiName}: 12 Jam (${s.shiftPagiIn} - ${s.shiftPagiOut})`,
+        cat: 'Shift Pagi (12 Jam)',
+        in: s.shiftPagiIn,
+        out: s.shiftPagiOut,
+        desc: 'Operasional siang 24/7 non-stop',
+      },
+      {
+        label: `${s.shiftMalamName}: 12 Jam (${s.shiftMalamIn} - ${s.shiftMalamOut})`,
+        cat: 'Shift Malam (12 Jam)',
+        in: s.shiftMalamIn,
+        out: s.shiftMalamOut,
+        desc: 'Operasional malam 24/7 non-stop',
+      },
+      {
+        label: 'Fleksibel Operasional (08:00 - 17:00)',
+        cat: 'Fleksibel',
+        in: '08:00',
+        out: '17:00',
+        desc: 'Staf pendukung kantor & GA',
+      },
+    ];
+  }, [isOpen]);
+
+  const defaultLoc = availableLocations[0]?.value || 'Lokasi Mariuk';
+  const defaultPreset = schedulePresets[0];
+
   const [formData, setFormData] = useState({
     name: '',
     nip: '',
     role: '',
     division: DIVISIONS[0],
-    location: LOCATIONS[0].value,
+    location: defaultLoc,
     group: GROUPS[0].value,
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
+    scheduleCategory: defaultPreset.cat,
+    checkInTime: defaultPreset.in,
+    checkOutTime: defaultPreset.out,
     status: 'Aktif',
   });
 
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    const curLoc = availableLocations[0]?.value || 'Lokasi Mariuk';
+    const curPreset = schedulePresets[0];
+
     if (initialData) {
       setFormData({
         name: initialData.name || '',
         nip: initialData.nip || '',
         role: initialData.role || '',
         division: initialData.division || DIVISIONS[0],
-        location: initialData.location || LOCATIONS[0].value,
+        location: initialData.location || curLoc,
         group: initialData.group || GROUPS[0].value,
-        scheduleCategory: initialData.scheduleCategory || 'Shift Pagi (12 Jam)',
-        checkInTime: initialData.checkInTime || '07:00',
-        checkOutTime: initialData.checkOutTime || '19:00',
+        scheduleCategory: initialData.scheduleCategory || curPreset.cat,
+        checkInTime: initialData.checkInTime || curPreset.in,
+        checkOutTime: initialData.checkOutTime || curPreset.out,
         status: initialData.status || 'Aktif',
       });
     } else {
@@ -108,16 +122,16 @@ export default function ModalFormKaryawan({
         nip: `HC-${String(Math.floor(100 + Math.random() * 900))}`,
         role: '',
         division: DIVISIONS[0],
-        location: LOCATIONS[0].value,
+        location: curLoc,
         group: GROUPS[0].value,
-        scheduleCategory: 'Shift Pagi (12 Jam)',
-        checkInTime: '07:00',
-        checkOutTime: '19:00',
+        scheduleCategory: curPreset.cat,
+        checkInTime: curPreset.in,
+        checkOutTime: curPreset.out,
         status: 'Aktif',
       });
     }
     setErrors({});
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, availableLocations, schedulePresets]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -369,7 +383,7 @@ export default function ModalFormKaryawan({
                   Lokasi Pabrik / Site Penempatan <span className="text-rose-500">*</span>
                 </label>
                 <div className="space-y-2">
-                  {LOCATIONS.map((loc) => {
+                  {availableLocations.map((loc) => {
                     const isSelected = formData.location === loc.value;
                     return (
                       <button
@@ -443,7 +457,7 @@ export default function ModalFormKaryawan({
                 Pilih Preset Shift Standar
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {SCHEDULE_PRESETS.map((preset) => {
+                {schedulePresets.map((preset) => {
                   const isCurrent = formData.scheduleCategory === preset.cat;
                   return (
                     <button

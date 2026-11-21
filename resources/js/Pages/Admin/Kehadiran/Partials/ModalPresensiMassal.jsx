@@ -1,12 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Users, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@/components/ui';
-
-const TARGET_OPTIONS = [
-  { value: 'ALL', label: 'Seluruh Karyawan Terjadwal' },
-  { value: 'Shift Pagi (12 Jam)', label: 'Shift Pagi: 12 Jam (07:00 - 19:00)' },
-  { value: 'Shift Malam (12 Jam)', label: 'Shift Malam: 12 Jam (19:00 - 07:00)' },
-];
+import { getShiftSettings } from '@/services/systemSettings.js';
 
 export default function ModalPresensiMassal({
   isOpen,
@@ -16,10 +11,25 @@ export default function ModalPresensiMassal({
   currentDate = '',
   existingAttendances = [],
 }) {
+  const [shifts, setShifts] = useState(() => getShiftSettings());
   const [targetGroup, setTargetGroup] = useState('ALL');
   const [date, setDate] = useState(currentDate);
-  const [checkInTime, setCheckInTime] = useState('07:00');
+  const [checkInTime, setCheckInTime] = useState(() => getShiftSettings().shiftPagiIn || '07:00');
   const [onlyUnrecorded, setOnlyUnrecorded] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      const current = getShiftSettings();
+      setShifts(current);
+      setCheckInTime(current.shiftPagiIn || '07:00');
+    }
+  }, [isOpen]);
+
+  const targetOptions = useMemo(() => [
+    { value: 'ALL', label: 'Seluruh Karyawan Terjadwal' },
+    { value: 'Shift Pagi (12 Jam)', label: `${shifts.shiftPagiName} (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})` },
+    { value: 'Shift Malam (12 Jam)', label: `${shifts.shiftMalamName} (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})` },
+  ], [shifts]);
 
   // Filter affected employees
   const targetEmployees = React.useMemo(() => {
@@ -87,7 +97,7 @@ export default function ModalPresensiMassal({
               onChange={(e) => setTargetGroup(e.target.value)}
               className="w-full text-xs rounded-xl border-slate-200 bg-white px-3 py-2.5 focus:border-navy focus:ring-navy transition-all"
             >
-              {TARGET_OPTIONS.map((opt) => (
+              {targetOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>

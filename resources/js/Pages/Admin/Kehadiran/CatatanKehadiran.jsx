@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
+import { getShiftSettings } from '@/services/systemSettings.js';
 import {
   CalendarCheck,
   Calendar,
@@ -460,6 +461,17 @@ export default function CatatanKehadiran() {
   const [filterDivision, setFilterDivision] = useState('ALL');
   const [filterShift, setFilterShift] = useState('ALL');
 
+  // Konfigurasi Shift yang Disinkronkan dari Modul Pengaturan Sistem
+  const [shiftSettings, setShiftSettings] = useState(() => getShiftSettings());
+
+  useEffect(() => {
+    const handleSync = () => {
+      setShiftSettings(getShiftSettings());
+    };
+    window.addEventListener('hris:settings-updated', handleSync);
+    return () => window.removeEventListener('hris:settings-updated', handleSync);
+  }, []);
+
   // Modal States
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState(null);
@@ -760,7 +772,7 @@ export default function CatatanKehadiran() {
               )}
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Roster 12 Jam (24/7): Shift Pagi (07:00–19:00) & Shift Malam (19:00–07:00) · Lokasi Mariuk & Cimalaka
+              Roster 12 Jam (24/7): {shiftSettings.shiftPagiName} ({shiftSettings.shiftPagiIn}–{shiftSettings.shiftPagiOut}) & {shiftSettings.shiftMalamName} ({shiftSettings.shiftMalamIn}–{shiftSettings.shiftMalamOut}) · Lokasi Mariuk & Cimalaka
             </p>
           </div>
         </div>
@@ -966,8 +978,8 @@ export default function CatatanKehadiran() {
               title="Filter Shift"
             >
               <option value="ALL">Semua Shift</option>
-              <option value="Pagi">Shift Pagi (07:00 - 19:00)</option>
-              <option value="Malam">Shift Malam (19:00 - 07:00)</option>
+              <option value="Pagi">{shiftSettings.shiftPagiName} ({shiftSettings.shiftPagiIn} - {shiftSettings.shiftPagiOut})</option>
+              <option value="Malam">{shiftSettings.shiftMalamName} ({shiftSettings.shiftMalamIn} - {shiftSettings.shiftMalamOut})</option>
             </TableSelect>
 
             {/* Reset Button */}

@@ -18,6 +18,7 @@ import {
   Button,
   Input,
 } from '@/components/ui';
+import { getShiftSettings, getAttendanceSettings } from '@/services/systemSettings.js';
 
 const STATUS_OPTIONS = [
   { value: 'Hadir', label: 'Hadir (Tepat Waktu)' },
@@ -27,6 +28,26 @@ const STATUS_OPTIONS = [
   { value: 'Cuti', label: 'Cuti Tahunan / Bersama' },
   { value: 'Alpha', label: 'Alpha (Mangkir)' },
 ];
+
+export function getDynamicShiftOptions() {
+  const shifts = getShiftSettings();
+  return [
+    {
+      value: `Shift Pagi (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
+      label: `${shifts.shiftPagiName}: 12 Jam (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
+      startTime: shifts.shiftPagiIn,
+      endTime: shifts.shiftPagiOut,
+      type: 'Pagi',
+    },
+    {
+      value: `Shift Malam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
+      label: `${shifts.shiftMalamName}: 12 Jam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
+      startTime: shifts.shiftMalamIn,
+      endTime: shifts.shiftMalamOut,
+      type: 'Malam',
+    },
+  ];
+}
 
 export const SHIFT_OPTIONS = [
   {
@@ -46,12 +67,13 @@ export const SHIFT_OPTIONS = [
 ];
 
 export function resolveShiftConfig(shiftStr) {
-  if (!shiftStr) return SHIFT_OPTIONS[0];
+  const options = getDynamicShiftOptions();
+  if (!shiftStr) return options[0];
   const s = String(shiftStr).toLowerCase();
-  if (s.includes('malam') || s.includes('19:00')) {
-    return SHIFT_OPTIONS[1];
+  if (s.includes('malam') || s.includes(options[1].startTime) || s.includes('19:00')) {
+    return options[1];
   }
-  return SHIFT_OPTIONS[0];
+  return options[0];
 }
 
 const isValidTime = (val) => Boolean(val && /^\d{2}:\d{2}$/.test(val));
@@ -65,6 +87,9 @@ export function calculateTardiness(checkInTime, shiftStr) {
   const shiftConfig = resolveShiftConfig(shiftStr);
   const [startH, startM] = shiftConfig.startTime.split(':').map(Number);
   const shiftStartMinute = startH * 60 + startM;
+
+  const attendanceSettings = getAttendanceSettings();
+  const tolerance = attendanceSettings.lateToleranceMinutes || 0;
 
   let diff = 0;
 
@@ -82,11 +107,22 @@ export function calculateTardiness(checkInTime, shiftStr) {
     diff = checkInMinute - shiftStartMinute;
   }
 
-  if (diff > 0) {
+  // Jika keterlambatan melampaui toleransi yang ditentukan di Pengaturan
+  if (diff > tolerance) {
     return {
       isLate: true,
       minutes: diff,
-      text: `Terlambat ${diff} menit dari jam masuk (${shiftConfig.startTime} WIB)`,
+      text: `Terlambat ${diff} menit dari jam masuk (${shiftConfig.startTime} WIB, batas toleransi: ${tolerance} mnt)`,
+    };
+  }
+
+  // Jika lewat jam masuk tapi masih dalam rentang toleransi / grace period
+  if (diff > 0 && diff <= tolerance) {
+    return {
+      isLate: false,
+      minutes: diff,
+      inGracePeriod: true,
+      text: `Tepat Waktu (Dalam batas masa tenggang toleransi ${diff}/${tolerance} menit)`,
     };
   }
 
@@ -116,14 +152,15 @@ export default function ModalFormPresensi({
   currentDate = '',
 }) {
   const isEditing = Boolean(initialData?.id);
+  const currentShiftOptions = useMemo(() => getDynamicShiftOptions(), [isOpen]);
 
   const [formData, setFormData] = useState({
     employeeId: '',
     date: currentDate,
-    shift: SHIFT_OPTIONS[0].value,
+    shift: currentShiftOptions[0].value,
     status: 'Hadir',
-    checkIn: '07:00',
-    checkOut: '19:00',
+    checkIn: currentShiftOptions[0].startTime,
+    checkOut: currentShiftOptions[0].endTime,
     notes: '',
   });
 
@@ -406,7 +443,7 @@ export default function ModalFormPresensi({
                 onChange={(e) => handleChange('shift', e.target.value)}
                 className="w-full text-xs rounded-xl border-slate-200 bg-white px-3 py-2.5 focus:border-navy focus:ring-navy transition-all"
               >
-                {SHIFT_OPTIONS.map((opt) => (
+                {currentShiftOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>

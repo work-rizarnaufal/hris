@@ -20,6 +20,37 @@ import {
   Button,
   Input,
 } from '@/components/ui';
+import { getShiftSettings } from '@/services/systemSettings.js';
+
+export function getDynamicShift12HOptions() {
+  const shifts = getShiftSettings();
+  return [
+    {
+      value: `Shift Pagi (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut})`,
+      label: `${shifts.shiftPagiName}: 12 Jam (${shifts.shiftPagiIn} - ${shifts.shiftPagiOut} WIB)`,
+      time: `${shifts.shiftPagiIn} - ${shifts.shiftPagiOut}`,
+      type: 'Pagi',
+    },
+    {
+      value: `Shift Malam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut})`,
+      label: `${shifts.shiftMalamName}: 12 Jam (${shifts.shiftMalamIn} - ${shifts.shiftMalamOut} WIB)`,
+      time: `${shifts.shiftMalamIn} - ${shifts.shiftMalamOut}`,
+      type: 'Malam',
+    },
+    {
+      value: 'Off Pasca-Dinas',
+      label: 'Off Pasca-Dinas (Libur Rotasi 24/7)',
+      time: 'Off',
+      type: 'Off',
+    },
+    {
+      value: 'Penugasan Khusus Operasional',
+      label: 'Penugasan Khusus / Lembur Operasional',
+      time: 'Fleksibel',
+      type: 'Khusus',
+    },
+  ];
+}
 
 export const SHIFT_12H_OPTIONS = [
   {
@@ -56,6 +87,7 @@ export default function ModalFormTukarShift({
   initialData = null,
 }) {
   const isEditing = Boolean(initialData?.id);
+  const shiftOptions = useMemo(() => getDynamicShift12HOptions(), [isOpen]);
 
   const [formData, setFormData] = useState({
     type: 'swap', // 'swap' | 'override'
@@ -67,7 +99,7 @@ export default function ModalFormTukarShift({
       month: '2-digit',
       day: '2-digit',
     }).format(new Date()),
-    targetShift: SHIFT_12H_OPTIONS[0].value,
+    targetShift: shiftOptions[0].value,
     reason: '',
   });
 
@@ -81,7 +113,7 @@ export default function ModalFormTukarShift({
         employeeId: initialData.employeeId || employees[0]?.id || 1,
         targetEmployeeId: initialData.targetEmployeeId || employees[1]?.id || 2,
         date: initialData.date || new Date().toISOString().slice(0, 10),
-        targetShift: initialData.targetShift || SHIFT_12H_OPTIONS[0].value,
+        targetShift: initialData.targetShift || shiftOptions[0].value,
         reason: initialData.reason || '',
       });
     } else {
@@ -95,12 +127,12 @@ export default function ModalFormTukarShift({
           month: '2-digit',
           day: '2-digit',
         }).format(new Date()),
-        targetShift: SHIFT_12H_OPTIONS[0].value,
+        targetShift: shiftOptions[0].value,
         reason: '',
       });
     }
     setErrors({});
-  }, [isOpen, initialData, employees]);
+  }, [isOpen, initialData, employees, shiftOptions]);
 
   const sourceEmp = useMemo(
     () => employees.find((e) => e.id === Number(formData.employeeId)),
@@ -341,7 +373,7 @@ export default function ModalFormTukarShift({
                 onChange={(e) => setFormData({ ...formData, targetShift: e.target.value })}
                 className="w-full h-9.5 text-xs rounded-xl border border-slate-200 bg-white px-3 focus:border-navy focus:ring-1 focus:ring-navy transition-all cursor-pointer"
               >
-                {SHIFT_12H_OPTIONS.map((opt) => (
+                {shiftOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
