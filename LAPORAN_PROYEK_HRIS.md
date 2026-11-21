@@ -267,44 +267,52 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 
 ## 8. Modul Jadwal & Roster Shift 2-Grup (`JadwalShift.jsx`)
 
-Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx) dan [`resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx)
+Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx), [`resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx), dan [`resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx`](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx)
 
-### A. 4 Kartu KPI Roster Jadwal
-1. *Total Terjadwal*: 12 Karyawan (100% tercover roster operasional).
-2. *Grup Operasional A*: 5 Personil (Masuk: Senin, Rabu, Jumat • Libur: Selasa, Kamis, Sabtu).
-3. *Grup Operasional B*: 4 Personil (Masuk: Selasa, Kamis, Sabtu • Libur: Senin, Rabu, Jumat).
-4. *Pengecualian & Status Grup*: Rekam tukar shift aktif dan pemantauan personil.
+### A. 4 Kartu KPI Roster Jadwal Operasional (Reaktif terhadap Filter Lokasi)
+1. *Total Personil Terjadwal*: 12 Personil (6 Lokasi Mariuk + 6 Lokasi Cimalaka, 100% ter-cover roster operasional 24/7).
+2. *Grup Operasional A*: 6 Personil (3 Mariuk, 3 Cimalaka) - Shift 12 Jam (Pagi 07:00–19:00 & Malam 19:00–07:00).
+3. *Grup Operasional B*: 6 Personil (3 Mariuk, 3 Cimalaka) - Shift 12 Jam (Pagi 07:00–19:00 & Malam 19:00–07:00).
+4. *Jadwal Khusus & Tukar Shift*: Pemantauan real-time kasus tukar shift dan penugasan operasional dengan handover terpadu pukul 07:00 & 19:00 WIB.
 
-### B. Tab 1: Matriks Roster Mingguan (`roster`)
-- **Aturan Baku Operasional**: 1 hari 2 shift (Pagi 07:00-15:00 & Sore 15:00-23:00) dengan pembagian tepat 2 grup (Grup A & Grup B).
-- **Logika Rotasi Selang-Seling**: Jika Grup A masuk hari Senin, maka otomatis hari Selasa libur (OFF). Sebaliknya, Grup B libur hari Senin dan masuk hari Selasa. Minggu seluruh lini libur.
-- **Navigasi Siklus Minggu**: Pemilih periode per minggu dengan tombol cepat `ChevronLeft` dan `ChevronRight`.
-- **Tabel Matriks Roster 7 Hari Dinamis**: Menampilkan kode shift harian yang terhitung otomatis (`S1`, `S2`, `NON`, `SEC1`, `SEC2`, `OFF`, `UNSET`) sesuai aturan permanen.
-- **Ekspor Dokumen Excel (.xlsx)**: 1-klik unduh matriks jadwal mingguan via SheetJS.
+### B. Segmented Location Controller (Mariuk & Cimalaka)
+- Tab switcher segmen satu sentuhan di atas tabel roster:
+  - **Semua Lokasi (12)**: Pandangan makro seluruh personil lintas pabrik.
+  - **Mariuk (6)**: Terfilter otomatis hanya personil Lokasi Mariuk dengan badge kuning amber.
+  - **Cimalaka (6)**: Terfilter otomatis hanya personil Lokasi Cimalaka dengan badge ungu indigo.
+- Indikator status live: *Roster 24/7 Non-Stop · Pergantian Shift 07:00 & 19:00 WIB*.
 
-### C. Tab 2: Master Shift & Rotasi 2-Grup (`patterns`) — `PanelRotasiGrup.jsx`
-- **Matriks Alur Kerja Bergantian 7 Hari (Senin s/d Minggu)**:
-  - *Senin*: Grup A **MASUK**, Grup B **LIBUR (OFF)**.
-  - *Selasa*: Grup A **LIBUR (OFF)**, Grup B **MASUK**.
-  - *Rabu*: Grup A **MASUK**, Grup B **LIBUR (OFF)**.
-  - *Kamis*: Grup A **LIBUR (OFF)**, Grup B **MASUK**.
-  - *Jumat*: Grup A **MASUK**, Grup B **LIBUR (OFF)**.
-  - *Sabtu*: Grup A **LIBUR (OFF)**, Grup B **MASUK**.
-  - *Minggu*: Seluruh lini operasional & kantor **LIBUR (OFF)**.
-- **Penetapan Personil (Kolom Dropdown Default)**:
-  - Dropdown grup netral per baris: `Grup A`, `Grup B`, `Belum Ditetapkan`. Perubahan langsung memperbarui jadwal dan kartu KPI.
-  - Toolbar aksi massal (*bulk transfer*) dengan checkbox multi-select.
-  - Tombol balik giliran: `Tukar Semua Giliran (Grup A ⇄ Grup B)`.
-- **Pengecualian Staf Kantor (General Office)**:
-  - Staf non-shift (HCGA, Payroll, IT) ditampilkan dalam kartu terpisah dengan jadwal tetap Senin-Jumat (08:00 - 17:00).
-- **Perubahan Jadwal Operasional Manual (7 Kriteria Operasional)**:
-  - Formulir penyesuaian khusus dengan 7 input: Tanggal Mulai, Grup Bekerja, Masuk Shift 1, Pulang Shift 1, Masuk Shift 2, Pulang Shift 2, Alasan Perubahan. Riwayat perubahan dapat dibatalkan sewaktu-waktu.
+### C. Tab 1: Matriks Roster Mingguan (`roster`)
+- **Aturan Baku Operasional 24/7 (Non-Stop 7 Hari Kerja)**:
+  - 1 hari 2 shift 12 jam: **Shift Pagi** (07:00–19:00 WIB) dan **Shift Malam** (19:00–07:00 WIB), tukar shift tepat jam 07:00 dan 19:00.
+  - Tidak ada libur akhir pekan untuk regu shift lapangan pabrik (beroperasi 7 hari seminggu).
+- **Logika Continuous Rolling Selang-Seling**:
+  - Minggu ganjil (Minggu 1 & 3): Grup A masuk hari Senin, Rabu, Jumat, Minggu (4 hari dinas = 48 jam); Grup B masuk Selasa, Kamis, Sabtu (3 hari dinas = 36 jam).
+  - Minggu genap (Minggu 2 & 4): Grup B masuk Senin, Rabu, Jumat, Minggu (48 jam); Grup A masuk Selasa, Kamis, Sabtu (36 jam).
+  - Rata-rata jam kerja adil dan proporsional: 42 jam/minggu.
+- **Tabel Matriks Roster 7 Hari Dinamis**:
+  - Kolom karyawan dilengkapi inisial avatar visual, NIP font-mono, jabatan, dan pill badge lokasi penempatan (`Mariuk` / `Cimalaka`).
+  - Kalkulasi total jam kerja mingguan aktual per karyawan: `48 Jam (4 Hari Dinas)` atau `36 Jam (3 Hari Dinas)`.
+  - Legenda kode terstandarisasi: `PAGI (07-19)`, `MALAM (19-07)`, `NON (Office 08-17)`, `SWAP`, `LIBUR`, `OFF`.
+- **Ekspor Dokumen Excel (.xlsx)**:
+  - Unduh roster mingguan via SheetJS mencakup nama, NIP, lokasi pabrik, divisi, 7 kolom hari, dan kalkulasi dinas aktual.
 
-### D. Tab 3: Log Pengecualian & Tukar Shift (`exceptions`)
-- Tabel riwayat penugasan shift khusus dan pertukaran shift antar-rekan kerja yang telah disetujui HCGA dengan tombol pembatalan.
+### D. Tab 2: Rotasi Grup & Jadwal Manual (`patterns`) — `PanelRotasiGrup.jsx`
+- **Tabel Alur Rotasi 7 Hari Non-Stop**:
+  - Alur dinas Senin s/d Minggu menampilkan giliran masuk 2 shift 12 jam dan pasca-dinas (OFF).
+- **Penetapan & Pemindahan Personil**:
+  - Dropdown per baris, bulk transfer dengan multi-select checkbox, dan tombol *Tukar Semua Giliran (Grup A ⇄ Grup B)*.
+  - Dilengkapi pill badge lokasi (`Mariuk` / `Cimalaka`) dan shift badge 12 jam (`Pagi 07:00–19:00` / `Malam 19:00–07:00`).
+- **Form Perubahan Jadwal Operasional Manual**:
+  - Konfigurasi ad-hoc dengan rentang jam shift 12 jam (Shift 1 Masuk 07:00 / Pulang 19:00; Shift 2 Masuk 19:00 / Pulang 07:00), grup sasaran, tanggal, dan alasan.
 
-### E. Modal Atomik Tukar Shift (`ModalFormTukarShift.jsx`)
-- Komponen atomik dialog dengan 2 mode: Tukar Shift Antar-Karyawan dan Pengecualian Shift Mandiri, terintegrasi dengan `<Toast />`.
+### E. Tab 3: Log Pengecualian & Tukar Shift (`exceptions`)
+- Rekam pertukaran shift resmi antar-rekan kerja atau penugasan khusus yang disetujui HCGA.
+- Nama pemohon dapat diklik langsung untuk membuka modal form ubah (*inline edit*), dilengkapi tombol aksi pensil dan hapus.
+
+### F. Modal Atomik Tukar Shift (`ModalFormTukarShift.jsx`)
+- Dialog modal atomik terstandarisasi dengan pilihan shift 12 jam (`Shift Pagi 07:00–19:00`, `Shift Malam 19:00–07:00`, `Off Pasca-Dinas`, `Penugasan Khusus`).
+- Preview card komparasi real-time antara *Karyawan Pemohon* dan *Rekan Pengganti* lengkap dengan identitas avatar, NIP, jabatan, dan badge lokasi kerja.
 
 ---
 
