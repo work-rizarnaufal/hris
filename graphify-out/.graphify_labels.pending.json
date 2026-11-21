@@ -1,7 +1,7 @@
 {
   "0": "@inertiajs/react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "SystemSetting",
+  "4": "Inertia\\Response",
   "5": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
@@ -18,5 +18,6 @@
   "48": "Location",
   "49": "HandleInertiaRequests.php",
   "50": "Illuminate\\Http\\Request",
-  "51": "User"
+  "51": "User",
+  "52": "ModalFormPresensi.jsx"
 }
