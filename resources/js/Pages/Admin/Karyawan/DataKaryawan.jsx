@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import {
   Users,
@@ -47,169 +47,6 @@ import ModalFormKaryawan from './Partials/ModalFormKaryawan.jsx';
 import ModalImporKaryawan from './Partials/ModalImporKaryawan.jsx';
 import { getLocations } from '@/services/systemSettings.js';
 
-// Data dummy awal 12 karyawan operasional HCGA (Sinkron Mariuk & Cimalaka)
-const INITIAL_EMPLOYEES = [
-  // --- LOKASI MARIUK (6 Personil) ---
-  {
-    id: 1,
-    name: 'Budi Santoso',
-    nip: 'HC-0101',
-    role: 'Senior Operator Lapangan',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 2,
-    name: 'Dewi Anggraini',
-    nip: 'HC-0104',
-    role: 'Quality Assurance Inspector',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 3,
-    name: 'Hendra Wijaya',
-    nip: 'HC-0105',
-    role: 'Danru Keamanan & K3',
-    division: 'Security & Safety',
-    location: 'Lokasi Mariuk',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-  {
-    id: 4,
-    name: 'Ahmad Fauzi',
-    nip: 'HC-0103',
-    role: 'Operator Forklift Utama',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 5,
-    name: 'Eko Prasetyo',
-    nip: 'HC-0107',
-    role: 'Teknisi Maintenance Mesin',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 6,
-    name: 'Joko Susilo',
-    nip: 'HC-0109',
-    role: 'Anggota Patroli Keamanan',
-    division: 'Security & Safety',
-    location: 'Lokasi Mariuk',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-
-  // --- LOKASI CIMALAKA (6 Personil) ---
-  {
-    id: 7,
-    name: 'Siti Rahmawati',
-    nip: 'HC-0102',
-    role: 'Supervisor Operasional Site',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 8,
-    name: 'Wahyu Hidayat',
-    nip: 'HC-0111',
-    role: 'Operator Mesin Produksi',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 9,
-    name: 'Dian Kusuma',
-    nip: 'HC-0110',
-    role: 'Petugas Keamanan Site',
-    division: 'Security & Safety',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup A',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-  {
-    id: 10,
-    name: 'Rina Marlina',
-    nip: 'HC-0106',
-    role: 'Koordinator Gudang & Logistik',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Aktif',
-  },
-  {
-    id: 11,
-    name: 'Maya Indah Lestari',
-    nip: 'HC-0108',
-    role: 'Operator QC Lapangan',
-    division: 'Operasional & Lapangan',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Pagi (12 Jam)',
-    checkInTime: '07:00',
-    checkOutTime: '19:00',
-    status: 'Cuti',
-  },
-  {
-    id: 12,
-    name: 'Nurul Aini',
-    nip: 'HC-0112',
-    role: 'Petugas Inventory Stok',
-    division: 'Logistik & Gudang',
-    location: 'Lokasi Cimalaka',
-    group: 'Grup B',
-    scheduleCategory: 'Shift Malam (12 Jam)',
-    checkInTime: '19:00',
-    checkOutTime: '07:00',
-    status: 'Aktif',
-  },
-];
-
 const normalizeEmployee = (emp) => {
   const locName = typeof emp.location === 'object'
     ? (emp.location?.name || (emp.location_id === 2 ? 'Lokasi Cimalaka' : 'Lokasi Mariuk'))
@@ -246,14 +83,11 @@ const normalizeEmployee = (emp) => {
 
 export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
   const [employees, setEmployees] = useState(() => {
-    if (initialDbEmployees && initialDbEmployees.length > 0) {
-      return initialDbEmployees.map(normalizeEmployee);
-    }
-    return INITIAL_EMPLOYEES.map(normalizeEmployee);
+    return Array.isArray(initialDbEmployees) ? initialDbEmployees.map(normalizeEmployee) : [];
   });
 
   useEffect(() => {
-    if (initialDbEmployees && initialDbEmployees.length > 0) {
+    if (Array.isArray(initialDbEmployees)) {
       setEmployees(initialDbEmployees.map(normalizeEmployee));
     }
   }, [initialDbEmployees]);
@@ -268,6 +102,7 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formInitialData, setFormInitialData] = useState(null);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Notification Toast State
   const [alertInfo, setAlertInfo] = useState(null);
@@ -338,27 +173,86 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
     setIsFormOpen(true);
   };
 
-  const handleSaveEmployee = (empData) => {
-    if (formInitialData) {
-      setEmployees((prev) => prev.map((item) => (item.id === empData.id ? empData : item)));
-      showAlert(`Data karyawan "${empData.name}" berhasil diperbarui.`);
+  const handleSaveEmployee = (empData, setModalErrors) => {
+    setIsSubmitting(true);
+    const payload = {
+      nip: empData.nip,
+      biometric_pin: empData.biometricPin || null,
+      name: empData.name,
+      role_title: empData.role,
+      division: empData.division,
+      location: empData.location,
+      shift_group: empData.group,
+      scheduleCategory: empData.scheduleCategory,
+      status: empData.status || 'Aktif',
+      employment_status: empData.employment_status || 'Tetap',
+    };
+
+    if (formInitialData?.id) {
+      router.put(`/karyawan/${formInitialData.id}`, payload, {
+        preserveScroll: true,
+        onSuccess: () => {
+          showAlert(`Data karyawan "${empData.name}" berhasil diperbarui.`);
+          setIsFormOpen(false);
+          setIsSubmitting(false);
+        },
+        onError: (errs) => {
+          setIsSubmitting(false);
+          if (setModalErrors) setModalErrors(errs);
+          const firstErr = Object.values(errs)[0] || 'Gagal memperbarui data karyawan.';
+          showAlert(firstErr, 'error');
+        },
+      });
     } else {
-      setEmployees((prev) => [empData, ...prev]);
-      showAlert(`Karyawan baru "${empData.name}" berhasil ditambahkan.`);
+      router.post('/karyawan', payload, {
+        preserveScroll: true,
+        onSuccess: () => {
+          showAlert(`Karyawan baru "${empData.name}" berhasil ditambahkan.`);
+          setIsFormOpen(false);
+          setIsSubmitting(false);
+        },
+        onError: (errs) => {
+          setIsSubmitting(false);
+          if (setModalErrors) setModalErrors(errs);
+          const firstErr = Object.values(errs)[0] || 'Gagal menyimpan data karyawan.';
+          showAlert(firstErr, 'error');
+        },
+      });
     }
   };
 
   const handleDelete = (id, name) => {
     if (window.confirm(`Apakah Anda yakin ingin menghapus data karyawan "${name}"?`)) {
-      setEmployees((prev) => prev.filter((item) => item.id !== id));
-      showAlert(`Data karyawan "${name}" telah dihapus.`, 'warning');
+      router.delete(`/karyawan/${id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+          showAlert(`Data karyawan "${name}" telah dihapus dari sistem.`, 'warning');
+        },
+        onError: () => {
+          showAlert(`Gagal menghapus data karyawan "${name}".`, 'error');
+        },
+      });
     }
   };
 
   // Import Handler
-  const handleImportSuccess = (importedList) => {
-    setEmployees((prev) => [...importedList, ...prev]);
-    showAlert(`Berhasil mengimpor ${importedList.length} data karyawan baru.`);
+  const handleImportSuccess = (importedList, setImportError) => {
+    router.post(
+      '/karyawan/batch-import',
+      { employees: importedList },
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          showAlert(`Berhasil mengimpor ${importedList.length} data karyawan ke dalam database.`);
+          setIsImportOpen(false);
+        },
+        onError: (errs) => {
+          const msg = Object.values(errs)[0] || 'Gagal mengimpor data karyawan ke database.';
+          if (setImportError) setImportError(msg);
+          showAlert(msg, 'error');
+        },
+      }
+    );
   };
 
   // Export to Excel
@@ -760,6 +654,7 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
         onClose={() => setIsFormOpen(false)}
         onSave={handleSaveEmployee}
         initialData={formInitialData}
+        isSubmitting={isSubmitting}
       />
 
       {/* Modal Impor Karyawan dari File Spreadsheet */}

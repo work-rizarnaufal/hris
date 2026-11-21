@@ -23,6 +23,7 @@ Route::get('/beranda', [BerandaController::class, 'index'])->name('admin.beranda
 
 Route::get('/karyawan', [KaryawanController::class, 'index'])->name('admin.karyawan');
 Route::post('/karyawan', [KaryawanController::class, 'store'])->name('admin.karyawan.store');
+Route::post('/karyawan/batch-import', [KaryawanController::class, 'batchImport'])->name('admin.karyawan.batchImport');
 Route::put('/karyawan/{karyawan}', [KaryawanController::class, 'update'])->name('admin.karyawan.update');
 Route::delete('/karyawan/{karyawan}', [KaryawanController::class, 'destroy'])->name('admin.karyawan.destroy');
 

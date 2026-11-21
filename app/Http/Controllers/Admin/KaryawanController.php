@@ -8,6 +8,8 @@ use App\Models\Location;
 use App\Models\Shift;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,7 +33,9 @@ class KaryawanController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $payload = $this->resolvePayload($request->all());
+
+        Validator::make($payload, [
             'nip' => ['required', 'string', 'max:50', 'unique:employees,nip'],
             'biometric_pin' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:150'],
@@ -39,21 +43,24 @@ class KaryawanController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'role_title' => ['required', 'string', 'max:100'],
             'division' => ['required', 'string', 'max:100'],
-            'location_id' => ['nullable', 'exists:locations,id'],
-            'shift_id' => ['nullable', 'exists:shifts,id'],
+            'location_id' => ['required', 'exists:locations,id'],
+            'shift_id' => ['required', 'exists:shifts,id'],
             'shift_group' => ['required', 'string'],
             'employment_status' => ['required', 'string'],
             'status' => ['required', 'string'],
-        ]);
+        ])->validate();
 
-        Employee::create($validated);
+        Employee::create($payload);
+        $this->syncLocationCounts();
 
         return back()->with('success', 'Data karyawan baru berhasil ditambahkan.');
     }
 
     public function update(Request $request, Employee $karyawan): RedirectResponse
     {
-        $validated = $request->validate([
+        $payload = $this->resolvePayload($request->all(), $karyawan->id);
+
+        Validator::make($payload, [
             'nip' => ['required', 'string', 'max:50', 'unique:employees,nip,'.$karyawan->id],
             'biometric_pin' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:150'],
@@ -61,14 +68,15 @@ class KaryawanController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'role_title' => ['required', 'string', 'max:100'],
             'division' => ['required', 'string', 'max:100'],
-            'location_id' => ['nullable', 'exists:locations,id'],
-            'shift_id' => ['nullable', 'exists:shifts,id'],
+            'location_id' => ['required', 'exists:locations,id'],
+            'shift_id' => ['required', 'exists:shifts,id'],
             'shift_group' => ['required', 'string'],
             'employment_status' => ['required', 'string'],
             'status' => ['required', 'string'],
-        ]);
+        ])->validate();
 
-        $karyawan->update($validated);
+        $karyawan->update($payload);
+        $this->syncLocationCounts();
 
         return back()->with('success', 'Profil dan data karyawan berhasil diperbarui.');
     }
@@ -76,7 +84,128 @@ class KaryawanController extends Controller
     public function destroy(Employee $karyawan): RedirectResponse
     {
         $karyawan->delete();
+        $this->syncLocationCounts();
 
         return back()->with('success', 'Data karyawan berhasil dihapus dari sistem.');
+    }
+
+    public function batchImport(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'employees' => ['required', 'array', 'min:1'],
+        ]);
+
+        $importedCount = 0;
+        DB::transaction(function () use ($request, &$importedCount) {
+            $maxNum = $this->getMaxNipNumber();
+
+            foreach ($request->input('employees') as $item) {
+                if (empty($item['name'])) {
+                    continue;
+                }
+                if (empty($item['nip'])) {
+                    $maxNum++;
+                    $item['nip'] = 'HC-'.str_pad((string) $maxNum, 4, '0', STR_PAD_LEFT);
+                }
+                $payload = $this->resolvePayload($item);
+
+                Employee::updateOrCreate(
+                    ['nip' => $payload['nip']],
+                    $payload
+                );
+                $importedCount++;
+            }
+            $this->syncLocationCounts();
+        });
+
+        return back()->with('success', "Berhasil mengimpor {$importedCount} data karyawan ke dalam database.");
+    }
+
+    protected function resolvePayload(array $data, ?int $existingId = null): array
+    {
+        // Resolve location_id
+        $locationId = $data['location_id'] ?? null;
+        if (! $locationId && ! empty($data['location'])) {
+            $locStr = (string) (is_array($data['location']) ? ($data['location']['name'] ?? '') : $data['location']);
+            if (stripos($locStr, 'cimalaka') !== false) {
+                $locationId = 2;
+            } elseif (stripos($locStr, 'mariuk') !== false) {
+                $locationId = 1;
+            } else {
+                $found = Location::where('name', 'like', "%{$locStr}%")->value('id');
+                $locationId = $found ?: 1;
+            }
+        }
+        $locationId = $locationId ? (int) $locationId : 1;
+
+        // Resolve shift_id
+        $shiftId = $data['shift_id'] ?? null;
+        if (! $shiftId && (! empty($data['scheduleCategory']) || ! empty($data['shift']))) {
+            $shiftStr = (string) ($data['scheduleCategory'] ?? (is_array($data['shift'] ?? null) ? ($data['shift']['name'] ?? '') : ($data['shift'] ?? '')));
+            if (stripos($shiftStr, 'malam') !== false) {
+                $shiftId = 2;
+            } elseif (stripos($shiftStr, 'kantor') !== false || stripos($shiftStr, 'fleksibel') !== false || stripos($shiftStr, 'office') !== false) {
+                $shiftId = 3;
+            } else {
+                $shiftId = 1;
+            }
+        }
+        $shiftId = $shiftId ? (int) $shiftId : 1;
+
+        $nip = trim((string) ($data['nip'] ?? ''));
+        if (empty($nip)) {
+            $nip = $this->generateNextNip();
+        }
+
+        $biometricPin = $data['biometric_pin'] ?? $data['biometricPin'] ?? null;
+        if (! $biometricPin && $nip) {
+            $rawDigits = preg_replace('/\D/', '', $nip);
+            $biometricPin = $rawDigits !== '' ? (string) (int) $rawDigits : null;
+        }
+
+        return [
+            'nip' => $nip,
+            'biometric_pin' => $biometricPin ? (string) $biometricPin : null,
+            'name' => trim((string) ($data['name'] ?? 'Karyawan Baru')),
+            'email' => $data['email'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'role_title' => trim((string) ($data['role_title'] ?? $data['role'] ?? 'Staff Operasional Lapangan')),
+            'division' => trim((string) ($data['division'] ?? 'Operasional & Lapangan')),
+            'location_id' => $locationId,
+            'shift_id' => $shiftId,
+            'shift_group' => $data['shift_group'] ?? $data['group'] ?? 'Grup A',
+            'employment_status' => $data['employment_status'] ?? 'Tetap',
+            'status' => $data['status'] ?? 'Aktif',
+        ];
+    }
+
+    protected function getMaxNipNumber(): int
+    {
+        $maxNum = 0;
+        $nips = Employee::where('nip', 'like', 'HC-%')->pluck('nip');
+        foreach ($nips as $nip) {
+            if (preg_match('/HC-(\d+)/', $nip, $m)) {
+                $num = (int) $m[1];
+                if ($num > $maxNum) {
+                    $maxNum = $num;
+                }
+            }
+        }
+
+        return $maxNum > 0 ? $maxNum : (Employee::max('id') ?? 0);
+    }
+
+    protected function generateNextNip(): string
+    {
+        $next = $this->getMaxNipNumber() + 1;
+
+        return 'HC-'.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    protected function syncLocationCounts(): void
+    {
+        foreach (Location::all() as $loc) {
+            $loc->update(['assigned_count' => Employee::where('location_id', $loc->id)->count()]);
+        }
     }
 }

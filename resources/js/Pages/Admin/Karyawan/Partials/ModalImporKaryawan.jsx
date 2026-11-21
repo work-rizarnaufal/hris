@@ -28,6 +28,7 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
       {
         'Nama Karyawan': 'Budi Santoso',
         NIP: 'HC-0101',
+        'PIN Biometrik': '101',
         Jabatan: 'Senior Operator Lapangan',
         Divisi: 'Operasional & Lapangan',
         'Lokasi Kerja': 'Lokasi Mariuk',
@@ -40,6 +41,7 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
       {
         'Nama Karyawan': 'Siti Rahmawati',
         NIP: 'HC-0102',
+        'PIN Biometrik': '102',
         Jabatan: 'Supervisor Operasional Site',
         Divisi: 'Operasional & Lapangan',
         'Lokasi Kerja': 'Lokasi Cimalaka',
@@ -83,8 +85,9 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
         const mapped = rawJson.map((row, idx) => ({
           id: Date.now() + idx,
           name: row['Nama Karyawan'] || row['Nama'] || row['name'] || `Karyawan ${idx + 1}`,
-          nip: row['NIP'] || row['nip'] || `HC-${1000 + idx}`,
-          role: row['Jabatan'] || row['Role'] || row['role'] || 'Staf',
+          nip: row['NIP'] || row['nip'] || '',
+          biometric_pin: row['PIN Biometrik'] || row['PIN'] || row['biometric_pin'] || row['Pin Finger'] || row['Pin'] || null,
+          role: row['Jabatan'] || row['Role'] || row['role'] || 'Staf Operasional Lapangan',
           division: row['Divisi'] || row['Departemen'] || row['division'] || 'Operasional & Lapangan',
           location: row['Lokasi Kerja'] || row['Lokasi'] || row['location'] || 'Lokasi Mariuk',
           group: row['Grup'] || row['group'] || 'Grup A',
@@ -106,11 +109,11 @@ export default function ModalImporKaryawan({ isOpen, onClose, onImportSuccess })
   const handleConfirmImport = () => {
     if (previewData.length === 0) return;
     setIsProcessing(true);
-    setTimeout(() => {
-      onImportSuccess(previewData);
+    setErrorMsg('');
+    onImportSuccess(previewData, (errMsg) => {
+      setErrorMsg(errMsg);
       setIsProcessing(false);
-      onClose();
-    }, 400);
+    });
   };
 
   return (

@@ -42,6 +42,7 @@ export default function ModalFormKaryawan({
   onClose,
   onSave,
   initialData,
+  isSubmitting = false,
 }) {
   const isEditing = Boolean(initialData?.id);
 
@@ -121,7 +122,7 @@ export default function ModalFormKaryawan({
     } else {
       setFormData({
         name: '',
-        nip: `HC-${String(Math.floor(100 + Math.random() * 900))}`,
+        nip: '',
         biometricPin: '',
         role: '',
         division: DIVISIONS[0],
@@ -158,7 +159,6 @@ export default function ModalFormKaryawan({
     const newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = 'Nama lengkap karyawan wajib diisi.';
-    if (!formData.nip.trim()) newErrors.nip = 'NIP karyawan wajib diisi.';
     if (!formData.role.trim()) newErrors.role = 'Jabatan / posisi kerja wajib diisi.';
     if (!formData.checkInTime) newErrors.checkInTime = 'Jam masuk kerja wajib diisi.';
     if (!formData.checkOutTime) newErrors.checkOutTime = 'Jam pulang kerja wajib diisi.';
@@ -170,9 +170,8 @@ export default function ModalFormKaryawan({
 
     onSave({
       ...formData,
-      id: initialData?.id || Date.now(),
-    });
-    onClose();
+      id: initialData?.id,
+    }, setErrors);
   };
 
   const isMariuk = String(formData.location || '').includes('Mariuk');
@@ -277,13 +276,16 @@ export default function ModalFormKaryawan({
 
               {/* NIP */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Nomor Induk Pegawai (NIP) <span className="text-rose-500">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Nomor Induk Pegawai (NIP)
+                  </label>
+                  <span className="text-[10px] text-slate-400">Otomatis jika kosong</span>
+                </div>
                 <Input
                   type="text"
                   name="nip"
-                  placeholder="Contoh: HC-0101"
+                  placeholder="Contoh: HC-0121 (Opsional)"
                   value={formData.nip}
                   onChange={handleChange}
                   className={`h-9.5 text-xs font-mono bg-white ${
@@ -561,10 +563,11 @@ export default function ModalFormKaryawan({
           <Button
             type="submit"
             variant="default"
-            className="gap-2 bg-navy hover:bg-navy/90 text-white text-xs font-semibold"
+            disabled={isSubmitting}
+            className="gap-2 bg-navy hover:bg-navy/90 text-white text-xs font-semibold disabled:opacity-60"
           >
             <Save className="w-4 h-4" />
-            <span>{isEditing ? 'Simpan Perubahan Karyawan' : 'Daftarkan Karyawan'}</span>
+            <span>{isSubmitting ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan Karyawan' : 'Daftarkan Karyawan')}</span>
           </Button>
         </ModalFooter>
       </form>

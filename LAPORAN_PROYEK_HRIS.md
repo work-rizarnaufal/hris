@@ -217,14 +217,18 @@ Pintasan alur kerja eksekutif dengan ikon representatif:
 
 Lokasi: [`resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx)
 
+- **Sinkronisasi Penuh ke Backend & Database SQLite**:
+  - Seluruh operasi CRUD (Tambah Karyawan, Edit Karyawan, Hapus Karyawan, dan Batch Impor Excel) kini terhubung langsung ke `KaryawanController.php` dan database SQLite (`employees`, `locations`, `shifts`).
+  - Menggunakan Inertia router (`router.post`, `router.put`, `router.delete`) dengan state `isSubmitting` dan error feedback presisi di level input form.
+  - Data dummy lama telah dibersihkan secara tuntas dan digantikan 86 data karyawan riil operasional site (35 Lokasi Mariuk & 51 Lokasi Cimalaka) dengan format NIP Opsi B (`HC-0001` - `HC-0120`) dan mapping `biometric_pin` mesin fisik.
 - **10 Kolom Tabel Simetris**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
 - **Head Table Rapi & Terpusat**: Kolom data badge/jam/status terpusat simetris dengan kolom header.
 - **Fitur Aksi**:
-  - **Tambah Karyawan**: Menggunakan modal atomik `ModalFormKaryawan.jsx` dengan preset shift cepat.
-  - **Ubah & Hapus Karyawan**: Edit inline data dan konfirmasi hapus langsung.
-  - **Impor Excel (`ModalImporKaryawan.jsx`)**: Menggunakan modal atomik, unggah `.xlsx`/`.csv`, unduh template resmi, dan live preview validasi data.
+  - **Tambah Karyawan (`ModalFormKaryawan.jsx`)**: Menggunakan modal atomik, preset shift cepat, auto-generate NIP jika dikosongkan (`HC-0121+`), auto-resolve ID lokasi dan shift.
+  - **Ubah & Hapus Karyawan**: Edit inline data modal dan konfirmasi hapus langsung tersinkron ke SQLite dengan pembaruan otomatis `assigned_count` di tabel `locations`.
+  - **Impor Excel (`ModalImporKaryawan.jsx`)**: Menggunakan endpoint batch `POST /karyawan/batch-import` dengan `DB::transaction`, memetakan NIP, PIN mesin finger, divisi, lokasi, dan shift secara atomik.
   - **Ekspor Excel**: 1-klik unduh `.xlsx` terfilter via SheetJS.
-  - **Live Filter**: Pencarian teks nama/NIP + dropdown filter Divisi, Grup, dan Status.
+  - **Live Filter**: Pencarian teks nama/NIP/PIN + dropdown filter Divisi, Grup, Lokasi, dan Status.
   - **Notifikasi**: Menggunakan notifikasi atomik `<Toast />`.
 
 ---
