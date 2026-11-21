@@ -167,9 +167,17 @@ Spesifikasi desain sistem lengkap dan token mesin telah dikunci pada dokumen ped
    - Input formulir konsisten dengan fokus ring emas `#c4a266`.
 8. **[`page-header.jsx`](resources/js/components/ui/page-header.jsx) & [`page-container.jsx`](resources/js/components/ui/page-container.jsx)**:
    - Pembungkus halaman standar dengan judul, deskripsi, area aksi kanan, dan lebar kontainer proporsional.
-9. **[`topbar.jsx`](resources/js/components/ui/topbar.jsx) & Card Profile Popover**:
+9. **[`topbar.jsx`](resources/js/components/ui/topbar.jsx) & Card Profile Popover dengan Role Switcher**:
    - Komponen Topbar responsif dengan jam WIB terintegrasi, breadcrumb, dan trigger **Card Profile Popover** interaktif.
-   - Dilengkapi header visual Deep Navy (`#10273f`) dan Warm Gold (`#c4a266`), inisial avatar dinamis, informasi unit operasional (Mariuk & Cimalaka), hak akses (Super Admin), pintasan cepat navigasi (Pengaturan, Roster Shift, Database & Keamanan), serta tombol keluar (*Logout*) yang terlindungi *outside-click* dan tombol *Escape*.
+   - Dilengkapi header visual Deep Navy (`#10273f`) dan Warm Gold (`#c4a266`), inisial avatar dinamis, informasi unit operasional (Mariuk & Cimalaka), dan tombol keluar (*Logout*) yang terlindungi *outside-click* dan tombol *Escape*.
+   - **Interactive Role Switcher (Simulasi RBAC Opsi A)**:
+     - Ditenagai oleh modul [`resources/js/services/authRole.js`](resources/js/services/authRole.js).
+     - Pengguna dapat beralih peran dengan 1-klik di dalam Card Profile:
+       1. **Super Administrator HCGA** (`SUPER_ADMIN`): Hak akses tak terbatas ke seluruh modul sistem, pengaturan geofence, master data, dan audit log.
+       2. **Supervisor Operasional Site** (`SUPERVISOR`): Akses operasional lapangan (Beranda, Kehadiran, Jadwal Shift, Laporan, Lembur, Cuti, Master Karyawan); terisolasi dari Pengaturan Sistem & Audit Log.
+       3. **Personel Lapangan / ESS** (`KARYAWAN`): Self-service portal (Beranda, Kehadiran GPS/Selfie, Jadwal Roster pribadi, Rapor individu); menu master data dan administrasi sistem otomatis disembunyikan.
+     - Terkoneksi secara reaktif via custom event `hris:role-changed` dan persistensi `localStorage`.
+     - **Pelindung Rute Shell ([`LayoutUtama.jsx`](resources/js/Layouts/LayoutUtama.jsx))**: Menampilkan kartu peringatan *Akses Modul Dibatasi* jika peran aktif mencoba mengakses rute yang berada di luar wewenangnya.
 
 ---
 

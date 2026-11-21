@@ -10,19 +10,24 @@ import {
   CalendarDays,
   ShieldCheck,
   MapPin,
+  Sparkles,
+  Users,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.js';
+import {
+  getActiveRoleProfile,
+  setActiveRole,
+  ROLE_PROFILES,
+} from '@/services/authRole.js';
 
 export function Topbar({
   title = 'Beranda',
-  actorName = siteConfig.defaultActor,
-  user = null,
-  companyName = siteConfig.defaultCompany,
   sidebarOpen = false,
   onToggleSidebar,
 }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const [currentRole, setCurrentRole] = useState(() => getActiveRoleProfile());
 
   const currentDateWIB = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
@@ -32,10 +37,21 @@ export function Topbar({
     timeZone: 'Asia/Jakarta',
   }).format(new Date());
 
-  const displayName = user?.name || actorName || siteConfig.defaultActor;
-  const displayEmail = user?.email || 'admin@nusantaraperkasa.co.id';
+  // Dengarkan perubahan role real-time dari komponen lain
+  useEffect(() => {
+    const handleRoleChange = (e) => {
+      if (e.detail?.profile) {
+        setCurrentRole(e.detail.profile);
+      }
+    };
+    window.addEventListener('hris:role-changed', handleRoleChange);
+    return () => window.removeEventListener('hris:role-changed', handleRoleChange);
+  }, []);
 
-  // Ambil inisial 2 karakter (misal "AH" atau "BT")
+  const displayName = currentRole.name;
+  const displayEmail = currentRole.email;
+
+  // Inisial 2 karakter
   const userInitials = displayName
     .split(' ')
     .filter(Boolean)
@@ -64,6 +80,10 @@ export function Topbar({
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isProfileOpen]);
+
+  const handleSwitchRole = (roleKey) => {
+    setActiveRole(roleKey);
+  };
 
   return (
     <header className="topbar sticky top-0 z-20 backdrop-blur-md bg-white/95 border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center transition-all">
@@ -109,7 +129,15 @@ export function Topbar({
               aria-haspopup="true"
               title="Menu Profil Pengguna"
             >
-              <div className="w-7 h-7 rounded-full bg-navy text-[#c4a266] font-bold text-xs flex items-center justify-center shrink-0 border border-[#c4a266]/40 shadow-2xs">
+              <div
+                className={`w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center shrink-0 border shadow-2xs ${
+                  currentRole.roleKey === 'SUPER_ADMIN'
+                    ? 'bg-navy text-[#c4a266] border-[#c4a266]/40'
+                    : currentRole.roleKey === 'SUPERVISOR'
+                    ? 'bg-indigo-900 text-indigo-200 border-indigo-400/40'
+                    : 'bg-emerald-900 text-emerald-200 border-emerald-400/40'
+                }`}
+              >
                 {userInitials}
               </div>
               <div className="hidden md:flex flex-col text-left leading-tight">
@@ -117,7 +145,7 @@ export function Topbar({
                   {displayName}
                 </span>
                 <span className="text-[10px] text-slate-400 font-medium">
-                  Administrator
+                  {currentRole.shortTitle}
                 </span>
               </div>
               <ChevronDown
@@ -130,24 +158,30 @@ export function Topbar({
             {/* Profile Card Floating Popover */}
             {isProfileOpen && (
               <div
-                className="absolute right-0 top-full mt-2 w-80 sm:w-84 max-w-[calc(100vw-24px)] bg-white rounded-2xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+                className="absolute right-0 top-full mt-2 w-80 sm:w-88 max-w-[calc(100vw-24px)] bg-white rounded-2xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
                 role="menu"
                 aria-orientation="vertical"
               >
                 {/* 1. Header Card Profil: Brand Deep Navy & Warm Gold */}
                 <div className="p-4 sm:p-5 bg-gradient-to-br from-[#10273f] via-[#142f4c] to-[#0d2135] text-white">
                   <div className="flex items-start gap-3.5">
-                    <div className="w-12 h-12 rounded-xl bg-navy border-2 border-[#c4a266]/60 text-[#c4a266] font-display font-bold text-lg flex items-center justify-center shrink-0 shadow-md">
+                    <div
+                      className={`w-12 h-12 rounded-xl border-2 font-display font-bold text-lg flex items-center justify-center shrink-0 shadow-md ${
+                        currentRole.roleKey === 'SUPER_ADMIN'
+                          ? 'bg-navy border-[#c4a266]/70 text-[#c4a266]'
+                          : currentRole.roleKey === 'SUPERVISOR'
+                          ? 'bg-indigo-950 border-indigo-400/70 text-indigo-300'
+                          : 'bg-emerald-950 border-emerald-400/70 text-emerald-300'
+                      }`}
+                    >
                       {userInitials}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="font-bold text-sm text-white truncate" title={displayName}>
-                          {displayName}
-                        </h4>
-                      </div>
-                      <p className="text-[11px] text-[#c4a266] font-medium mt-0.5">
-                        Head of Human Capital & General Affairs
+                      <h4 className="font-bold text-sm text-white truncate" title={displayName}>
+                        {displayName}
+                      </h4>
+                      <p className="text-[11px] text-[#c4a266] font-medium mt-0.5 line-clamp-1" title={currentRole.roleLabel}>
+                        {currentRole.roleLabel}
                       </p>
                       <p className="text-[11px] text-slate-300 font-mono mt-0.5 truncate" title={displayEmail}>
                         {displayEmail}
@@ -159,54 +193,88 @@ export function Topbar({
                   <div className="mt-3.5 pt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
                     <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      Sesi Administrator Aktif
+                      Sesi {currentRole.shortTitle} Aktif
                     </span>
                     <span className="text-slate-300 font-mono text-[10px] bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
-                      NIP: HC-0001
+                      NIP: {currentRole.nip}
                     </span>
                   </div>
                 </div>
 
-                {/* 2. Informasi Konteks Operasional (Mariuk & Cimalaka) */}
-                <div className="px-4 py-2.5 bg-slate-50/80 border-b border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
-                  <div className="p-2 rounded-lg bg-white border border-slate-200/70 shadow-2xs">
+                {/* 2. Simulasi Peran Pengguna (Role Switcher 1-Klik) */}
+                <div className="p-3 bg-slate-50/90 border-b border-slate-200/80">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      Ganti Peran Simulasi (RBAC)
+                    </span>
+                    <span className="text-[10px] text-[#ab874b] font-medium flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-[#c4a266]" />
+                      Live Switcher
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {Object.values(ROLE_PROFILES).map((r) => {
+                      const isActive = currentRole.roleKey === r.roleKey;
+                      return (
+                        <button
+                          key={r.roleKey}
+                          type="button"
+                          onClick={() => handleSwitchRole(r.roleKey)}
+                          className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                            isActive
+                              ? r.roleKey === 'SUPER_ADMIN'
+                                ? 'bg-amber-50/90 border-amber-300 text-amber-900 font-bold ring-1 ring-amber-300 shadow-2xs'
+                                : r.roleKey === 'SUPERVISOR'
+                                ? 'bg-indigo-50/90 border-indigo-300 text-indigo-900 font-bold ring-1 ring-indigo-300 shadow-2xs'
+                                : 'bg-emerald-50/90 border-emerald-300 text-emerald-900 font-bold ring-1 ring-emerald-300 shadow-2xs'
+                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-slate-300'
+                          }`}
+                          title={`Beralih ke peran ${r.roleLabel}`}
+                        >
+                          <span className="text-[11px] leading-tight block">
+                            {r.shortTitle}
+                          </span>
+                          {isActive ? (
+                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          ) : (
+                            <span className="text-[9px] text-slate-400 font-normal">Pilih</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-2 leading-relaxed bg-white/70 p-2 rounded-lg border border-slate-200/50">
+                    {currentRole.description}
+                  </p>
+                </div>
+
+                {/* 3. Informasi Konteks Operasional */}
+                <div className="px-4 py-2.5 bg-white border-b border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="p-2 rounded-lg bg-slate-50 border border-slate-200/70 shadow-2xs">
                     <span className="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1">
                       <MapPin className="w-3 h-3 text-[#c4a266]" />
-                      Area Operasi
+                      Unit Tugas
                     </span>
-                    <span className="font-bold text-navy truncate block mt-0.5">
-                      Mariuk & Cimalaka
+                    <span className="font-bold text-navy truncate block mt-0.5" title={currentRole.unit}>
+                      {currentRole.unit}
                     </span>
                   </div>
-                  <div className="p-2 rounded-lg bg-white border border-slate-200/70 shadow-2xs">
+                  <div className="p-2 rounded-lg bg-slate-50 border border-slate-200/70 shadow-2xs">
                     <span className="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      Tingkat Akses
+                      Hak Akses
                     </span>
                     <span className="font-bold text-emerald-700 truncate block mt-0.5">
-                      Super Admin
+                      {currentRole.shortTitle}
                     </span>
                   </div>
                 </div>
 
-                {/* 3. Pintasan Navigasi Sistem */}
+                {/* 4. Pintasan Navigasi Sistem Sesuai Izin Role */}
                 <div className="p-2 space-y-0.5">
                   <Link
-                    href="/pengaturan"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 rounded-lg hover:bg-slate-100 hover:text-navy transition-colors group"
-                  >
-                    <div className="w-7 h-7 rounded-md bg-slate-100 group-hover:bg-navy/10 text-slate-500 group-hover:text-navy flex items-center justify-center transition-colors shrink-0">
-                      <Settings className="w-4 h-4 text-slate-600 group-hover:text-navy" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="block font-semibold">Pengaturan Sistem & Kebijakan</span>
-                      <span className="text-[10px] text-slate-400 block -mt-0.5">Shift 12 jam, toleransi & geofence</span>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/jadwal"
+                    href="/beranda"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 rounded-lg hover:bg-slate-100 hover:text-navy transition-colors group"
                   >
@@ -214,27 +282,45 @@ export function Topbar({
                       <CalendarDays className="w-4 h-4 text-slate-600 group-hover:text-navy" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="block font-semibold">Kalender & Roster Shift</span>
-                      <span className="text-[10px] text-slate-400 block -mt-0.5">Rotasi 24/7 Grup A & Grup B</span>
+                      <span className="block font-semibold">Beranda & Dashboard</span>
+                      <span className="text-[10px] text-slate-400 block -mt-0.5">Ringkasan KPI operasional</span>
                     </div>
                   </Link>
 
-                  <Link
-                    href="/pengaturan?tab=maintenance"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 rounded-lg hover:bg-slate-100 hover:text-navy transition-colors group"
-                  >
-                    <div className="w-7 h-7 rounded-md bg-slate-100 group-hover:bg-navy/10 text-slate-500 group-hover:text-navy flex items-center justify-center transition-colors shrink-0">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="block font-semibold">Status Database & Keamanan</span>
-                      <span className="text-[10px] text-slate-400 block -mt-0.5">Cadangan data & profil perusahaan</span>
-                    </div>
-                  </Link>
+                  {currentRole.roleKey !== 'KARYAWAN' && (
+                    <Link
+                      href="/karyawan"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 rounded-lg hover:bg-slate-100 hover:text-navy transition-colors group"
+                    >
+                      <div className="w-7 h-7 rounded-md bg-slate-100 group-hover:bg-navy/10 text-slate-500 group-hover:text-navy flex items-center justify-center transition-colors shrink-0">
+                        <Users className="w-4 h-4 text-slate-600 group-hover:text-navy" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="block font-semibold">Direktori Karyawan</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">Master personil Mariuk & Cimalaka</span>
+                      </div>
+                    </Link>
+                  )}
+
+                  {currentRole.roleKey === 'SUPER_ADMIN' && (
+                    <Link
+                      href="/pengaturan"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 rounded-lg hover:bg-slate-100 hover:text-navy transition-colors group"
+                    >
+                      <div className="w-7 h-7 rounded-md bg-slate-100 group-hover:bg-navy/10 text-slate-500 group-hover:text-navy flex items-center justify-center transition-colors shrink-0">
+                        <Settings className="w-4 h-4 text-slate-600 group-hover:text-navy" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="block font-semibold">Pengaturan Sistem & Kebijakan</span>
+                        <span className="text-[10px] text-slate-400 block -mt-0.5">Shift 12 jam, toleransi & geofence</span>
+                      </div>
+                    </Link>
+                  )}
                 </div>
 
-                {/* 4. Footer Logout */}
+                {/* 5. Footer Logout */}
                 <div className="p-2 border-t border-slate-100 bg-slate-50/50">
                   <Link
                     href="/logout"

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from '@inertiajs/react';
 import { Building2, LogOut } from 'lucide-react';
 import { navigationConfig } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
+import { getActiveRoleProfile, isRouteAllowed } from '@/services/authRole.js';
 
 // Daftar rute modul yang sudah memiliki implementasi halaman penuh
 const IMPLEMENTED_ROUTES = new Set([
@@ -21,6 +22,18 @@ export function Sidebar({
   actorName = siteConfig.defaultActor,
   currentUrl = '',
 }) {
+  const [roleProfile, setRoleProfile] = useState(() => getActiveRoleProfile());
+
+  useEffect(() => {
+    const handleRoleChange = (e) => {
+      if (e.detail?.profile) {
+        setRoleProfile(e.detail.profile);
+      }
+    };
+    window.addEventListener('hris:role-changed', handleRoleChange);
+    return () => window.removeEventListener('hris:role-changed', handleRoleChange);
+  }, []);
+
   const isItemActive = (href) => {
     const cleanUrl = (typeof currentUrl === 'string' ? currentUrl : '').split('?')[0];
     if (href === '/beranda') return cleanUrl === '/beranda' || cleanUrl === '/' || cleanUrl === '';
@@ -61,51 +74,58 @@ export function Sidebar({
             </span>
           </div>
 
-          {/* Navigation groups */}
-          {navigationConfig.map((group, groupIdx) => (
-            <div key={group.group}>
-              <div className={`nav-caption ${groupIdx > 0 ? 'second' : ''}`}>
-                {group.group}
-              </div>
-              <nav className="flex flex-col gap-1">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isDisabled = item.disabled ?? !IMPLEMENTED_ROUTES.has(item.href);
-                  const active = !isDisabled && isItemActive(item.href);
+          {/* Navigation groups terfilter hak akses role */}
+          {navigationConfig.map((group, groupIdx) => {
+            const allowedItems = group.items.filter((item) =>
+              isRouteAllowed(item.href, roleProfile.roleKey)
+            );
+            if (allowedItems.length === 0) return null;
 
-                  if (isDisabled) {
+            return (
+              <div key={group.group}>
+                <div className={`nav-caption ${groupIdx > 0 ? 'second' : ''}`}>
+                  {group.group}
+                </div>
+                <nav className="flex flex-col gap-1">
+                  {allowedItems.map((item) => {
+                    const Icon = item.icon;
+                    const isDisabled = item.disabled ?? !IMPLEMENTED_ROUTES.has(item.href);
+                    const active = !isDisabled && isItemActive(item.href);
+
+                    if (isDisabled) {
+                      return (
+                        <div
+                          key={item.href}
+                          className="nav-item opacity-45 cursor-not-allowed select-none hover:bg-transparent hover:text-[#a8b9cc] transition-none"
+                          title={`${item.title} (Dalam Pengembangan / TBA)`}
+                          aria-disabled="true"
+                        >
+                          {Icon && <Icon className="w-4 h-4 shrink-0 text-slate-500" />}
+                          <span className="flex-1 text-slate-400">{item.title}</span>
+                          <small className="text-[10px] font-mono font-bold tracking-wider bg-slate-800 text-amber-300/90 border border-amber-400/20 px-2 py-0.5 rounded shadow-2xs">
+                            TBA
+                          </small>
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div
+                      <Link
                         key={item.href}
-                        className="nav-item opacity-45 cursor-not-allowed select-none hover:bg-transparent hover:text-[#a8b9cc] transition-none"
-                        title={`${item.title} (Dalam Pengembangan / TBA)`}
-                        aria-disabled="true"
+                        href={item.href}
+                        className={`nav-item ${active ? 'active' : ''}`}
+                        onClick={onClose}
                       >
-                        {Icon && <Icon className="w-4 h-4 shrink-0 text-slate-500" />}
-                        <span className="flex-1 text-slate-400">{item.title}</span>
-                        <small className="text-[10px] font-mono font-bold tracking-wider bg-slate-800 text-amber-300/90 border border-amber-400/20 px-2 py-0.5 rounded shadow-2xs">
-                          TBA
-                        </small>
-                      </div>
+                        {Icon && <Icon className="w-4 h-4 shrink-0" />}
+                        <span>{item.title}</span>
+                        {item.badge && <small>{item.badge}</small>}
+                      </Link>
                     );
-                  }
-
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`nav-item ${active ? 'active' : ''}`}
-                      onClick={onClose}
-                    >
-                      {Icon && <Icon className="w-4 h-4 shrink-0" />}
-                      <span>{item.title}</span>
-                      {item.badge && <small>{item.badge}</small>}
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-          ))}
+                  })}
+                </nav>
+              </div>
+            );
+          })}
         </div>
 
         {/* User profile bottom */}
@@ -113,13 +133,15 @@ export function Sidebar({
           <div className="sidebar-user flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="avatar small text-slate-800 font-bold bg-amber-200 shrink-0">
-                {actorName.slice(0, 2).toUpperCase()}
+                {roleProfile.name.slice(0, 2).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <strong className="truncate block" title={actorName}>
-                  {actorName}
+                <strong className="truncate block" title={roleProfile.name}>
+                  {roleProfile.name}
                 </strong>
-                <small>Administrator HCGA</small>
+                <small className="truncate block text-[#c4a266] font-medium" title={roleProfile.roleLabel}>
+                  {roleProfile.shortTitle}
+                </small>
               </div>
             </div>
             <Link
