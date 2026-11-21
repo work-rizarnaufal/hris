@@ -55,7 +55,7 @@ export default function ModalPresensiMassal({
         <ModalHeader
           title="Presensi Massal Cepat"
           description="Tandai kehadiran tepat waktu untuk banyak karyawan operasional sekaligus."
-          icon={Users}
+          icon={<Users className="w-5 h-5" />}
           onClose={onClose}
         />
 

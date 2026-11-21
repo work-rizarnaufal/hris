@@ -1068,7 +1068,11 @@ export default function CatatanKehadiran() {
                       {/* 2. Karyawan */}
                       <TableCell>
                         <div className="min-w-0">
-                          <strong className="text-xs font-semibold text-navy block truncate hover:text-amber-700 cursor-pointer">
+                          <strong
+                            onClick={() => handleOpenEdit(rec)}
+                            className="text-xs font-semibold text-navy block truncate hover:text-[#c4a266] transition-colors cursor-pointer"
+                            title="Klik untuk ubah presensi karyawan ini"
+                          >
                             {rec.employeeName}
                           </strong>
                           <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">

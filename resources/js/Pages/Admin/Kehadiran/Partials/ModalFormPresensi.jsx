@@ -1,6 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Clock, CalendarCheck, Save, AlertCircle } from 'lucide-react';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@/components/ui';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Clock,
+  CalendarCheck,
+  Save,
+  AlertCircle,
+  MapPin,
+  Lock,
+  Building,
+  CheckCircle2,
+  Calendar,
+} from 'lucide-react';
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  Input,
+} from '@/components/ui';
 
 const STATUS_OPTIONS = [
   { value: 'Hadir', label: 'Hadir (Tepat Waktu)' },
@@ -8,19 +25,86 @@ const STATUS_OPTIONS = [
   { value: 'Izin', label: 'Izin Resmi' },
   { value: 'Sakit', label: 'Sakit (Surat Dokter)' },
   { value: 'Cuti', label: 'Cuti Tahunan / Bersama' },
-  { value: 'Alpha', label: 'Alpha (Tanpa Keterangan)' },
+  { value: 'Alpha', label: 'Alpha (Mangkir)' },
 ];
 
-const SHIFT_OPTIONS = [
-  { value: 'Shift Pagi (12 Jam)', label: 'Shift Pagi: 12 Jam (07:00 - 19:00)', startTime: '07:00', endTime: '19:00' },
-  { value: 'Shift Malam (12 Jam)', label: 'Shift Malam: 12 Jam (19:00 - 07:00)', startTime: '19:00', endTime: '07:00' },
+export const SHIFT_OPTIONS = [
+  {
+    value: 'Shift Pagi (07:00 - 19:00)',
+    label: 'Shift Pagi: 12 Jam (07:00 - 19:00)',
+    startTime: '07:00',
+    endTime: '19:00',
+    type: 'Pagi',
+  },
+  {
+    value: 'Shift Malam (19:00 - 07:00)',
+    label: 'Shift Malam: 12 Jam (19:00 - 07:00)',
+    startTime: '19:00',
+    endTime: '07:00',
+    type: 'Malam',
+  },
 ];
 
-function getStartMinute(shiftStr) {
-  const matched = SHIFT_OPTIONS.find((s) => s.value === shiftStr);
-  if (!matched) return 480;
-  const [h, m] = matched.startTime.split(':').map(Number);
-  return h * 60 + m;
+export function resolveShiftConfig(shiftStr) {
+  if (!shiftStr) return SHIFT_OPTIONS[0];
+  const s = String(shiftStr).toLowerCase();
+  if (s.includes('malam') || s.includes('19:00')) {
+    return SHIFT_OPTIONS[1];
+  }
+  return SHIFT_OPTIONS[0];
+}
+
+const isValidTime = (val) => Boolean(val && /^\d{2}:\d{2}$/.test(val));
+
+export function calculateTardiness(checkInTime, shiftStr) {
+  if (!checkInTime || !isValidTime(checkInTime)) return null;
+
+  const [inH, inM] = checkInTime.split(':').map(Number);
+  const checkInMinute = inH * 60 + inM;
+
+  const shiftConfig = resolveShiftConfig(shiftStr);
+  const [startH, startM] = shiftConfig.startTime.split(':').map(Number);
+  const shiftStartMinute = startH * 60 + startM;
+
+  let diff = 0;
+
+  if (shiftConfig.type === 'Malam') {
+    // Shift Malam starts at 19:00 (1140 min).
+    // If checking in past midnight (e.g., 00:00 - 06:59), add 24 hours (1440 min).
+    if (checkInMinute < 12 * 60) {
+      const adjustedMinute = checkInMinute + 24 * 60;
+      diff = adjustedMinute - shiftStartMinute;
+    } else {
+      diff = checkInMinute - shiftStartMinute;
+    }
+  } else {
+    // Shift Pagi starts at 07:00 (420 min).
+    diff = checkInMinute - shiftStartMinute;
+  }
+
+  if (diff > 0) {
+    return {
+      isLate: true,
+      minutes: diff,
+      text: `Terlambat ${diff} menit dari jam masuk (${shiftConfig.startTime} WIB)`,
+    };
+  }
+
+  if (diff < 0) {
+    const early = Math.abs(diff);
+    return {
+      isLate: false,
+      minutes: 0,
+      earlyMinutes: early,
+      text: `Tepat Waktu (Hadir ${early} menit lebih awal dari ${shiftConfig.startTime} WIB)`,
+    };
+  }
+
+  return {
+    isLate: false,
+    minutes: 0,
+    text: `Tepat Waktu (Pukul ${shiftConfig.startTime} WIB)`,
+  };
 }
 
 export default function ModalFormPresensi({
@@ -39,7 +123,7 @@ export default function ModalFormPresensi({
     shift: SHIFT_OPTIONS[0].value,
     status: 'Hadir',
     checkIn: '07:00',
-    checkOut: '15:00',
+    checkOut: '19:00',
     notes: '',
   });
 
@@ -47,25 +131,38 @@ export default function ModalFormPresensi({
 
   useEffect(() => {
     if (initialData) {
+      const shiftConfig = resolveShiftConfig(initialData.shift);
+      const isPresent = initialData.status === 'Hadir' || initialData.status === 'Terlambat';
+
       setFormData({
         id: initialData.id,
         employeeId: initialData.employeeId || '',
         date: initialData.date || currentDate,
-        shift: initialData.shift || SHIFT_OPTIONS[0].value,
+        shift: shiftConfig.value,
         status: initialData.status || 'Hadir',
-        checkIn: initialData.checkIn || '',
-        checkOut: initialData.checkOut || '',
-        notes: initialData.notes || '',
+        checkIn: isPresent && isValidTime(initialData.checkIn)
+          ? initialData.checkIn
+          : isPresent
+          ? shiftConfig.startTime
+          : '',
+        checkOut: isPresent && isValidTime(initialData.checkOut)
+          ? initialData.checkOut
+          : isPresent
+          ? shiftConfig.endTime
+          : '',
+        notes: initialData.notes && initialData.notes !== '-' ? initialData.notes : '',
       });
     } else {
       const defaultEmp = employees[0];
+      const shiftConfig = resolveShiftConfig(defaultEmp?.scheduleCategory);
+
       setFormData({
         employeeId: defaultEmp?.id || '',
         date: currentDate,
-        shift: defaultEmp?.scheduleCategory || SHIFT_OPTIONS[0].value,
+        shift: shiftConfig.value,
         status: 'Hadir',
-        checkIn: defaultEmp?.checkInTime || '07:00',
-        checkOut: defaultEmp?.checkOutTime || '15:00',
+        checkIn: defaultEmp?.checkInTime || shiftConfig.startTime,
+        checkOut: defaultEmp?.checkOutTime || shiftConfig.endTime,
         notes: '',
       });
     }
@@ -75,42 +172,42 @@ export default function ModalFormPresensi({
   const isPresentType = formData.status === 'Hadir' || formData.status === 'Terlambat';
 
   // Live calculation of tardiness
-  const tardinessInfo = React.useMemo(() => {
+  const tardinessInfo = useMemo(() => {
     if (!isPresentType || !formData.checkIn) return null;
-    const [h, m] = formData.checkIn.split(':').map(Number);
-    if (isNaN(h) || isNaN(m)) return null;
-
-    const actualMinute = h * 60 + m;
-    const startMinute = getStartMinute(formData.shift);
-    const diff = actualMinute - startMinute;
-
-    if (diff > 0) {
-      return { isLate: true, minutes: diff, text: `Terlambat ${diff} menit dari jam shift` };
-    }
-    return { isLate: false, minutes: 0, text: 'Tepat Waktu (Sesuai Jadwal)' };
+    return calculateTardiness(formData.checkIn, formData.shift);
   }, [formData.checkIn, formData.shift, isPresentType]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
 
-      // Auto update status Hadir vs Terlambat jika waktu checkIn diubah
-      if (field === 'checkIn' && isPresentType && value) {
-        const [h, m] = value.split(':').map(Number);
-        if (!isNaN(h) && !isNaN(m)) {
-          const actualMinute = h * 60 + m;
-          const startMinute = getStartMinute(updated.shift);
-          updated.status = actualMinute > startMinute ? 'Terlambat' : 'Hadir';
+      // Jika shift diubah, sesuaikan default jam masuk & pulang jika tipe hadir
+      if (field === 'shift') {
+        const newShiftConfig = resolveShiftConfig(value);
+        if (isPresentType) {
+          if (!isValidTime(updated.checkIn)) {
+            updated.checkIn = newShiftConfig.startTime;
+          }
+          updated.checkOut = newShiftConfig.endTime;
         }
       }
 
-      // Jika employee dipilih, sesuaikan shift defaultnya
+      // Auto update status Hadir vs Terlambat jika waktu checkIn diubah
+      if (field === 'checkIn' && isPresentType && isValidTime(value)) {
+        const tardy = calculateTardiness(value, updated.shift);
+        if (tardy) {
+          updated.status = tardy.isLate ? 'Terlambat' : 'Hadir';
+        }
+      }
+
+      // Jika employee dipilih (mode tambah), sesuaikan data shift defaultnya
       if (field === 'employeeId') {
         const emp = employees.find((e) => e.id === Number(value));
         if (emp) {
-          if (emp.scheduleCategory) updated.shift = emp.scheduleCategory;
-          if (emp.checkInTime) updated.checkIn = emp.checkInTime;
-          if (emp.checkOutTime) updated.checkOut = emp.checkOutTime;
+          const empShift = resolveShiftConfig(emp.scheduleCategory);
+          updated.shift = empShift.value;
+          updated.checkIn = emp.checkInTime || empShift.startTime;
+          updated.checkOut = emp.checkOutTime || empShift.endTime;
         }
       }
 
@@ -125,11 +222,21 @@ export default function ModalFormPresensi({
   const handleStatusChange = (newStatus) => {
     setFormData((prev) => {
       const isNowPresent = newStatus === 'Hadir' || newStatus === 'Terlambat';
+      const shiftConfig = resolveShiftConfig(prev.shift);
+
       return {
         ...prev,
         status: newStatus,
-        checkIn: isNowPresent ? (prev.checkIn || '07:00') : '',
-        checkOut: isNowPresent ? (prev.checkOut || '15:00') : '',
+        checkIn: isNowPresent
+          ? isValidTime(prev.checkIn)
+            ? prev.checkIn
+            : shiftConfig.startTime
+          : '',
+        checkOut: isNowPresent
+          ? isValidTime(prev.checkOut)
+            ? prev.checkOut
+            : shiftConfig.endTime
+          : '',
       };
     });
   };
@@ -140,8 +247,8 @@ export default function ModalFormPresensi({
 
     if (!formData.employeeId) newErrors.employeeId = 'Pilih karyawan.';
     if (!formData.date) newErrors.date = 'Pilih tanggal presensi.';
-    if (isPresentType && !formData.checkIn) {
-      newErrors.checkIn = 'Jam masuk wajib diisi untuk status kehadiran.';
+    if (isPresentType && (!formData.checkIn || !isValidTime(formData.checkIn))) {
+      newErrors.checkIn = 'Jam masuk wajib diisi dengan format valid (HH:MM).';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -150,6 +257,8 @@ export default function ModalFormPresensi({
     }
 
     const selectedEmp = employees.find((e) => e.id === Number(formData.employeeId));
+    const finalLocation = initialData?.location || selectedEmp?.location || 'Lokasi Mariuk';
+    const finalGroup = initialData?.group || selectedEmp?.group || 'Grup A';
 
     onSave({
       id: formData.id || Date.now(),
@@ -158,12 +267,13 @@ export default function ModalFormPresensi({
       nip: selectedEmp?.nip || initialData?.nip || '-',
       division: selectedEmp?.division || initialData?.division || '-',
       role: selectedEmp?.role || initialData?.role || '-',
-      location: selectedEmp?.location || initialData?.location || 'Lokasi Mariuk',
+      location: finalLocation,
+      group: finalGroup,
       date: formData.date,
       shift: formData.shift,
       status: formData.status,
-      checkIn: isPresentType ? formData.checkIn : '-',
-      checkOut: isPresentType ? (formData.checkOut || '-') : '-',
+      checkIn: isPresentType && isValidTime(formData.checkIn) ? formData.checkIn : '-',
+      checkOut: isPresentType && isValidTime(formData.checkOut) ? formData.checkOut : '-',
       lateMinutes: tardinessInfo?.isLate ? tardinessInfo.minutes : 0,
       deviation: isPresentType
         ? (tardinessInfo?.isLate ? `+${tardinessInfo.minutes}m` : 'Tepat Waktu')
@@ -175,6 +285,14 @@ export default function ModalFormPresensi({
   };
 
   const selectedEmp = employees.find((e) => e.id === Number(formData.employeeId));
+  const currentEmpName = initialData?.employeeName || selectedEmp?.name || 'Karyawan';
+  const currentEmpNip = initialData?.nip || selectedEmp?.nip || '-';
+  const currentEmpRole = initialData?.role || selectedEmp?.role || '-';
+  const currentEmpDivision = initialData?.division || selectedEmp?.division || '-';
+  const currentEmpLocation = initialData?.location || selectedEmp?.location || 'Lokasi Mariuk';
+  const currentEmpGroup = initialData?.group || selectedEmp?.group || 'Grup A';
+
+  const isMariuk = currentEmpLocation.includes('Mariuk');
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg">
@@ -183,28 +301,68 @@ export default function ModalFormPresensi({
           title={isEditing ? 'Ubah Catatan Presensi' : 'Catat Presensi Karyawan'}
           description={
             isEditing
-              ? `Perbarui detail presensi untuk ${formData.employeeName || selectedEmp?.name || 'karyawan'}.`
-              : 'Tambahkan catatan kehadiran individual karyawan ke dalam sistem operasional.'
+              ? `Perbarui detail presensi & jam kerja untuk ${currentEmpName}.`
+              : 'Tambahkan catatan kehadiran individual karyawan ke dalam sistem operasional 24/7.'
           }
-          icon={CalendarCheck}
+          icon={<CalendarCheck className="w-5 h-5 text-[#c4a266]" />}
           onClose={onClose}
         />
 
         <ModalBody className="space-y-4">
-          {/* 1. Pemilihan Karyawan */}
+          {/* 1. Informasi Karyawan */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Karyawan <span className="text-rose-500">*</span>
-            </label>
-            {isEditing ? (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
-                <div>
-                  <strong className="block text-sm text-navy">{initialData?.employeeName}</strong>
-                  <span className="text-xs text-slate-500">{initialData?.nip} · {initialData?.role}</span>
-                </div>
-                <span className="text-xs text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                  {initialData?.division}
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-slate-700">
+                Karyawan Operasional <span className="text-rose-500">*</span>
+              </label>
+              {isEditing && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                  <Lock className="w-3 h-3 text-slate-400" />
+                  Identitas Terkunci
                 </span>
+              )}
+            </div>
+
+            {isEditing ? (
+              <div className="p-3.5 bg-slate-50/90 rounded-xl border border-slate-200/90 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-navy text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                    {currentEmpName
+                      .split(' ')
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join('')}
+                  </div>
+                  <div>
+                    <strong className="block text-sm font-bold text-navy">
+                      {currentEmpName}
+                    </strong>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                      <span className="font-mono font-medium text-slate-600">{currentEmpNip}</span>
+                      <span>•</span>
+                      <span>{currentEmpRole}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold border ${
+                      isMariuk
+                        ? 'bg-amber-50 text-amber-900 border-amber-200'
+                        : 'bg-indigo-50 text-indigo-900 border-indigo-200'
+                    }`}
+                  >
+                    <MapPin className="w-3 h-3 shrink-0" />
+                    {currentEmpLocation}
+                  </span>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-white text-slate-700 border border-slate-200">
+                    {currentEmpGroup}
+                  </span>
+                  <span className="text-xs text-slate-500 hidden md:inline-block">
+                    {currentEmpDivision}
+                  </span>
+                </div>
               </div>
             ) : (
               <select
@@ -215,7 +373,7 @@ export default function ModalFormPresensi({
                 <option value="">-- Pilih Karyawan --</option>
                 {employees.map((emp) => (
                   <option key={emp.id} value={emp.id}>
-                    {emp.nip} — {emp.name} ({emp.division})
+                    {emp.nip} — {emp.name} ({emp.location} · {emp.division})
                   </option>
                 ))}
               </select>
@@ -225,11 +383,11 @@ export default function ModalFormPresensi({
             )}
           </div>
 
-          {/* 2. Tanggal Presensi & Shift */}
+          {/* 2. Tanggal Presensi & Shift 12 Jam */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Tanggal Kerja <span className="text-rose-500">*</span>
+                Tanggal Operasional <span className="text-rose-500">*</span>
               </label>
               <Input
                 type="date"
@@ -241,7 +399,7 @@ export default function ModalFormPresensi({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Jadwal / Shift Terjadwal
+                Jadwal / Shift 12 Jam
               </label>
               <select
                 value={formData.shift}
@@ -270,13 +428,14 @@ export default function ModalFormPresensi({
                     key={st.value}
                     type="button"
                     onClick={() => handleStatusChange(st.value)}
-                    className={`py-2 px-3 text-xs font-medium rounded-xl border text-left transition-all ${
+                    className={`py-2 px-3 text-xs rounded-xl border text-left transition-all flex items-center justify-between ${
                       isSelected
-                        ? 'border-navy bg-navy/5 text-navy font-semibold ring-1 ring-navy'
-                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                        ? 'border-navy bg-navy/5 text-navy font-bold ring-1 ring-navy'
+                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 font-medium'
                     }`}
                   >
-                    {st.label}
+                    <span>{st.label}</span>
+                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-navy shrink-0" />}
                   </button>
                 );
               })}
@@ -284,8 +443,8 @@ export default function ModalFormPresensi({
           </div>
 
           {/* 4. Jam Masuk & Jam Pulang (hanya bila Hadir/Terlambat) */}
-          {isPresentType && (
-            <div className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 space-y-3">
+          {isPresentType ? (
+            <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/90 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -316,29 +475,34 @@ export default function ModalFormPresensi({
               {/* Status Deviasi Realtime Preview */}
               {tardinessInfo && (
                 <div
-                  className={`text-xs p-2.5 rounded-lg flex items-center gap-2 ${
+                  className={`text-xs p-3 rounded-lg flex items-center gap-2.5 transition-all ${
                     tardinessInfo.isLate
-                      ? 'bg-amber-50 text-amber-900 border border-amber-200/60'
-                      : 'bg-emerald-50 text-emerald-900 border border-emerald-200/60'
+                      ? 'bg-amber-50 text-amber-900 border border-amber-200/80'
+                      : 'bg-emerald-50 text-emerald-900 border border-emerald-200/80'
                   }`}
                 >
-                  <Clock className="w-4 h-4 shrink-0" />
-                  <span className="font-medium">
-                    {tardinessInfo.text}
-                  </span>
+                  <Clock className={`w-4 h-4 shrink-0 ${tardinessInfo.isLate ? 'text-amber-700' : 'text-emerald-700'}`} />
+                  <span className="font-semibold">{tardinessInfo.text}</span>
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-xs text-slate-500 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-slate-400 shrink-0" />
+              <span>
+                Status <strong>{formData.status}</strong> tidak memerlukan pencatatan jam masuk & jam pulang.
+              </span>
             </div>
           )}
 
           {/* 5. Catatan / Alasan */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              Keterangan / Alasan (Opsional)
+              Keterangan / Alasan Operasional (Opsional)
             </label>
             <Input
               type="text"
-              placeholder="Contoh: Surat dokter terlampir / Izin keluarga / Kendala operasional"
+              placeholder="Contoh: Shift pagi berjalan normal / Izin keperluan mendesak / Surat dokter terlampir"
               value={formData.notes}
               onChange={(e) => handleChange('notes', e.target.value)}
             />
@@ -349,7 +513,7 @@ export default function ModalFormPresensi({
           <Button type="button" variant="outline" onClick={onClose}>
             Batal
           </Button>
-          <Button type="submit" variant="default" className="gap-2">
+          <Button type="submit" variant="default" className="gap-2 bg-navy hover:bg-navy/90 text-white">
             <Save className="w-4 h-4" />
             <span>{isEditing ? 'Simpan Perubahan' : 'Simpan Presensi'}</span>
           </Button>
@@ -358,4 +522,3 @@ export default function ModalFormPresensi({
     </Modal>
   );
 }
-

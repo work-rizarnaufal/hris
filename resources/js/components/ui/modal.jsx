@@ -77,6 +77,12 @@ function ModalHeader({
   children,
   className = '',
 }) {
+  const renderedIcon = React.isValidElement(icon)
+    ? icon
+    : typeof icon === 'function' || (typeof icon === 'object' && icon !== null && 'render' in icon)
+    ? React.createElement(icon, { className: 'w-5 h-5' })
+    : icon;
+
   return (
     <div
       className={cn(
@@ -85,9 +91,9 @@ function ModalHeader({
       )}
     >
       <div className="flex items-start gap-3 min-w-0">
-        {icon && (
+        {renderedIcon && (
           <div className="w-10 h-10 rounded-xl bg-[#f7f2e8] border border-[#c4a266]/30 flex items-center justify-center text-[#c4a266] shrink-0 mt-0.5">
-            {icon}
+            {renderedIcon}
           </div>
         )}
         <div className="min-w-0 flex-1">
