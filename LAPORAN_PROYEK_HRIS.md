@@ -154,6 +154,7 @@ Spesifikasi desain sistem lengkap dan token mesin telah dikunci pada dokumen ped
 2. **[`table.jsx`](resources/js/components/ui/table.jsx)**:
    - `<Table>`, `<TableHeader>`, `<TableBody>`, `<TableFooter>`, `<TableRow>`, `<TableHead>`, `<TableCell>`, `<TableCaption>`, `<TableEmpty>`.
    - **Toolbar & Filter Atomik**: `<TableToolbar>`, `<TableSearch>`, `<TableFilterGroup>`, `<TableSelect>`.
+   - **Pagination Atomik**: `<TablePagination>` dengan navigasi halaman dinamis, pemilih jumlah baris (10, 25, 50, 100), ringkasan data terfilter (`from - to dari total`), dan penomoran halaman dengan elipsis cerdas.
    - Menghilangkan *CSS clash* lama, menyediakan tata letak dropdown filter yang konsisten, tinggi seragam (`h-9`), ikon panah kustom (`ChevronDown`), dan tata letak responsif bebas pembungkusan (*wrapping*) canggung pada layar mobile/tablet. Dilengkapi utility container `.table-scroll` dengan *universal hidden scrollbar*.
 3. **[`toast.jsx`](resources/js/components/ui/toast.jsx)**:
    - Komponen notifikasi mengambang standar resmi HCGA (`success`, `warning`, `error`).
@@ -221,7 +222,11 @@ Lokasi: [`resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx`](resources/js/Page
   - Seluruh operasi CRUD (Tambah Karyawan, Edit Karyawan, Hapus Karyawan, dan Batch Impor Excel) kini terhubung langsung ke `KaryawanController.php` dan database SQLite (`employees`, `locations`, `shifts`).
   - Menggunakan Inertia router (`router.post`, `router.put`, `router.delete`) dengan state `isSubmitting` dan error feedback presisi di level input form.
   - Data dummy lama telah dibersihkan secara tuntas dan digantikan 86 data karyawan riil operasional site (35 Lokasi Mariuk & 51 Lokasi Cimalaka) dengan format NIP Opsi B (`HC-0001` - `HC-0120`) dan mapping `biometric_pin` mesin fisik.
-- **10 Kolom Tabel Simetris**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
+- **10 Kolom Tabel Simetris & Navigasi Pagination**:
+  - Kolom: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
+  - Penomoran baris kontinu berdasarkan halaman aktif `(currentPage - 1) * perPage + index + 1`.
+  - Dilengkapi `<TablePagination>` dengan pemilih baris per halaman (10, 25, 50, 100 baris, default 10 baris), tombol Sebelumnya/Berikutnya, dan tombol nomor halaman berelipsis.
+  - Otomatis mereset ke halaman 1 saat pengguna mengetik pencarian atau mengubah filter lokasi/divisi/grup/status.
 - **Head Table Rapi & Terpusat**: Kolom data badge/jam/status terpusat simetris dengan kolom header.
 - **Fitur Aksi**:
   - **Tambah Karyawan (`ModalFormKaryawan.jsx`)**: Menggunakan modal atomik, preset shift cepat, auto-generate NIP jika dikosongkan (`HC-0121+`), auto-resolve ID lokasi dan shift.

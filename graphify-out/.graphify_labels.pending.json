@@ -2,7 +2,7 @@
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
   "4": "web.php",
   "5": "lucide-react",
-  "6": "App\\Http\\Controllers\\Admin\\PengaturanController",
+  "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
   "13": "cn",
   "39": "Anti-Slop (Full Specification)",
@@ -10,13 +10,9 @@
   "41": "PengaturanSistem.jsx",
   "42": "Illuminate\\Database\\Eloquent\\Relations\\BelongsTo",
   "43": "Illuminate\\Database\\Seeder",
-  "44": "KaryawanController.php",
   "45": "Employee",
   "46": "User",
-  "47": "App\\Http\\Controllers\\Admin\\KehadiranController",
   "48": "Location",
   "49": "App\\Models\\Location",
-  "50": "Illuminate\\Http\\Request",
-  "51": "Illuminate\\Http\\RedirectResponse",
-  "52": "SystemSetting"
+  "52": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory"
 }

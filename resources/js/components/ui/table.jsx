@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils.js';
 
 const Table = React.forwardRef(({ className, containerClassName, ...props }, ref) => (
@@ -161,6 +161,134 @@ const TableSelect = React.forwardRef(({ className, containerClassName, children,
 ));
 TableSelect.displayName = 'TableSelect';
 
+const TablePagination = React.forwardRef(({
+  className,
+  currentPage = 1,
+  totalPages = 1,
+  totalItems = 0,
+  itemsPerPage = 10,
+  onPageChange,
+  onItemsPerPageChange,
+  perPageOptions = [10, 25, 50, 100],
+  filteredCount,
+  ...props
+}, ref) => {
+  const effectiveTotal = filteredCount !== undefined ? filteredCount : totalItems;
+  const from = effectiveTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const to = Math.min(currentPage * itemsPerPage, effectiveTotal);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'p-3.5 border-t border-slate-200/80 bg-slate-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-600',
+        className
+      )}
+      {...props}
+    >
+      {/* Informasi Jumlah Record */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div>
+          Menampilkan <strong className="text-slate-900 font-semibold">{from} - {to}</strong> dari{' '}
+          <strong className="text-slate-900 font-semibold">
+            {filteredCount !== undefined && filteredCount !== totalItems ? `${filteredCount} (terfilter)` : totalItems}
+          </strong> data
+        </div>
+
+        {/* Pilihan Baris per Halaman */}
+        {onItemsPerPageChange && (
+          <div className="flex items-center gap-1.5 pl-3 border-l border-slate-200">
+            <span className="text-[11px] text-slate-500">Tampilkan:</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+              className="h-7 text-xs bg-white border border-slate-200 rounded-md px-2 py-0.5 text-slate-700 font-medium focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer transition-all"
+            >
+              {perPageOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt} baris
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Navigasi Nomor Halaman */}
+      {totalPages > 1 && (
+        <div className="flex items-center gap-1 self-center sm:self-auto">
+          <button
+            type="button"
+            disabled={currentPage <= 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            className="h-7.5 px-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs font-medium hover:bg-slate-50 hover:text-navy disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1 shadow-2xs"
+            title="Halaman Sebelumnya"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sebelumnya</span>
+          </button>
+
+          <div className="flex items-center gap-1">
+            {getPageNumbers().map((p, idx) => {
+              if (p === '...') {
+                return (
+                  <span key={`ellipsis-${idx}`} className="px-1.5 text-slate-400 text-xs">
+                    ...
+                  </span>
+                );
+              }
+              const isActive = p === currentPage;
+              return (
+                <button
+                  key={`page-${p}`}
+                  type="button"
+                  onClick={() => onPageChange(p)}
+                  className={cn(
+                    'w-7.5 h-7.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center',
+                    isActive
+                      ? 'bg-navy text-white shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs'
+                  )}
+                >
+                  {p}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            disabled={currentPage >= totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            className="h-7.5 px-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs font-medium hover:bg-slate-50 hover:text-navy disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1 shadow-2xs"
+            title="Halaman Berikutnya"
+          >
+            <span className="hidden sm:inline">Berikutnya</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+});
+TablePagination.displayName = 'TablePagination';
+
 export {
   Table,
   TableHeader,
@@ -175,4 +303,5 @@ export {
   TableSearch,
   TableFilterGroup,
   TableSelect,
+  TablePagination,
 };

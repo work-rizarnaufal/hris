@@ -41,6 +41,7 @@ import {
   TableSearch,
   TableFilterGroup,
   TableSelect,
+  TablePagination,
   Toast,
 } from '@/components/ui';
 import ModalFormKaryawan from './Partials/ModalFormKaryawan.jsx';
@@ -161,6 +162,28 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
     setFilterGroup('ALL');
     setFilterStatus('ALL');
   };
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Reset ke halaman 1 saat filter / pencarian berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterLocation, filterDivision, filterGroup, filterStatus, itemsPerPage]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredEmployees.length / itemsPerPage));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedEmployees = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredEmployees.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredEmployees, currentPage, itemsPerPage]);
 
   // Add / Edit Handlers
   const handleOpenAdd = () => {
@@ -501,7 +524,9 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
                   </div>
                 </TableEmpty>
               ) : (
-                filteredEmployees.map((emp, index) => {
+                paginatedEmployees.map((emp, index) => {
+                  const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
+
                   // Badge styling helper
                   const statusClass =
                     emp.status === 'Aktif'
@@ -521,7 +546,7 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
                     <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
                       {/* 1. No */}
                       <TableCell className="text-center font-medium text-slate-500 text-xs">
-                        {index + 1}
+                        {rowNumber}
                       </TableCell>
 
                       {/* 2. Nama Karyawan */}
@@ -637,14 +662,16 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
           </Table>
 
           {/* Footer Pagination / Count Info */}
-          <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
-            <div>
-              Menampilkan <strong>{filteredEmployees.length}</strong> dari total <strong>{employees.length}</strong> karyawan terdaftar
-            </div>
-            <div className="text-[11px] text-slate-400">
-              Pembaruan data tersinkronisasi dengan master roster HCGA
-            </div>
-          </div>
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={employees.length}
+            filteredCount={filteredEmployees.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
+            perPageOptions={[10, 25, 50, 100]}
+          />
         </CardContent>
       </Card>
 
