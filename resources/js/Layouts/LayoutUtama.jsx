@@ -56,6 +56,8 @@ export default function LayoutUtama({
         <Topbar
           title={pageTitle}
           actorName={actorName}
+          user={props.auth?.user}
+          companyName={companyName}
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         />

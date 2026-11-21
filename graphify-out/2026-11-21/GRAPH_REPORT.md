@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-21)
 
 ## Corpus Check
-- 88 files · ~61,324 words
+- 88 files · ~60,800 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 13 file(s) not represented in the graph (top: (none) 10, .example 1, .css 1)
 
 ## Summary
-- 417 nodes · 933 edges · 40 communities (12 shown, 28 thin omitted)
+- 417 nodes · 938 edges · 41 communities (13 shown, 28 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1d742ebe`
+- Built from commit: `b4934351`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,6 +21,7 @@
 - Backend Composer Dependencies
 - HCGA HRIS Enterprise Design System (DESIGN.md)
 - Inertia React UI & Layout Components
+- app.jsx
 - PengaturanSistem.jsx
 - Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)
 - Laravel Application Bootstrap
@@ -46,27 +47,27 @@
 ## Surprising Connections (you probably didn't know these)
 - `renderAdminLayout()` --calls--> `LayoutUtama()`  [EXTRACTED]
   resources/js/app.jsx → resources/js/Layouts/LayoutUtama.jsx
-- `DataKaryawan()` --calls--> `ModalFormKaryawan()`  [EXTRACTED]
-  resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx → resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx
 - `Card()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardDescription()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (40 total, 28 thin omitted)
+## Communities (41 total, 28 thin omitted)
 
 ### Community 0 - "Inertia React UI & Layout Components"
 Cohesion: 0.18
 Nodes (28): @inertiajs/react, lucide-react, react, Card(), CardContent(), CardDescription(), CardHeader(), CardTitle() (+20 more)
 
 ### Community 1 - "Frontend Dependencies & Manifest"
-Cohesion: 0.06
-Nodes (36): dependencies, clsx@^2.1.1, @inertiajs/react@^2.0.0, lucide-react@^0.475.0, react@^18.3.1, react-dom@^18.3.1, recharts@^2.15.0, tailwind-merge@^2.5.5 (+28 more)
+Cohesion: 0.08
+Nodes (32): dependencies, clsx@^2.1.1, @inertiajs/react@^2.0.0, lucide-react@^0.475.0, react@^18.3.1, react-dom@^18.3.1, recharts@^2.15.0, tailwind-merge@^2.5.5 (+24 more)
 
 ### Community 2 - "Backend Composer Dependencies"
 Cohesion: 0.05
@@ -80,9 +81,13 @@ Nodes (33): 1. Overview, 2. Colors, 3. Typography, 4. Layout, 5. Elevation & Dep
 Cohesion: 0.07
 Nodes (3): HandleInertiaRequests, MATCH /logout(), POST /login()
 
+### Community 5 - "app.jsx"
+Cohesion: 0.21
+Nodes (4): renderAdminLayout(), renderUserLayout(), colors, LayoutPublik()
+
 ### Community 6 - "PengaturanSistem.jsx"
 Cohesion: 0.11
-Nodes (37): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, PanelRotasiGrup(), DIVISIONS, GROUPS, ModalFormKaryawan() (+29 more)
+Nodes (39): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, PanelRotasiGrup(), DataKaryawan(), DIVISIONS, GROUPS (+31 more)
 
 ### Community 8 - "Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)"
 Cohesion: 0.44
@@ -105,8 +110,8 @@ Cohesion: 0.40
 Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, Ponytail (Companion Pragmatism Skill), The Decision Ladder
 
 ### Community 41 - "CatatanKehadiran.jsx"
-Cohesion: 0.14
-Nodes (17): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, DataKaryawan(), INITIAL_EMPLOYEES (+9 more)
+Cohesion: 0.15
+Nodes (15): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, INITIAL_EMPLOYEES, DEFAULT_DATE (+7 more)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
@@ -116,13 +121,13 @@ Nodes (17): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_S
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `cn`, `PengaturanSistem.jsx`, `CatatanKehadiran.jsx`?**
+- **Why does `react` connect `Inertia React UI & Layout Components` to `Frontend Dependencies & Manifest`, `app.jsx`, `PengaturanSistem.jsx`, `CatatanKehadiran.jsx`, `cn`?**
   _High betweenness centrality (0.128) - this node is a cross-community bridge._
 - **What connects `Aturan Antislop & Ponytail` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Frontend Dependencies & Manifest` be split into smaller, more focused modules?**
-  _Cohesion score 0.05585106382978723 - nodes in this community are weakly interconnected._
-- **Why does `HCGA HRIS Enterprise Design System (DESIGN.md)` connect `HCGA HRIS Enterprise Design System (DESIGN.md)` to `Frontend Dependencies & Manifest`?**
+  _Cohesion score 0.07563025210084033 - nodes in this community are weakly interconnected._
+- **Why does `HCGA HRIS Enterprise Design System (DESIGN.md)` connect `HCGA HRIS Enterprise Design System (DESIGN.md)` to `app.jsx`?**
   _High betweenness centrality (0.091) - this node is a cross-community bridge._
 - **Should `Backend Composer Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
