@@ -42,10 +42,10 @@ class KaryawanController extends Controller
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],
             'role_title' => ['required', 'string', 'max:100'],
-            'division' => ['required', 'string', 'max:100'],
+            'division' => ['nullable', 'string', 'max:100'],
             'location_id' => ['required', 'exists:locations,id'],
-            'shift_id' => ['required', 'exists:shifts,id'],
-            'shift_group' => ['required', 'string'],
+            'shift_id' => ['nullable', 'exists:shifts,id'],
+            'shift_group' => ['nullable', 'string'],
             'employment_status' => ['required', 'string'],
             'status' => ['required', 'string'],
         ])->validate();
@@ -67,10 +67,10 @@ class KaryawanController extends Controller
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],
             'role_title' => ['required', 'string', 'max:100'],
-            'division' => ['required', 'string', 'max:100'],
+            'division' => ['nullable', 'string', 'max:100'],
             'location_id' => ['required', 'exists:locations,id'],
-            'shift_id' => ['required', 'exists:shifts,id'],
-            'shift_group' => ['required', 'string'],
+            'shift_id' => ['nullable', 'exists:shifts,id'],
+            'shift_group' => ['nullable', 'string'],
             'employment_status' => ['required', 'string'],
             'status' => ['required', 'string'],
         ])->validate();
@@ -140,17 +140,19 @@ class KaryawanController extends Controller
 
         // Resolve shift_id
         $shiftId = $data['shift_id'] ?? null;
-        if (! $shiftId && (! empty($data['scheduleCategory']) || ! empty($data['shift']))) {
+        if (! empty($data['scheduleCategory']) || ! empty($data['shift'])) {
             $shiftStr = (string) ($data['scheduleCategory'] ?? (is_array($data['shift'] ?? null) ? ($data['shift']['name'] ?? '') : ($data['shift'] ?? '')));
-            if (stripos($shiftStr, 'malam') !== false) {
+            if (stripos($shiftStr, 'belum') !== false || $shiftStr === '-' || $shiftStr === '') {
+                $shiftId = null;
+            } elseif (stripos($shiftStr, 'malam') !== false) {
                 $shiftId = 2;
             } elseif (stripos($shiftStr, 'kantor') !== false || stripos($shiftStr, 'fleksibel') !== false || stripos($shiftStr, 'office') !== false) {
                 $shiftId = 3;
-            } else {
+            } elseif (stripos($shiftStr, 'pagi') !== false) {
                 $shiftId = 1;
             }
         }
-        $shiftId = $shiftId ? (int) $shiftId : 1;
+        $shiftId = $shiftId ? (int) $shiftId : null;
 
         $nip = trim((string) ($data['nip'] ?? ''));
         if (empty($nip)) {
@@ -163,6 +165,12 @@ class KaryawanController extends Controller
             $biometricPin = $rawDigits !== '' ? (string) (int) $rawDigits : null;
         }
 
+        $div = trim((string) ($data['division'] ?? ''));
+        $division = (! empty($div) && $div !== 'Belum Ditetapkan' && $div !== '-') ? $div : null;
+
+        $grp = trim((string) ($data['shift_group'] ?? $data['group'] ?? ''));
+        $shiftGroup = (! empty($grp)) ? $grp : 'Belum Ditetapkan';
+
         return [
             'nip' => $nip,
             'biometric_pin' => $biometricPin ? (string) $biometricPin : null,
@@ -170,10 +178,10 @@ class KaryawanController extends Controller
             'email' => $data['email'] ?? null,
             'phone' => $data['phone'] ?? null,
             'role_title' => trim((string) ($data['role_title'] ?? $data['role'] ?? 'Staff Operasional Lapangan')),
-            'division' => trim((string) ($data['division'] ?? 'Operasional & Lapangan')),
+            'division' => $division,
             'location_id' => $locationId,
             'shift_id' => $shiftId,
-            'shift_group' => $data['shift_group'] ?? $data['group'] ?? 'Grup A',
+            'shift_group' => $shiftGroup,
             'employment_status' => $data['employment_status'] ?? 'Tetap',
             'status' => $data['status'] ?? 'Aktif',
         ];

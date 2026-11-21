@@ -33,8 +33,10 @@ const DIVISIONS = [
 ];
 
 const GROUPS = [
+  { value: 'Belum Ditetapkan', label: 'Belum Ditetapkan', desc: 'Jadwal belum ditentukan oleh admin' },
   { value: 'Grup A', label: 'Grup A (Rotasi Hari Ganjil)', desc: 'Senin, Rabu, Jumat, Minggu' },
   { value: 'Grup B', label: 'Grup B (Rotasi Hari Genap)', desc: 'Selasa, Kamis, Sabtu' },
+  { value: 'Non-Shift', label: 'Non-Shift (Staff Kantor)', desc: 'Jam kerja reguler Senin - Jumat' },
 ];
 
 export default function ModalFormKaryawan({
@@ -58,6 +60,13 @@ export default function ModalFormKaryawan({
   const schedulePresets = useMemo(() => {
     const s = getShiftSettings();
     return [
+      {
+        label: 'Belum Ditetapkan (-)',
+        cat: 'Belum Ditetapkan',
+        in: '',
+        out: '',
+        desc: 'Shift belum ditentukan oleh admin',
+      },
       {
         label: `${s.shiftPagiName} (${s.shiftPagiIn} - ${s.shiftPagiOut})`,
         cat: 'Shift Pagi (08:00 - 17:00)',
@@ -83,19 +92,18 @@ export default function ModalFormKaryawan({
   }, [isOpen]);
 
   const defaultLoc = availableLocations[0]?.value || 'Lokasi Mariuk';
-  const defaultPreset = schedulePresets[0];
 
   const [formData, setFormData] = useState({
     name: '',
     nip: '',
     biometricPin: '',
     role: '',
-    division: DIVISIONS[0],
+    division: '',
     location: defaultLoc,
-    group: GROUPS[0].value,
-    scheduleCategory: defaultPreset.cat,
-    checkInTime: defaultPreset.in,
-    checkOutTime: defaultPreset.out,
+    group: 'Belum Ditetapkan',
+    scheduleCategory: 'Belum Ditetapkan',
+    checkInTime: '',
+    checkOutTime: '',
     status: 'Aktif',
   });
 
@@ -103,7 +111,6 @@ export default function ModalFormKaryawan({
 
   useEffect(() => {
     const curLoc = availableLocations[0]?.value || 'Lokasi Mariuk';
-    const curPreset = schedulePresets[0];
 
     if (initialData) {
       setFormData({
@@ -111,12 +118,12 @@ export default function ModalFormKaryawan({
         nip: initialData.nip || '',
         biometricPin: initialData.biometricPin || initialData.biometric_pin || '',
         role: initialData.role || '',
-        division: initialData.division || DIVISIONS[0],
+        division: (initialData.division && initialData.division !== '-') ? initialData.division : '',
         location: initialData.location || curLoc,
-        group: initialData.group || GROUPS[0].value,
-        scheduleCategory: initialData.scheduleCategory || curPreset.cat,
-        checkInTime: initialData.checkInTime || curPreset.in,
-        checkOutTime: initialData.checkOutTime || curPreset.out,
+        group: initialData.group || initialData.shift_group || 'Belum Ditetapkan',
+        scheduleCategory: (initialData.scheduleCategory && initialData.scheduleCategory !== '-') ? initialData.scheduleCategory : 'Belum Ditetapkan',
+        checkInTime: (initialData.checkInTime && initialData.checkInTime !== '-') ? initialData.checkInTime : '',
+        checkOutTime: (initialData.checkOutTime && initialData.checkOutTime !== '-') ? initialData.checkOutTime : '',
         status: initialData.status || 'Aktif',
       });
     } else {
@@ -125,12 +132,12 @@ export default function ModalFormKaryawan({
         nip: '',
         biometricPin: '',
         role: '',
-        division: DIVISIONS[0],
+        division: '',
         location: curLoc,
-        group: GROUPS[0].value,
-        scheduleCategory: curPreset.cat,
-        checkInTime: curPreset.in,
-        checkOutTime: curPreset.out,
+        group: 'Belum Ditetapkan',
+        scheduleCategory: 'Belum Ditetapkan',
+        checkInTime: '',
+        checkOutTime: '',
         status: 'Aktif',
       });
     }
@@ -160,8 +167,12 @@ export default function ModalFormKaryawan({
 
     if (!formData.name.trim()) newErrors.name = 'Nama lengkap karyawan wajib diisi.';
     if (!formData.role.trim()) newErrors.role = 'Jabatan / posisi kerja wajib diisi.';
-    if (!formData.checkInTime) newErrors.checkInTime = 'Jam masuk kerja wajib diisi.';
-    if (!formData.checkOutTime) newErrors.checkOutTime = 'Jam pulang kerja wajib diisi.';
+
+    const isShiftActive = formData.scheduleCategory && formData.scheduleCategory !== 'Belum Ditetapkan' && formData.scheduleCategory !== '-';
+    if (isShiftActive) {
+      if (!formData.checkInTime) newErrors.checkInTime = 'Jam masuk kerja wajib diisi jika shift aktif.';
+      if (!formData.checkOutTime) newErrors.checkOutTime = 'Jam pulang kerja wajib diisi jika shift aktif.';
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -219,7 +230,7 @@ export default function ModalFormKaryawan({
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    {formData.role || 'Jabatan'} · {formData.division}
+                    {formData.role || 'Jabatan'} · {formData.division || 'Belum Ditetapkan'}
                   </p>
                 </div>
               </div>
@@ -345,14 +356,15 @@ export default function ModalFormKaryawan({
               {/* Divisi */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Divisi / Departemen <span className="text-rose-500">*</span>
+                  Divisi / Departemen
                 </label>
                 <select
                   name="division"
-                  value={formData.division}
+                  value={formData.division || ''}
                   onChange={handleChange}
                   className="w-full h-9.5 text-xs rounded-xl border border-slate-200 bg-white px-3 focus:border-navy focus:ring-1 focus:ring-navy transition-all cursor-pointer"
                 >
+                  <option value="">Belum Ditetapkan (-)</option>
                   {DIVISIONS.map((div) => (
                     <option key={div} value={div}>
                       {div}
@@ -482,7 +494,7 @@ export default function ModalFormKaryawan({
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Pilih Preset Shift Standar
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {schedulePresets.map((preset) => {
                   const isCurrent = formData.scheduleCategory === preset.cat;
                   return (
@@ -498,7 +510,7 @@ export default function ModalFormKaryawan({
                     >
                       <strong className="block text-xs">{preset.cat}</strong>
                       <span className="text-[11px] text-slate-500 font-mono mt-0.5 block">
-                        {preset.in} - {preset.out}
+                        {preset.in && preset.out ? `${preset.in} - ${preset.out}` : 'Belum ditentukan'}
                       </span>
                     </button>
                   );
@@ -523,7 +535,7 @@ export default function ModalFormKaryawan({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Jam Masuk Kerja (WIB) <span className="text-rose-500">*</span>
+                  Jam Masuk Kerja (WIB) {formData.scheduleCategory && formData.scheduleCategory !== 'Belum Ditetapkan' && <span className="text-rose-500">*</span>}
                 </label>
                 <Input
                   type="time"
@@ -539,7 +551,7 @@ export default function ModalFormKaryawan({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Jam Pulang Kerja (WIB) <span className="text-rose-500">*</span>
+                  Jam Pulang Kerja (WIB) {formData.scheduleCategory && formData.scheduleCategory !== 'Belum Ditetapkan' && <span className="text-rose-500">*</span>}
                 </label>
                 <Input
                   type="time"
