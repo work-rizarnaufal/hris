@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attendance;
 use App\Models\Location;
 use App\Services\FingerprintImportService;
 use Illuminate\Database\Seeder;
@@ -31,6 +32,7 @@ class AttendanceSeeder extends Seeder
         $allRecords = array_merge($parsed['ready'], $parsed['anomalies']);
 
         if (! empty($allRecords)) {
+            Attendance::where('import_batch_id', 'BATCH-INITIAL-REAL-LOG')->delete();
             $service->commitRecords($allRecords, 'BATCH-INITIAL-REAL-LOG');
         }
     }
