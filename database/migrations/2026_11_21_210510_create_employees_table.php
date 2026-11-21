@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->foreignId('shift_id')->nullable()->constrained('shifts')->nullOnDelete();
             $table->string('nip')->unique();
+            $table->string('biometric_pin')->nullable()->index();
             $table->string('nik')->nullable();
             $table->string('name');
             $table->string('email')->nullable();

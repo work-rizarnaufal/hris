@@ -27,9 +27,9 @@ export const DEFAULT_ATTENDANCE_SETTINGS = {
   earlyCheckInMinutes: 60,
   earlyDepartureToleranceMinutes: 0,
   weeklyMinHours: 40,
-  enableGeofence: true, // Master switch validasi radius geofence presensi mobile
-  requireSelfie: true,
-  preventMockGps: true,
+  enableGeofence: false, // Default dinonaktifkan (Mode Presensi Fingerprint Site)
+  requireSelfie: false,
+  preventMockGps: false,
   minOvertimeMinutes: 60,
   standardAnnualLeaveDays: 12,
   leaveExpiryPeriod: '31 Maret (Tahun Berikutnya)',

@@ -87,6 +87,7 @@ export default function ModalFormKaryawan({
   const [formData, setFormData] = useState({
     name: '',
     nip: '',
+    biometricPin: '',
     role: '',
     division: DIVISIONS[0],
     location: defaultLoc,
@@ -107,6 +108,7 @@ export default function ModalFormKaryawan({
       setFormData({
         name: initialData.name || '',
         nip: initialData.nip || '',
+        biometricPin: initialData.biometricPin || initialData.biometric_pin || '',
         role: initialData.role || '',
         division: initialData.division || DIVISIONS[0],
         location: initialData.location || curLoc,
@@ -120,6 +122,7 @@ export default function ModalFormKaryawan({
       setFormData({
         name: '',
         nip: `HC-${String(Math.floor(100 + Math.random() * 900))}`,
+        biometricPin: '',
         role: '',
         division: DIVISIONS[0],
         location: curLoc,
@@ -292,6 +295,27 @@ export default function ModalFormKaryawan({
                     {errors.nip}
                   </span>
                 )}
+              </div>
+
+              {/* ID Mesin Fingerprint (PIN) */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-slate-700">
+                    ID Mesin Fingerprint (PIN)
+                  </label>
+                  <span className="text-[10px] text-slate-400">Opsional</span>
+                </div>
+                <Input
+                  type="text"
+                  name="biometricPin"
+                  placeholder="Contoh: 101"
+                  value={formData.biometricPin}
+                  onChange={handleChange}
+                  className="h-9.5 text-xs font-mono bg-white border-slate-200 focus:border-navy"
+                />
+                <span className="text-slate-400 text-[10px] mt-1 block">
+                  Nomor ID pada mesin fisik site (jika kosong, membaca angka NIP).
+                </span>
               </div>
 
               {/* Jabatan */}

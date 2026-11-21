@@ -28,7 +28,8 @@ return new class extends Migration
             $table->decimal('longitude_out', 10, 7)->nullable();
             $table->string('photo_in')->nullable();
             $table->string('photo_out')->nullable();
-            $table->string('method')->default('gps_selfie');
+            $table->string('method')->default('fingerprint'); // fingerprint, manual_admin, gps_selfie
+            $table->string('import_batch_id')->nullable()->index();
             $table->text('notes')->nullable();
             $table->timestamps();
 

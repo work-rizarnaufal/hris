@@ -570,29 +570,54 @@ Eksekusi seeder (`php artisan db:seed`) menyuntikkan:
 - `AuthController`: Menangani alur `showLogin`, `login` (verifikasi kredensial asli), dan `logout`.
 - `BerandaController`: Menyajikan metrik eksekutif terhitung langsung dari database SQLite.
 - `KaryawanController`: Mengirimkan prop `employees`, `availableLocations`, `availableShifts`, serta menangani operasi `store`, `update`, dan `destroy`.
+- `KehadiranController`: Menangani index log harian, input manual/koreksi admin (`storeManual`), preview parse log fingerprint (`previewFingerprint`), commit batch presensi (`commitFingerprint`), dan penautan biometric PIN (`linkBiometricPin`).
 - `PengaturanController`: Mengelola konfigurasi toleransi, geofence, dan jadwal libur.
-- **Automated Feature Tests**: Telah diuji dengan PHPUnit (`KaryawanBackendTest.php`) dengan hasil **2 passed (5 assertions), 100% sukses**.
+- **Automated Feature Tests**: Telah diuji dengan PHPUnit (`KaryawanBackendTest.php` dan `FingerprintAndManualAttendanceTest.php`) dengan hasil **7 passed (39 assertions), 100% sukses**.
 
 ---
 
-## 17. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 17. Implementasi Ingesti Log Fingerprint & Penonaktifan GPS Sementara
+
+Menindaklanjuti kebutuhan operasional riil pabrik bahwa data absensi tidak diinput mandiri oleh karyawan via GPS/selfie web, melainkan ditarik dari mesin absensi fisik (fingerprint) dan diinput/dikoreksi oleh Admin jika berhalangan scan:
+
+1. **Decoupling `biometric_pin` dari `id` / `nip` Database**:
+   - Menambahkan kolom `biometric_pin` (nullable, index) pada tabel `employees` dan accessor di `Employee.php` dengan fallback ke digit numerik NIP jika belum disetel manual.
+   - Admin dapat menambahkan, melihat, dan memperbarui nomor PIN mesin fingerprint langsung melalui formulir `ModalFormKaryawan.jsx`.
+   - Isolasi PIN per-site: Query pencocokan PIN selalu mengombinasikan `location_id` dan `biometric_pin` agar PIN yang sama pada mesin di Site Mariuk dan Site Cimalaka tidak tertukar.
+
+2. **Mesin Parser & Deduplikasi Log (`FingerprintImportService.php`)**:
+   - **Multi-Format Ingestion**: Mendukung file Excel (`.xlsx`), CSV (`.csv`), dan format mesin ZKTeco/Solution (`.dat` / `.txt`).
+   - **Deduplikasi 5 Menit**: Mengeliminasi scan ganda (double-punch) yang dilakukan karyawan dalam rentang waktu < 5 menit.
+   - **Windowing Shift 12 Jam & Midnight Crossing**: Mengelompokkan scan Shift Pagi (07:00–19:00) dan Shift Malam (19:00–07:00) hari berikutnya ke tanggal buku tugas yang tepat tanpa membuat duplikasi baris harian.
+   - **Deteksi Anomali Single-Punch**: Memisahkan presensi yang lengkap (*ready*) dengan presensi anomali (hanya tap masuk atau hanya tap pulang).
+   - **Penanganan Unmapped PIN**: Menampung log dari nomor PIN baru yang belum terdaftar di database HRIS dan menyediakan aksi 1-klik untuk menautkannya ke karyawan.
+
+3. **Input Presensi Manual oleh Admin (`manual_admin`)**:
+   - Disediakan endpoint `POST /kehadiran/manual` dan modal `ModalFormPresensi.jsx` untuk input presensi jika karyawan lupa scan, dinas luar, atau melampirkan surat dokter.
+   - Setiap catatan presensi manual ditandai dengan `method = 'manual_admin'` dan badge amber khusus di tabel presensi.
+
+4. **Penonaktifan Validasi GPS & Selfie**:
+   - `enableGeofence` disetel ke `false` secara default di `systemSettings.js` dan database seeder.
+   - Seluruh validasi radius geofence dan kewajiban selfie mobile dinonaktifkan sementara.
+   - Antarmuka `CatatanKehadiran.jsx` menampilkan notice banner informatif: *Mode Operasional: Presensi Mesin Biometric Fingerprint (Validasi GPS Dinonaktifkan)*.
+
+---
+
+## 18. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
-1. **Backend Engine Presensi & Geofence (`KehadiranController`)**:
-   - Menghitung otomatis status `hadir` / `terlambat` / `menit_terlambat` berdasarkan toleransi 15 menit dari jam shift.
-   - Validasi formula jarak geofence (Haversine formula) terhadap koordinat Mariuk/Cimalaka saat check-in mobile.
-2. **Backend Engine Roster Rotasi 2-Grup (`JadwalController`)**:
+1. **Backend Engine Roster Rotasi 2-Grup (`JadwalController`)**:
    - Generator otomatis jadwal dinas bergantian 12 jam (Senin, Rabu, Jumat Grup A; Selasa, Kamis, Sabtu Grup B).
    - Logika verifikasi dan persetujuan tukar shift antar rekan kerja.
-3. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
+2. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
    - Membangun formulir permohonan Surat Perintah Lembur (SPL).
    - Mengkalkulasi tarif upah lembur otomatis berdasarkan formula Depnaker yang telah disetel di Pengaturan Sistem.
-4. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
+3. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
    - Menyediakan form permohonan cuti tahunan dengan validasi sisa kuota (12 hari).
    - Alur persetujuan bertingkat (Supervisor $\to$ HCGA Manager).
-5. **Integrasi Perangkat Presensi / Mobile API**:
-   - Menyediakan API endpoint untuk integrasi mesin sidik jari/fingerprint atau aplikasi presensi mobile GPS + selfie.
+4. **Otomatisasi Penarikan Log Mesin (Background Sync)**:
+   - Menyediakan scheduled command (`php artisan attendance:pull-fingerprint`) atau webhook listener jika mesin absensi site mendukung direct push via ADMS/Cloud.
 
 ---
 *Laporan handover ini diperbarui secara komprehensif pada 21 November 2026 sebagai dokumentasi resmi arsitektur sistem HRIS.*

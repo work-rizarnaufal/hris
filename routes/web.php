@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BerandaController;
 use App\Http\Controllers\Admin\KaryawanController;
+use App\Http\Controllers\Admin\KehadiranController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -33,9 +34,11 @@ Route::get('/organisasi', function () {
     return Inertia::render('Admin/Organisasi/OrganisasiJabatan');
 })->name('admin.organisasi');
 
-Route::get('/kehadiran', function () {
-    return Inertia::render('Admin/Kehadiran/CatatanKehadiran');
-})->name('admin.kehadiran');
+Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('admin.kehadiran');
+Route::post('/kehadiran/manual', [KehadiranController::class, 'storeManual'])->name('admin.kehadiran.manual');
+Route::post('/kehadiran/preview-fingerprint', [KehadiranController::class, 'previewFingerprint'])->name('admin.kehadiran.previewFingerprint');
+Route::post('/kehadiran/commit-fingerprint', [KehadiranController::class, 'commitFingerprint'])->name('admin.kehadiran.commitFingerprint');
+Route::post('/kehadiran/link-biometric-pin', [KehadiranController::class, 'linkBiometricPin'])->name('admin.kehadiran.linkBiometricPin');
 
 Route::get('/jadwal', function () {
     return Inertia::render('Admin/Jadwal/JadwalShift');

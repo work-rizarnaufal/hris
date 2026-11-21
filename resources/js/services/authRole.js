@@ -54,7 +54,7 @@ export const ROLE_PROFILES = {
     nip: 'HC-0101',
     unit: 'Lokasi Mariuk (Pabrik 1)',
     badgeColor: 'emerald',
-    description: 'Portal mandiri: Presensi GPS & selfie, cek jadwal shift pribadi, dan pengajuan tukar shift.',
+    description: 'Portal mandiri: Monitoring presensi fingerprint site, cek jadwal shift pribadi, dan pengajuan tukar shift.',
     allowedRoutes: ['/beranda', '/kehadiran', '/jadwal', '/laporan'],
   },
 };

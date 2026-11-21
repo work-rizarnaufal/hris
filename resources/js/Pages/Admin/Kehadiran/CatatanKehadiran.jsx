@@ -23,6 +23,8 @@ import {
   Building,
   MapPin,
   Sparkles,
+  Fingerprint,
+  UserCheck,
 } from 'lucide-react';
 import {
   Card,
@@ -50,6 +52,7 @@ import {
 } from '@/components/ui';
 import ModalFormPresensi from './Partials/ModalFormPresensi.jsx';
 import ModalPresensiMassal from './Partials/ModalPresensiMassal.jsx';
+import ModalImporFingerprint from './Partials/ModalImporFingerprint.jsx';
 
 // Data Induk Karyawan HCGA (Sinkron Mariuk & Cimalaka)
 const MASTER_EMPLOYEES = [
@@ -449,10 +452,61 @@ const INITIAL_ATTENDANCES = [
   },
 ];
 
-export default function CatatanKehadiran() {
+export default function CatatanKehadiran({
+  dbEmployees = [],
+  dbLocations = [],
+  dbShifts = [],
+  dbAttendances = [],
+}) {
   const [selectedDate, setSelectedDate] = useState(DEFAULT_DATE);
-  const [attendances, setAttendances] = useState(INITIAL_ATTENDANCES);
-  const [employees] = useState(MASTER_EMPLOYEES);
+
+  const initialEmployeesList = useMemo(() => {
+    if (dbEmployees && dbEmployees.length > 0) {
+      return dbEmployees.map((emp) => ({
+        id: emp.id,
+        name: emp.name,
+        nip: emp.nip,
+        biometricPin: emp.biometric_pin || emp.biometricPin || '-',
+        role: emp.role || emp.position || '-',
+        division: emp.division || '-',
+        location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+        group: emp.group || 'Grup A',
+        scheduleCategory: emp.shift?.name || 'Shift Pagi (12 Jam)',
+        checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : '07:00',
+        checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : '19:00',
+        status: emp.status || 'Aktif',
+      }));
+    }
+    return MASTER_EMPLOYEES;
+  }, [dbEmployees]);
+
+  const initialAttendancesList = useMemo(() => {
+    if (dbAttendances && dbAttendances.length > 0) {
+      return dbAttendances.map((att) => ({
+        id: att.id,
+        employeeId: att.employee_id,
+        employeeName: att.employee?.name || '-',
+        nip: att.employee?.nip || '-',
+        division: att.employee?.division || '-',
+        role: att.employee?.role || '-',
+        location: att.location?.name || (att.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+        group: att.employee?.group || 'Grup A',
+        date: typeof att.date === 'string' ? att.date.slice(0, 10) : new Date(att.date).toISOString().slice(0, 10),
+        shift: att.shift || 'Shift Pagi (12 Jam)',
+        status: att.status,
+        checkIn: att.check_in_time ? att.check_in_time.slice(0, 5) : '-',
+        checkOut: att.check_out_time ? att.check_out_time.slice(0, 5) : '-',
+        lateMinutes: att.late_minutes || 0,
+        deviation: att.late_minutes > 0 ? `+${att.late_minutes}m` : (att.check_in_time ? 'Tepat Waktu' : '-'),
+        notes: att.notes || '-',
+        method: att.method || 'fingerprint',
+      }));
+    }
+    return INITIAL_ATTENDANCES.map((a) => ({ ...a, method: a.method || 'fingerprint' }));
+  }, [dbAttendances]);
+
+  const [attendances, setAttendances] = useState(initialAttendancesList);
+  const [employees] = useState(initialEmployeesList);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -476,6 +530,7 @@ export default function CatatanKehadiran() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingData, setEditingData] = useState(null);
   const [isMassOpen, setIsMassOpen] = useState(false);
+  const [isFingerprintOpen, setIsFingerprintOpen] = useState(false);
 
   // Toast Notifikasi
   const [alertInfo, setAlertInfo] = useState(null);
@@ -613,12 +668,39 @@ export default function CatatanKehadiran() {
       );
       if (index >= 0) {
         const copy = [...prev];
-        copy[index] = { ...copy[index], ...recordData };
+        copy[index] = { ...copy[index], ...recordData, method: recordData.method || 'manual_admin' };
         return copy;
       }
-      return [recordData, ...prev];
+      return [{ ...recordData, method: recordData.method || 'manual_admin' }, ...prev];
     });
     showAlert(`Catatan presensi untuk ${recordData.employeeName} berhasil disimpan.`);
+  };
+
+  const handleFingerprintImportSuccess = (importedRecords) => {
+    if (!importedRecords || importedRecords.length === 0) return;
+
+    setAttendances((prev) => {
+      let updated = [...prev];
+      importedRecords.forEach((newRec) => {
+        const idx = updated.findIndex(
+          (a) => a.employeeId === newRec.employeeId && a.date === newRec.date
+        );
+        const recordWithId = {
+          ...newRec,
+          id: newRec.id || Date.now() + newRec.employeeId,
+          deviation: newRec.lateMinutes > 0 ? `+${newRec.lateMinutes}m` : 'Tepat Waktu',
+          method: 'fingerprint',
+        };
+        if (idx >= 0) {
+          updated[idx] = { ...updated[idx], ...recordWithId };
+        } else {
+          updated.unshift(recordWithId);
+        }
+      });
+      return updated;
+    });
+
+    showAlert(`Berhasil mengimpor ${importedRecords.length} log presensi biometric fingerprint.`);
   };
 
   const handleDeleteRecord = (id, name) => {
@@ -721,6 +803,14 @@ export default function CatatanKehadiran() {
         subtitle="Monitoring log presensi harian, tracking absensi, dan jam masuk/pulang karyawan operasional."
       >
         <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            variant="outline"
+            onClick={() => setIsFingerprintOpen(true)}
+            className="gap-2 bg-indigo-50/50 hover:bg-indigo-100/60 text-indigo-700 border-indigo-200 hover:border-indigo-300 font-semibold"
+          >
+            <Fingerprint className="w-4 h-4 text-indigo-600" />
+            <span>Tarik Log Fingerprint</span>
+          </Button>
           <Button
             variant="outline"
             onClick={handleExportExcel}
@@ -826,6 +916,34 @@ export default function CatatanKehadiran() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Notice Mode Site Fingerprint (Validasi GPS Dinonaktifkan) */}
+      <div className="mb-6 px-4 py-3 bg-gradient-to-r from-slate-50 via-indigo-50/25 to-slate-50 border border-slate-200/90 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0">
+            <Fingerprint className="w-4 h-4 text-indigo-600" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-slate-800">Mode Operasional: Presensi Mesin Biometric Fingerprint (Site Mariuk & Cimalaka)</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80">Aktif</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Validasi GPS Dinonaktifkan</span>
+            </div>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              Presensi dicatat otomatis dari tarikan log mesin sidik jari atau diinput/dikoreksi manual oleh Admin jika karyawan berhalangan tap.
+            </p>
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsFingerprintOpen(true)}
+          className="shrink-0 text-xs gap-1.5 font-medium border-indigo-200 text-indigo-700 hover:bg-indigo-50/80 bg-white"
+        >
+          <Fingerprint className="w-3.5 h-3.5" />
+          <span>Tarik Log Mesin</span>
+        </Button>
       </div>
 
       {/* KPI Cards (5 Cards) */}
@@ -1158,9 +1276,28 @@ export default function CatatanKehadiran() {
                         )}
                       </TableCell>
 
-                      {/* 8. Status */}
+                      {/* 8. Status & Metode Presensi */}
                       <TableCell className="text-center">
-                        {getStatusBadge(rec.status)}
+                        <div className="flex flex-col items-center gap-1">
+                          {getStatusBadge(rec.status)}
+                          {rec.method === 'manual_admin' ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200/70"
+                              title="Presensi dicatat / dikoreksi manual oleh Admin"
+                            >
+                              <UserCheck className="w-2.5 h-2.5 text-amber-600" />
+                              Manual
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200/70"
+                              title="Presensi ditarik dari mesin biometric fingerprint fisik"
+                            >
+                              <Fingerprint className="w-2.5 h-2.5 text-indigo-600" />
+                              Fingerprint
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
 
                       {/* 9. Keterangan */}
@@ -1235,6 +1372,14 @@ export default function CatatanKehadiran() {
         employees={employees}
         currentDate={selectedDate}
         existingAttendances={currentDayAttendances}
+      />
+
+      {/* Modal Impor / Tarik Log Fingerprint */}
+      <ModalImporFingerprint
+        isOpen={isFingerprintOpen}
+        onClose={() => setIsFingerprintOpen(false)}
+        onSuccess={handleFingerprintImportSuccess}
+        employees={employees}
       />
     </>
   );

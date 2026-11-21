@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
-    "mtime": 1795257621.9293222,
-    "seen": 1795257743.3936532,
-    "ast_hash": "b564a4780eecd1e4d688dfdb8ecc3c18",
+    "mtime": 1795272793.45043,
+    "seen": 1795273395.922694,
+    "ast_hash": "58c5a2ffd061d0b3afe7c3feca12de46",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx": {
@@ -126,15 +126,15 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "mtime": 1795257095.846847,
-    "seen": 1795257114.3746305,
-    "ast_hash": "75bb10ee883650b8dd8bfd318aae8ffa",
+    "mtime": 1795273104.2659793,
+    "seen": 1795273395.922694,
+    "ast_hash": "13dbd95552535ca7206ccbe69aac5c4c",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
-    "mtime": 1795256959.8100786,
-    "seen": 1795257114.3746305,
-    "ast_hash": "741677accc84153c610c61145bbc4f3c",
+    "mtime": 1795272998.0462072,
+    "seen": 1795273395.922694,
+    "ast_hash": "4ba2fb94c978d09cdc8188a3602625d1",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "resources/js/services/systemSettings.js": {
-    "mtime": 1795271203.1785028,
-    "seen": 1795271350.963075,
-    "ast_hash": "85ffa5645cfaf86e3a3d716a50dbb2d8",
+    "mtime": 1795272657.468738,
+    "seen": 1795273395.922694,
+    "ast_hash": "b5b27bd4551545081a9c22b32008086f",
     "semantic_hash": ""
   },
   "resources/views/app.blade.php": {
@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1795270193.192382,
-    "seen": 1795270339.955239,
-    "ast_hash": "2f5367d3e50eae18984809147237c722",
+    "mtime": 1795272749.124657,
+    "seen": 1795273395.922694,
+    "ast_hash": "d718fcb820ce6b27e19f27326e4dc62f",
     "semantic_hash": ""
   },
   "storage/framework/views/33035f1adbd8fc13ef8a3b77d50480bf.php": {
@@ -534,9 +534,9 @@
     "semantic_hash": ""
   },
   "resources/js/services/authRole.js": {
-    "mtime": 1795267652.4249766,
-    "seen": 1795267946.7592618,
-    "ast_hash": "40347bf1fa4e73d4754a6b433e8f2008",
+    "mtime": 1795272673.665149,
+    "seen": 1795273395.922694,
+    "ast_hash": "542bd859527d3385514df750a32fbb55",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/BerandaController.php": {
@@ -546,9 +546,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/KaryawanController.php": {
-    "mtime": 1795270192.6950955,
-    "seen": 1795270339.955239,
-    "ast_hash": "8cb54edb8a6c3b44ebbd1d02eb08f319",
+    "mtime": 1795272812.3766396,
+    "seen": 1795273395.922694,
+    "ast_hash": "f7269bb97d419628450a400f52beb737",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/PengaturanController.php": {
@@ -570,15 +570,15 @@
     "semantic_hash": ""
   },
   "app/Models/Attendance.php": {
-    "mtime": 1795270004.3697784,
-    "seen": 1795270339.955239,
-    "ast_hash": "cad7ac79a4254f575d6bd9cf1ce06f37",
+    "mtime": 1795272597.7084274,
+    "seen": 1795273395.922694,
+    "ast_hash": "2d17561a22f54a606f817e369c3edbf5",
     "semantic_hash": ""
   },
   "app/Models/Employee.php": {
-    "mtime": 1795270123.7858672,
-    "seen": 1795270339.955239,
-    "ast_hash": "d322c2a94559eb05d567ef6662839702",
+    "mtime": 1795273195.097967,
+    "seen": 1795273395.922694,
+    "ast_hash": "f6883fbe02e85284a2995428b8fa0d96",
     "semantic_hash": ""
   },
   "app/Models/Holiday.php": {
@@ -642,9 +642,9 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_11_21_210510_create_employees_table.php": {
-    "mtime": 1795269961.312252,
-    "seen": 1795270339.955239,
-    "ast_hash": "ddee40472c04162997528cbd86cdb5ed",
+    "mtime": 1795272574.6150577,
+    "seen": 1795273395.922694,
+    "ast_hash": "6d6d15132d91bc30eb1fe2ab19f8f4ba",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_21_210510_create_holidays_table.php": {
@@ -660,9 +660,9 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_11_21_210511_create_attendances_table.php": {
-    "mtime": 1795269961.7707405,
-    "seen": 1795270339.955239,
-    "ast_hash": "3fa3e88796979b840f467e5b6df19d0e",
+    "mtime": 1795272579.4888265,
+    "seen": 1795273395.922694,
+    "ast_hash": "18c61f8f8627d0b0745fec370c0d8618",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_21_210511_create_shift_schedules_table.php": {
@@ -684,9 +684,9 @@
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795270193.0847538,
-    "seen": 1795270339.955239,
-    "ast_hash": "230c6deb392726778835db52f30f7f79",
+    "mtime": 1795272647.6877854,
+    "seen": 1795273395.922694,
+    "ast_hash": "ef5157d86952f6b4b3aa79cfd890b8c3",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "database/seeders/SystemSettingSeeder.php": {
-    "mtime": 1795271207.445234,
-    "seen": 1795271350.963075,
-    "ast_hash": "094b0ccf72652da68694deb8ef26423f",
+    "mtime": 1795272652.7003005,
+    "seen": 1795273395.922694,
+    "ast_hash": "d8795ecf3badd352a463ac391be605b5",
     "semantic_hash": ""
   },
   "tests/Feature/KaryawanBackendTest.php": {
@@ -723,6 +723,30 @@
     "mtime": 1795270233.888597,
     "seen": 1795270339.955239,
     "ast_hash": "7e567dc27e68d5b57bae16af07f68907",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Admin/KehadiranController.php": {
+    "mtime": 1795273161.9833798,
+    "seen": 1795273395.922694,
+    "ast_hash": "5bd225c19331e8c0a8cb61be740eb027",
+    "semantic_hash": ""
+  },
+  "app/Services/FingerprintImportService.php": {
+    "mtime": 1795273361.036648,
+    "seen": 1795273395.922694,
+    "ast_hash": "dd0faac1052e9c6fc522552917f03058",
+    "semantic_hash": ""
+  },
+  "resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx": {
+    "mtime": 1795272858.2387044,
+    "seen": 1795273395.922694,
+    "ast_hash": "ba7a983f890b16f9ed09fca193d7a279",
+    "semantic_hash": ""
+  },
+  "tests/Feature/FingerprintAndManualAttendanceTest.php": {
+    "mtime": 1795273364.3646288,
+    "seen": 1795273395.922694,
+    "ast_hash": "bedd34b9cad2bb83266f5a94ed4481c3",
     "semantic_hash": ""
   },
   "package-lock.json": {

@@ -33,6 +33,7 @@ class KaryawanController extends Controller
     {
         $validated = $request->validate([
             'nip' => ['required', 'string', 'max:50', 'unique:employees,nip'],
+            'biometric_pin' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:150'],
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],
@@ -54,6 +55,7 @@ class KaryawanController extends Controller
     {
         $validated = $request->validate([
             'nip' => ['required', 'string', 'max:50', 'unique:employees,nip,'.$karyawan->id],
+            'biometric_pin' => ['nullable', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:150'],
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],

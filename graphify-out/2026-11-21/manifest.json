@@ -174,9 +174,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx": {
-    "mtime": 1795256603.4888842,
-    "seen": 1795256651.5901563,
-    "ast_hash": "546e787c3700511a707a0f9da165ef67",
+    "mtime": 1795271301.658781,
+    "seen": 1795271350.963075,
+    "ast_hash": "49928e95533e140cb09c12647068be34",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "resources/js/services/systemSettings.js": {
-    "mtime": 1795250064.5382779,
-    "seen": 1795250261.196631,
-    "ast_hash": "7d4293b33cd4494d3aaeb44399ba71f8",
+    "mtime": 1795271203.1785028,
+    "seen": 1795271350.963075,
+    "ast_hash": "85ffa5645cfaf86e3a3d716a50dbb2d8",
     "semantic_hash": ""
   },
   "resources/views/app.blade.php": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795270313.3072312,
-    "seen": 1795270339.955239,
-    "ast_hash": "1c4daadf7d679e553cdbeadac0c912e8",
+    "mtime": 1795271339.6380708,
+    "seen": 1795271350.9640713,
+    "ast_hash": "b23977525a01413c579ec3f921bf7896",
     "semantic_hash": ""
   },
   "README.md": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "database/seeders/SystemSettingSeeder.php": {
-    "mtime": 1795270040.6202996,
-    "seen": 1795270339.955239,
-    "ast_hash": "39dce119d2581ee7f8088d685b066378",
+    "mtime": 1795271207.445234,
+    "seen": 1795271350.963075,
+    "ast_hash": "094b0ccf72652da68694deb8ef26423f",
     "semantic_hash": ""
   },
   "tests/Feature/KaryawanBackendTest.php": {

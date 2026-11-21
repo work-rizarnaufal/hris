@@ -316,6 +316,7 @@ export default function ModalFormPresensi({
         ? (tardinessInfo?.isLate ? `+${tardinessInfo.minutes}m` : 'Tepat Waktu')
         : '-',
       notes: formData.notes.trim() || '-',
+      method: initialData?.method || 'manual_admin',
     });
 
     onClose();

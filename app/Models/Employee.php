@@ -16,6 +16,7 @@ class Employee extends Model
         'location_id',
         'shift_id',
         'nip',
+        'biometric_pin',
         'nik',
         'name',
         'email',
@@ -42,7 +43,13 @@ class Employee extends Model
         'scheduleCategory',
         'checkInTime',
         'checkOutTime',
+        'biometricPin',
     ];
+
+    public function getBiometricPinAttribute(?string $value): string
+    {
+        return $value ?? ($this->attributes['biometric_pin'] ?? (string) preg_replace('/\D/', '', (string) $this->nip));
+    }
 
     public function getRoleAttribute(): string
     {

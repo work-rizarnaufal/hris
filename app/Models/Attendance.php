@@ -27,6 +27,7 @@ class Attendance extends Model
         'photo_in',
         'photo_out',
         'method',
+        'import_batch_id',
         'notes',
     ];
 

@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-21)
 
 ## Corpus Check
-- 120 files · ~66,417 words
+- 120 files · ~66,986 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
 ## Summary
-- 580 nodes · 1250 edges · 50 communities (16 shown, 34 thin omitted)
+- 581 nodes · 1252 edges · 50 communities (16 shown, 34 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `359cec0a`
+- Built from commit: `8bdde426`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,7 +37,7 @@
 - Illuminate\Database\Eloquent\Factories\HasFactory
 - Employee
 - User
-- Shift
+- SystemSetting
 - KaryawanBackendTest.php
 - Location
 
@@ -95,8 +95,8 @@ Cohesion: 0.09
 Nodes (17): renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar(), Topbar(), getPageMetadata(), navigationConfig, siteConfig (+9 more)
 
 ### Community 6 - "PengaturanSistem.jsx"
-Cohesion: 0.11
-Nodes (39): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, PanelRotasiGrup(), DataKaryawan(), DIVISIONS, GROUPS (+31 more)
+Cohesion: 0.10
+Nodes (40): JadwalShift(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS, PanelRotasiGrup(), DataKaryawan(), DIVISIONS, GROUPS (+32 more)
 
 ### Community 7 - "Illuminate\Database\Schema\Blueprint"
 Cohesion: 0.09
@@ -127,12 +127,12 @@ Cohesion: 0.13
 Nodes (15): recharts, xlsx, masterRecentAttendance, weeklyTrendData, EMPLOYEES_SCHEDULE, WEEKS, INITIAL_EMPLOYEES, DEFAULT_DATE (+7 more)
 
 ### Community 43 - "Illuminate\Database\Seeder"
-Cohesion: 0.17
-Nodes (5): DatabaseSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder, SystemSettingSeeder
+Cohesion: 0.21
+Nodes (4): DatabaseSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder
 
 ### Community 44 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.23
-Nodes (3): Attendance, Holiday, SystemSetting
+Cohesion: 0.21
+Nodes (3): Attendance, Holiday, Shift
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`

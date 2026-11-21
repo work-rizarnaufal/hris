@@ -38,6 +38,7 @@ class EmployeeSeeder extends Seeder
             // --- LOKASI MARIUK (6 Personel) ---
             [
                 'nip' => 'HC-0101',
+                'biometric_pin' => '101',
                 'name' => 'Budi Santoso',
                 'email' => 'budi.santoso@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7801',
@@ -55,6 +56,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0104',
+                'biometric_pin' => '104',
                 'name' => 'Dewi Anggraini',
                 'email' => 'dewi.anggraini@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7804',
@@ -71,6 +73,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0105',
+                'biometric_pin' => '105',
                 'name' => 'Hendra Wijaya',
                 'email' => 'hendra.wijaya@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7805',
@@ -87,6 +90,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0103',
+                'biometric_pin' => '103',
                 'name' => 'Ahmad Fauzi',
                 'email' => 'ahmad.fauzi@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7803',
@@ -103,6 +107,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0107',
+                'biometric_pin' => '107',
                 'name' => 'Eko Prasetyo',
                 'email' => 'eko.prasetyo@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7807',
@@ -119,6 +124,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0109',
+                'biometric_pin' => '109',
                 'name' => 'Joko Susilo',
                 'email' => 'joko.susilo@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7809',
@@ -137,6 +143,7 @@ class EmployeeSeeder extends Seeder
             // --- LOKASI CIMALAKA (6 Personel) ---
             [
                 'nip' => 'HC-0102',
+                'biometric_pin' => '202',
                 'name' => 'Siti Rahmawati',
                 'email' => 'siti.rahmawati@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7802',
@@ -154,6 +161,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0111',
+                'biometric_pin' => '211',
                 'name' => 'Wahyu Hidayat',
                 'email' => 'wahyu.hidayat@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7811',
@@ -170,6 +178,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0110',
+                'biometric_pin' => '210',
                 'name' => 'Dian Kusuma',
                 'email' => 'dian.kusuma@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7810',
@@ -186,6 +195,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0106',
+                'biometric_pin' => '206',
                 'name' => 'Rina Marlina',
                 'email' => 'rina.marlina@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7806',
@@ -202,6 +212,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0108',
+                'biometric_pin' => '208',
                 'name' => 'Maya Indah Lestari',
                 'email' => 'maya.indah@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7808',
@@ -218,6 +229,7 @@ class EmployeeSeeder extends Seeder
             ],
             [
                 'nip' => 'HC-0112',
+                'biometric_pin' => '212',
                 'name' => 'Nurul Aini',
                 'email' => 'nurul.aini@nusantaraperkasa.co.id',
                 'phone' => '0812-3456-7812',
@@ -255,6 +267,7 @@ class EmployeeSeeder extends Seeder
                 ['nip' => $data['nip']],
                 [
                     'user_id' => $userId,
+                    'biometric_pin' => $data['biometric_pin'] ?? null,
                     'name' => $data['name'],
                     'email' => $data['email'],
                     'phone' => $data['phone'],
