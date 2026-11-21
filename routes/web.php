@@ -37,6 +37,7 @@ Route::get('/organisasi', function () {
 })->name('admin.organisasi');
 
 Route::get('/kehadiran', [KehadiranController::class, 'index'])->name('admin.kehadiran');
+Route::get('/kehadiran/impor', [KehadiranController::class, 'imporView'])->name('admin.kehadiran.impor');
 Route::post('/kehadiran/manual', [KehadiranController::class, 'storeManual'])->name('admin.kehadiran.manual');
 Route::post('/kehadiran/mass', [KehadiranController::class, 'storeMass'])->name('admin.kehadiran.mass');
 Route::delete('/kehadiran/{attendance}', [KehadiranController::class, 'destroy'])->name('admin.kehadiran.destroy');

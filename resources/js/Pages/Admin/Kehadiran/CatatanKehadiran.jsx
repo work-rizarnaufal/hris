@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import { getShiftSettings } from '@/services/systemSettings.js';
 import {
@@ -469,14 +469,13 @@ export default function CatatanKehadiran({
         subtitle="Monitoring log presensi harian, tracking absensi, dan jam masuk/pulang karyawan operasional."
       >
         <div className="flex flex-wrap items-center gap-2.5">
-          <Button
-            variant="outline"
-            onClick={() => setIsFingerprintOpen(true)}
-            className="gap-2 bg-indigo-50/50 hover:bg-indigo-100/60 text-indigo-700 border-indigo-200 hover:border-indigo-300 font-semibold"
+          <Link
+            href="/kehadiran/impor"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all shadow-2xs"
           >
             <Fingerprint className="w-4 h-4 text-indigo-600" />
             <span>Tarik Log Fingerprint</span>
-          </Button>
+          </Link>
           <Button
             variant="outline"
             onClick={handleExportExcel}
