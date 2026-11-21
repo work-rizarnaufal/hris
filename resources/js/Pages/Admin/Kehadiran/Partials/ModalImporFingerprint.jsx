@@ -40,10 +40,6 @@ export default function ModalImporFingerprint({
   employees = [],
   locations = [],
 }) {
-  const [selectedLocationId, setSelectedLocationId] = useState(() => {
-    return locations[0]?.id || 1;
-  });
-
   const [fileInfo, setFileInfo] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [editableRecords, setEditableRecords] = useState([]);
@@ -147,13 +143,12 @@ export default function ModalImporFingerprint({
 
   // Demo scan generator untuk pengujian cepat
   const handleLoadDemoLog = () => {
-    const isMariuk = Number(selectedLocationId) === 1;
     const realPins = employees
       .map((e) => String(e.biometricPin || e.biometric_pin || e.id))
       .filter((p) => p && p !== '-');
     const targetPins = realPins.length >= 4
       ? realPins
-      : (isMariuk ? ['1', '2', '3', '4'] : ['5', '6', '7', '8']);
+      : ['96', '81', '37', '40'];
     const today = new Date().toISOString().slice(0, 10);
 
     const demoScans = [
@@ -179,7 +174,7 @@ export default function ModalImporFingerprint({
     ];
 
     setFileInfo({
-      name: `Demo_AttLog_${isMariuk ? 'Mariuk' : 'Cimalaka'}_${today}.dat`,
+      name: `Demo_AttLog_Simulasi_${today}.dat`,
       size: `${demoScans.length} baris scan`,
     });
 
@@ -468,64 +463,22 @@ export default function ModalImporFingerprint({
       <ModalBody className="space-y-4">
         {/* STEP 1: Upload File Area (Tampil jika belum ada data preview) */}
         {editableRecords.length === 0 && (
-          <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-4 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <label className="text-xs font-bold text-slate-800 block">
-                  1. Pilih Referensi Lokasi Mesin Pabrik:
-                </label>
-                <p className="text-[11px] text-slate-500">
-                  Sistem otomatis mencocokkan PIN biometrik karyawan Mariuk dan Cimalaka secara global.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <label
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all ${
-                    Number(selectedLocationId) === 1
-                      ? 'bg-amber-100/70 border-amber-400 text-amber-900 shadow-2xs'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="siteLocation"
-                    value="1"
-                    checked={Number(selectedLocationId) === 1}
-                    onChange={() => setSelectedLocationId(1)}
-                    className="hidden"
-                  />
-                  <MapPin className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Site Mariuk (Subang)</span>
-                </label>
-
-                <label
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold cursor-pointer transition-all ${
-                    Number(selectedLocationId) === 2
-                      ? 'bg-indigo-100/70 border-indigo-400 text-indigo-900 shadow-2xs'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="siteLocation"
-                    value="2"
-                    checked={Number(selectedLocationId) === 2}
-                    onChange={() => setSelectedLocationId(2)}
-                    className="hidden"
-                  />
-                  <MapPin className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Site Cimalaka (Sumedang)</span>
-                </label>
-              </div>
+          <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-5 space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-800 block">
+                Unggah Berkas Ekstraksi Mesin Fingerprint:
+              </label>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Sistem otomatis memetakan PIN dan mendeteksi lokasi site (Mariuk & Cimalaka) berdasarkan data master karyawan.
+              </p>
             </div>
 
-            <div className="pt-2 border-t border-slate-200/70 flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
               <div className="flex-1 w-full">
-                <label className="flex items-center justify-center gap-2.5 px-4 py-4 rounded-xl border-2 border-dashed border-slate-300 hover:border-indigo-500 bg-white hover:bg-indigo-50/30 cursor-pointer transition-all text-xs font-medium text-slate-700">
+                <label className="flex items-center justify-center gap-2.5 px-4 py-5 rounded-xl border-2 border-dashed border-slate-300 hover:border-indigo-500 bg-white hover:bg-indigo-50/30 cursor-pointer transition-all text-xs font-medium text-slate-700 shadow-2xs">
                   <Upload className="w-5 h-5 text-indigo-600" />
                   <span>
-                    {fileInfo ? fileInfo.name : 'Pilih / Drop File Tarikan Fingerprint (.xlsx, .csv, .dat, .txt)'}
+                    {fileInfo ? fileInfo.name : 'Pilih / Seret File Log Fingerprint (.xlsx, .csv, .dat, .txt)'}
                   </span>
                   <input
                     type="file"
@@ -541,7 +494,7 @@ export default function ModalImporFingerprint({
                 variant="outline"
                 size="sm"
                 onClick={handleLoadDemoLog}
-                className="text-xs shrink-0 font-medium border-amber-300 text-amber-800 hover:bg-amber-50 gap-1.5 h-11"
+                className="text-xs shrink-0 font-medium border-amber-300 text-amber-800 hover:bg-amber-50 gap-1.5 h-12"
                 title="Muat data simulasi log mesin untuk pengujian instan"
               >
                 <Sparkles className="w-4 h-4 text-amber-600" />
@@ -549,8 +502,11 @@ export default function ModalImporFingerprint({
               </Button>
             </div>
 
-            <div className="text-[11px] text-slate-500 bg-white p-2.5 rounded-lg border border-slate-200/70">
-              Mendukung format file tarikan mesin resmi: <strong>FORMAT MESIN FINGER.xlsx</strong> (Cloud ID, ID, Nama, Tanggal Absensi, Jam Absensi, Verifikasi, Tipe Absensi, Jabatan, Kantor).
+            <div className="text-[11px] text-slate-500 bg-white p-3 rounded-lg border border-slate-200/70 space-y-1">
+              <p className="font-semibold text-slate-700">Format yang didukung:</p>
+              <p>
+                File laporan mesin finger (contoh: <code>report_scan_*.xlsx</code> atau <code>FORMAT MESIN FINGER.xlsx</code>) yang memuat kolom <em>ID, Tanggal Absensi, Jam Absensi, Tipe Absensi, Kantor</em>.
+              </p>
             </div>
           </div>
         )}
