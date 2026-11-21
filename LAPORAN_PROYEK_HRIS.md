@@ -626,7 +626,31 @@ Menindaklanjuti kebutuhan operasional riil pabrik bahwa data absensi tidak diinp
 
 ---
 
-## 18. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 18. Restrukturisasi Data Karyawan Riil & Penugasan Fleksibel (Belum Ditetapkan)
+
+Berdasarkan data operasional pabrik terkini dari `Data Karyawan.xlsx`:
+1. **Pembersihan Database & Re-Impor Data Riil**:
+   - Menghapus seluruh data karyawan dummy dan catatan kehadiran lama.
+   - Mengimpor 86 personil riil dari file `Data Karyawan.xlsx` (35 personil di Site Mariuk, 51 personil di Site Cimalaka).
+   - Seluruh entri ganda/duplikat (misal nama Tarma ID 34 & ID 38) dipertahankan sesuai permintaan pengguna untuk ditelaah lebih lanjut oleh Admin.
+2. **Pelepasan Divisi & Nullable di Database**:
+   - Menjalankan migrasi `2026_11_22_030401_make_division_nullable_in_employees_table.php` agar kolom `division` bersifat `nullable`.
+   - Menghapus seluruh data divisi lama pada 86 karyawan menjadi `null` (`-`).
+3. **Penugasan Grup & Shift "Belum Ditetapkan"**:
+   - Kolom `shift_id` disetel ke `null`, dan `shift_group` disetel ke `'Belum Ditetapkan'`.
+   - Jam kerja masuk dan pulang default disetel ke `'-'` pada model accessor.
+4. **Pembaruan Modal Edit Karyawan (`ModalFormKaryawan.jsx`)**:
+   - **Opsi Divisi**: Menambahkan `<option value="">Belum Ditetapkan (-)</option>` pada dropdown divisi. Tanda bintang merah wajib dihilangkan.
+   - **Opsi Grup Shift**: Menyediakan pilihan `'Belum Ditetapkan'` pada opsi grup.
+   - **Preset Jadwal Kerja**: Menyediakan tombol preset `'Belum Ditetapkan (-)'` di samping Shift Pagi, Shift Malam, dan Non-Shift Kantor.
+   - **Validasi Waktu Fleksibel**: Jam masuk dan jam pulang kerja hanya divalidasi sebagai *required* jika shift berstatus aktif (bukan `'Belum Ditetapkan'`).
+5. **Pembaruan Backend Controller (`KaryawanController.php`)**:
+   - Validasi `division`, `shift_id`, dan `shift_group` diubah menjadi `nullable`.
+   - Metode `resolvePayload` menangani normalisasi string `'Belum Ditetapkan'` atau kosong menjadi `null` pada kolom `division` dan `shift_id`.
+
+---
+
+## 19. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
