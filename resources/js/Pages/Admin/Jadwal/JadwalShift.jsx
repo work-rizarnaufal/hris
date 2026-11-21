@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   Trash2,
   Pencil,
+  MapPin,
 } from 'lucide-react';
 import {
   Card,
@@ -37,6 +38,7 @@ import {
   TableFilterGroup,
   TableSelect,
   Toast,
+  Text,
 } from '@/components/ui';
 import ModalFormTukarShift from './Partials/ModalFormTukarShift.jsx';
 import PanelRotasiGrup from './Partials/PanelRotasiGrup.jsx';
@@ -340,17 +342,25 @@ export default function JadwalShift() {
     });
   }, [employees, filterLocation, filterDivision, filterGroup, searchQuery]);
 
-  // Statistik Ringkasan Jadwal
+  // Statistik Ringkasan Jadwal (Reaktif terhadap Filter Lokasi)
   const stats = useMemo(() => {
-    const total = employees.length;
-    const groupA = employees.filter((e) => e.group === 'Grup A').length;
-    const groupB = employees.filter((e) => e.group === 'Grup B').length;
-    const unassigned = employees.filter((e) => e.group === 'Belum Ditetapkan').length;
-    const nonShift = employees.filter((e) => e.group === 'Non-Shift').length;
-    const totalExceptions = exceptions.length;
+    const list =
+      filterLocation === 'ALL'
+        ? employees
+        : employees.filter((e) => e.location === filterLocation);
+
+    const total = list.length;
+    const groupA = list.filter((e) => e.group === 'Grup A').length;
+    const groupB = list.filter((e) => e.group === 'Grup B').length;
+    const unassigned = list.filter((e) => e.group === 'Belum Ditetapkan').length;
+    const nonShift = list.filter((e) => e.group === 'Non-Shift').length;
+    const totalExceptions = exceptions.filter((ex) => {
+      const emp = employees.find((e) => e.id === ex.employeeId);
+      return filterLocation === 'ALL' || emp?.location === filterLocation;
+    }).length;
     const totalManualSchedules = manualSchedules.length;
     return { total, groupA, groupB, unassigned, nonShift, totalExceptions, totalManualSchedules };
-  }, [employees, exceptions, manualSchedules]);
+  }, [employees, exceptions, manualSchedules, filterLocation]);
 
   // Handle Update Grup Karyawan per Individu (dari Kolom Dropdown)
   const handleUpdateEmployeeGroup = (empId, newGroup) => {
@@ -594,6 +604,26 @@ export default function JadwalShift() {
     };
   };
 
+  // Kalkulasi total jam kerja mingguan aktual berdasarkan jadwal aktif (12 jam per dinas)
+  const calculateWeeklyHours = (emp, days) => {
+    let totalHours = 0;
+    days.forEach((day) => {
+      const shiftInfo = getEmployeeShiftForDay(emp, day);
+      if (
+        shiftInfo.code.includes('PAGI') ||
+        shiftInfo.code.includes('MALAM') ||
+        shiftInfo.code.includes('SWAP') ||
+        shiftInfo.code.includes('S1') ||
+        shiftInfo.code.includes('S2')
+      ) {
+        totalHours += 12;
+      } else if (shiftInfo.code === 'NON') {
+        totalHours += 8;
+      }
+    });
+    return totalHours;
+  };
+
   // Ekspor Excel Roster Mingguan
   const handleExportRoster = () => {
     const rows = filteredEmployees.map((emp, index) => {
@@ -601,6 +631,7 @@ export default function JadwalShift() {
         No: index + 1,
         NIP: emp.nip,
         'Nama Karyawan': emp.name,
+        Lokasi: emp.location || '-',
         Divisi: emp.division,
         Grup: emp.group,
         'Shift Dasar': emp.baseShift,
@@ -611,7 +642,8 @@ export default function JadwalShift() {
         row[`${day.label} (${day.date})`] = shiftInfo.code;
       });
 
-      row['Total Jam Kerja'] = '40 Jam';
+      const weeklyHours = calculateWeeklyHours(emp, currentWeek.days);
+      row['Total Jam Kerja'] = `${weeklyHours} Jam`;
       return row;
     });
 
@@ -623,6 +655,7 @@ export default function JadwalShift() {
       { wch: 4 },
       { wch: 12 },
       { wch: 22 },
+      { wch: 18 },
       { wch: 24 },
       { wch: 12 },
       { wch: 28 },
@@ -699,13 +732,15 @@ export default function JadwalShift() {
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Total Terjadwal
+                  Total Personel Terjadwal
                 </p>
                 <p className="text-2xl font-bold font-display text-navy mt-1">
-                  {stats.total} <span className="text-sm font-normal text-slate-400">Karyawan</span>
+                  {stats.total} <span className="text-sm font-normal text-slate-400">Personel</span>
                 </p>
-                <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
-                  100% Tercover Roster
+                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                  {filterLocation === 'ALL'
+                    ? '6 Mariuk + 6 Cimalaka (24/7)'
+                    : `${stats.groupA} Grup A + ${stats.groupB} Grup B`}
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-navy/5 text-navy flex items-center justify-center">
@@ -723,8 +758,8 @@ export default function JadwalShift() {
                 <p className="text-2xl font-bold font-display text-emerald-700 mt-1">
                   {stats.groupA} <span className="text-sm font-normal text-slate-400">Personil</span>
                 </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Masuk: Sen, Rab, Jum (Off: Sel, Kam, Sab)
+                <p className="text-[11px] text-emerald-700 font-medium mt-0.5">
+                  Shift 12 Jam (Pagi 07-19 & Malam 19-07)
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -742,8 +777,8 @@ export default function JadwalShift() {
                 <p className="text-2xl font-bold font-display text-amber-700 mt-1">
                   {stats.groupB} <span className="text-sm font-normal text-slate-400">Personil</span>
                 </p>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Masuk: Sel, Kam, Sab (Off: Sen, Rab, Jum)
+                <p className="text-[11px] text-amber-700 font-medium mt-0.5">
+                  Shift 12 Jam (Pagi 07-19 & Malam 19-07)
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -756,13 +791,13 @@ export default function JadwalShift() {
             <CardContent className="p-4 flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Jadwal Manual & Tukar Shift
+                  Jadwal Khusus & Tukar Shift
                 </p>
                 <p className="text-2xl font-bold font-display text-purple-700 mt-1">
                   {stats.totalExceptions + stats.totalManualSchedules} <span className="text-sm font-normal text-slate-400">Kasus</span>
                 </p>
                 <p className="text-[11px] text-purple-600 font-medium mt-0.5">
-                  {stats.totalManualSchedules} Jadwal Manual • {stats.totalExceptions} Tukar Shift
+                  Handover Jam 07:00 & 19:00 WIB
                 </p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
@@ -868,6 +903,52 @@ export default function JadwalShift() {
               </div>
             </CardHeader>
 
+            {/* Segmented Location Controller (Mariuk & Cimalaka) */}
+            <div className="px-4 py-3 bg-slate-50/70 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="inline-flex items-center gap-1.5 p-1 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setFilterLocation('ALL')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                    filterLocation === 'ALL'
+                      ? 'bg-navy text-white shadow-xs'
+                      : 'text-slate-600 hover:text-navy hover:bg-slate-50'
+                  }`}
+                >
+                  Semua Lokasi ({employees.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterLocation('Lokasi Mariuk')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    filterLocation === 'Lokasi Mariuk'
+                      ? 'bg-amber-50 text-amber-900 border border-amber-200/80 shadow-xs'
+                      : 'text-slate-600 hover:text-navy hover:bg-slate-50'
+                  }`}
+                >
+                  <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                  Mariuk ({employees.filter((e) => e.location === 'Lokasi Mariuk').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilterLocation('Lokasi Cimalaka')}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    filterLocation === 'Lokasi Cimalaka'
+                      ? 'bg-indigo-50 text-indigo-900 border border-indigo-200/80 shadow-xs'
+                      : 'text-slate-600 hover:text-navy hover:bg-slate-50'
+                  }`}
+                >
+                  <MapPin className="w-3.5 h-3.5 text-indigo-600" />
+                  Cimalaka ({employees.filter((e) => e.location === 'Lokasi Cimalaka').length})
+                </button>
+              </div>
+
+              <div className="text-xs text-slate-500 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Roster 24/7 Non-Stop · Pergantian Shift 07:00 & 19:00 WIB</span>
+              </div>
+            </div>
+
             {/* Atomic Toolbar & Filters */}
             <TableToolbar>
               <TableSearch
@@ -915,7 +996,7 @@ export default function JadwalShift() {
                 </TableSelect>
 
                 {/* Reset Filters */}
-                {(searchQuery || filterDivision !== 'ALL' || filterGroup !== 'ALL') && (
+                {(searchQuery || filterLocation !== 'ALL' || filterDivision !== 'ALL' || filterGroup !== 'ALL') && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -967,46 +1048,84 @@ export default function JadwalShift() {
                   {filteredEmployees.length === 0 ? (
                     <TableEmpty colSpan={11} message="Tidak ada data karyawan yang cocok dengan kriteria filter." />
                   ) : (
-                    filteredEmployees.map((emp, index) => (
-                      <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
-                        <TableCell className="text-center font-medium text-slate-500 text-xs">
-                          {index + 1}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-bold text-navy text-xs">{emp.name}</p>
-                            <p className="text-[11px] text-slate-500">{emp.nip} • {emp.role}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-xs text-slate-800 font-medium">{emp.division}</p>
-                          <span
-                            className={`inline-block text-[10px] font-bold px-1.5 py-0.2 rounded mt-0.5 ${
-                              emp.group === 'Grup A'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : emp.group === 'Grup B'
-                                ? 'bg-amber-100 text-amber-800'
-                                : emp.group === 'Belum Ditetapkan'
-                                ? 'bg-slate-200 text-slate-700'
-                                : 'bg-sky-100 text-sky-800'
-                            }`}
-                          >
-                            {emp.group}
-                          </span>
-                        </TableCell>
+                    filteredEmployees.map((emp, index) => {
+                      const weeklyHours = calculateWeeklyHours(emp, currentWeek.days);
+                      const dutyDays = weeklyHours > 0 ? (weeklyHours >= 12 ? Math.round(weeklyHours / 12) : 1) : 0;
+                      const isMariuk = emp.location?.includes('Mariuk');
+                      const isCimalaka = emp.location?.includes('Cimalaka');
 
-                        {/* 7 Sel Hari */}
-                        {currentWeek.days.map((day) => (
-                          <TableCell key={day.key} className="text-center p-2">
-                            {renderShiftCellBadge(emp, day)}
+                      return (
+                        <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
+                          <TableCell className="text-center font-medium text-slate-500 text-xs">
+                            {index + 1}
                           </TableCell>
-                        ))}
+                          <TableCell>
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-navy/10 text-navy font-bold flex items-center justify-center text-xs flex-shrink-0">
+                                {emp.name
+                                  .split(' ')
+                                  .map((n) => n[0])
+                                  .slice(0, 2)
+                                  .join('')}
+                              </div>
+                              <div>
+                                <p className="font-bold text-navy text-xs">{emp.name}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="text-[11px] text-slate-500 font-mono">{emp.nip}</span>
+                                  <span className="text-[11px] text-slate-400">•</span>
+                                  <span className="text-[11px] text-slate-500">{emp.role}</span>
+                                  {emp.location && (
+                                    <span
+                                      className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${
+                                        isMariuk
+                                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                          : isCimalaka
+                                          ? 'bg-indigo-50 text-indigo-800 border border-indigo-200'
+                                          : 'bg-slate-100 text-slate-700'
+                                      }`}
+                                    >
+                                      {isMariuk ? 'Mariuk' : isCimalaka ? 'Cimalaka' : emp.location}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-xs text-slate-800 font-medium">{emp.division}</p>
+                            <span
+                              className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${
+                                emp.group === 'Grup A'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : emp.group === 'Grup B'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : emp.group === 'Belum Ditetapkan'
+                                  ? 'bg-slate-200 text-slate-700'
+                                  : 'bg-sky-100 text-sky-800'
+                              }`}
+                            >
+                              {emp.group}
+                            </span>
+                          </TableCell>
 
-                        <TableCell className="text-center font-bold text-xs text-slate-800">
-                          40 Jam
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          {/* 7 Sel Hari */}
+                          {currentWeek.days.map((day) => (
+                            <TableCell key={day.key} className="text-center p-2">
+                              {renderShiftCellBadge(emp, day)}
+                            </TableCell>
+                          ))}
+
+                          <TableCell className="text-center font-bold text-xs text-slate-800">
+                            <div>
+                              <span>{weeklyHours} Jam</span>
+                              <span className="block text-[10px] font-normal text-slate-400">
+                                ({dutyDays} Hari Dinas)
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -1015,23 +1134,29 @@ export default function JadwalShift() {
               <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs text-slate-600">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="font-bold text-slate-700">Legenda Kode:</span>
-                  <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-emerald-600 inline-block" /> S1 (Pagi 07-15)
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="w-2.5 h-2.5 rounded bg-emerald-600 inline-block" />
+                    <strong>PAGI (07-19)</strong>: Shift Pagi 12 Jam
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-amber-600 inline-block" /> S2 (Siang 15-23)
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="w-2.5 h-2.5 rounded bg-indigo-600 inline-block" />
+                    <strong>MALAM (19-07)</strong>: Shift Malam 12 Jam
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-sky-600 inline-block" /> NON (Office 08-17)
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="w-2.5 h-2.5 rounded bg-sky-600 inline-block" />
+                    <strong>NON</strong>: Office (08-17)
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-purple-600 inline-block" /> SWAP (Tukar Shift)
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="w-2.5 h-2.5 rounded bg-purple-600 inline-block" />
+                    <strong>SWAP</strong>: Tukar Shift Resmi
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-rose-600 inline-block" /> LIBUR (Hari Libur Resmi)
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="w-2.5 h-2.5 rounded bg-rose-600 inline-block" />
+                    <strong>LIBUR</strong>: Hari Libur Operasional
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[11px]">
-                    <span className="w-2.5 h-2.5 rounded bg-slate-400 inline-block" /> OFF (Libur Roster)
+                  <span className="inline-flex items-center gap-1.5 text-[11px]">
+                    <span className="w-2.5 h-2.5 rounded bg-slate-400 inline-block" />
+                    <strong>OFF</strong>: Libur Pasca-Dinas
                   </span>
                 </div>
 
