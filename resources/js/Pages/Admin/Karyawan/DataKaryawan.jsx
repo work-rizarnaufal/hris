@@ -36,7 +36,6 @@ import {
   TableHead,
   TableCell,
   TableEmpty,
-  Text,
   TableToolbar,
   TableSearch,
   TableFilterGroup,
@@ -230,14 +229,20 @@ export default function DataKaryawan() {
     setTimeout(() => setAlertInfo(null), 3500);
   };
 
-  // KPI Counts
+  // KPI Counts (Reaktif terhadap Filter Lokasi)
   const stats = useMemo(() => {
-    const total = employees.length;
-    const active = employees.filter((e) => e.status === 'Aktif').length;
-    const onLeave = employees.filter((e) => e.status === 'Cuti').length;
-    const inactive = employees.filter((e) => e.status === 'Non-Aktif').length;
-    return { total, active, onLeave, inactive };
-  }, [employees]);
+    const list =
+      filterLocation === 'ALL'
+        ? employees
+        : employees.filter((e) => e.location === filterLocation);
+
+    const total = list.length;
+    const active = list.filter((e) => e.status === 'Aktif').length;
+    const onLeave = list.filter((e) => e.status === 'Cuti').length;
+    const groupA = list.filter((e) => e.group === 'Grup A').length;
+    const groupB = list.filter((e) => e.group === 'Grup B').length;
+    return { total, active, onLeave, groupA, groupB };
+  }, [employees, filterLocation]);
 
   // Filtered List
   const filteredEmployees = useMemo(() => {
@@ -380,68 +385,130 @@ export default function DataKaryawan() {
         }
       />
 
-      {/* Ringkasan Metrik Singkat (KPI Badges) */}
+      {/* Segmented Location Controller & Operational Heartbeat */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white border border-slate-200/90 rounded-2xl shadow-2xs mb-6">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+          <button
+            type="button"
+            onClick={() => setFilterLocation('ALL')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              filterLocation === 'ALL'
+                ? 'bg-navy text-white shadow-xs'
+                : 'text-slate-600 hover:text-navy hover:bg-slate-200/60'
+            }`}
+          >
+            Semua Lokasi ({employees.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterLocation('Lokasi Mariuk')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+              filterLocation === 'Lokasi Mariuk'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-amber-800 hover:bg-amber-50'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            Mariuk ({employees.filter((e) => e.location === 'Lokasi Mariuk').length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterLocation('Lokasi Cimalaka')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+              filterLocation === 'Lokasi Cimalaka'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-indigo-800 hover:bg-indigo-50'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
+            Cimalaka ({employees.filter((e) => e.location === 'Lokasi Cimalaka').length})
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-xs font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1.5"></span>
+            Direktori Personil 24/7 · 6 Mariuk + 6 Cimalaka
+          </Badge>
+        </div>
+      </div>
+
+      {/* 4 Kartu KPI Metrik Karyawan (Reaktif terhadap Lokasi) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <Card className="hover:border-slate-300 transition-colors">
+        <Card className="hover:border-slate-300 transition-colors shadow-2xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Total Karyawan
+                Total Personil
               </div>
               <div className="text-2xl font-bold font-display text-navy mt-0.5">
                 {stats.total} <span className="text-xs font-normal text-slate-400">orang</span>
               </div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                {filterLocation === 'ALL'
+                  ? '6 Mariuk + 6 Cimalaka'
+                  : filterLocation}
+              </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-navy shrink-0">
-              <Users className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-navy/5 flex items-center justify-center text-navy shrink-0">
+              <Users className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:border-slate-300 transition-colors">
+        <Card className="hover:border-slate-300 transition-colors shadow-2xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Status Aktif
+                Status Siap Dinas
               </div>
-              <div className="text-2xl font-bold font-display text-[#398872] mt-0.5">
+              <div className="text-2xl font-bold font-display text-emerald-700 mt-0.5">
                 {stats.active} <span className="text-xs font-normal text-slate-400">orang</span>
               </div>
+              <div className="text-[11px] text-emerald-600 font-medium mt-0.5">
+                {stats.onLeave > 0 ? `${stats.onLeave} Orang Sedang Cuti` : '100% Siap Operasional'}
+              </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-[#eef7f1] flex items-center justify-center text-[#398872] shrink-0">
-              <CheckCircle2 className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:border-slate-300 transition-colors">
+        <Card className="hover:border-slate-300 transition-colors shadow-2xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Sedang Cuti
+                Roster Grup A
               </div>
-              <div className="text-2xl font-bold font-display text-[#8880b1] mt-0.5">
-                {stats.onLeave} <span className="text-xs font-normal text-slate-400">orang</span>
+              <div className="text-2xl font-bold font-display text-amber-700 mt-0.5">
+                {stats.groupA} <span className="text-xs font-normal text-slate-400">orang</span>
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Rotasi Hari Ganjil (24/7)
               </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-[#f1f0f9] flex items-center justify-center text-[#8880b1] shrink-0">
-              <Clock className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+              <Building className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="hover:border-slate-300 transition-colors">
+        <Card className="hover:border-slate-300 transition-colors shadow-2xs">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
-                Non-Aktif / Resign
+                Roster Grup B
               </div>
-              <div className="text-2xl font-bold font-display text-[#b36a74] mt-0.5">
-                {stats.inactive} <span className="text-xs font-normal text-slate-400">orang</span>
+              <div className="text-2xl font-bold font-display text-indigo-700 mt-0.5">
+                {stats.groupB} <span className="text-xs font-normal text-slate-400">orang</span>
+              </div>
+              <div className="text-[11px] text-slate-500 mt-0.5">
+                Rotasi Hari Genap (24/7)
               </div>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-[#fbf0f2] flex items-center justify-center text-[#b36a74] shrink-0">
-              <ShieldAlert className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+              <Clock className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
@@ -552,123 +619,141 @@ export default function DataKaryawan() {
                   </div>
                 </TableEmpty>
               ) : (
-                filteredEmployees.map((emp, index) => {
-                  // Badge styling helper
-                  const statusClass =
-                    emp.status === 'Aktif'
-                      ? 'status-aktif'
-                      : emp.status === 'Cuti'
-                      ? 'status-cuti'
-                      : 'status-alpha';
+                filteredEmployees.map((emp, index) => (
+                  <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
+                    {/* 1. No */}
+                    <TableCell className="text-center font-medium text-slate-500 text-xs">
+                      {index + 1}
+                    </TableCell>
 
-                  const groupBadgeBg =
-                    emp.group === 'Grup A'
-                      ? 'bg-[#f7f2e8] text-[#ab874b] border-[#c4a266]/30'
-                      : emp.group === 'Grup B'
-                      ? 'bg-[#eef7f1] text-[#398872] border-[#398872]/30'
-                      : 'bg-slate-100 text-slate-600 border-slate-200';
-
-                  return (
-                    <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
-                      {/* 1. No */}
-                      <TableCell className="text-center font-medium text-slate-500 text-xs">
-                        {index + 1}
-                      </TableCell>
-
-                      {/* 2. Nama Karyawan */}
-                      <TableCell>
-                        <div className="person">
-                          <div className="avatar small font-bold text-slate-700 bg-slate-100 border border-slate-200">
-                            {emp.name.slice(0, 2).toUpperCase()}
-                          </div>
-                          <div>
-                            <strong
-                              onClick={() => handleOpenEdit(emp)}
-                              className="block text-xs font-semibold text-navy hover:text-[#c4a266] transition-colors cursor-pointer"
-                              title="Klik untuk ubah data karyawan"
-                            >
-                              {emp.name}
-                            </strong>
-                            <Text variant="caption" color="muted">
-                              {emp.nip} • {emp.role}
-                            </Text>
-                          </div>
+                    {/* 2. Nama Karyawan */}
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-navy/10 text-navy font-bold text-xs flex items-center justify-center shrink-0 border border-navy/15">
+                          {emp.name.slice(0, 2).toUpperCase()}
                         </div>
-                      </TableCell>
-
-                      {/* 3. Divisi */}
-                      <TableCell className="font-medium text-slate-700">
-                        {emp.division}
-                      </TableCell>
-
-                      {/* 4. Lokasi Kerja */}
-                      <TableCell>
-                        <div className="flex items-center gap-1.5 text-slate-600 text-xs">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{emp.location}</span>
-                        </div>
-                      </TableCell>
-
-                      {/* 5. Grup */}
-                      <TableCell className="text-center">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border ${groupBadgeBg}`}
-                        >
-                          {emp.group}
-                        </span>
-                      </TableCell>
-
-                      {/* 6. Kategori Jadwal */}
-                      <TableCell className="text-slate-600 text-xs">
-                        {emp.scheduleCategory}
-                      </TableCell>
-
-                      {/* 7. Jam Masuk */}
-                      <TableCell className="text-center">
-                        <Text variant="code" className="text-emerald-800 bg-emerald-50 border border-emerald-200/60 font-semibold inline-block">
-                          {emp.checkInTime}
-                        </Text>
-                      </TableCell>
-
-                      {/* 8. Jam Pulang */}
-                      <TableCell className="text-center">
-                        <Text variant="code" className="text-slate-700 bg-slate-100 border border-slate-200 font-semibold inline-block">
-                          {emp.checkOutTime}
-                        </Text>
-                      </TableCell>
-
-                      {/* 9. Status */}
-                      <TableCell className="text-center">
-                        <span className={`badge ${statusClass}`}>
-                          <i />
-                          {emp.status}
-                        </span>
-                      </TableCell>
-
-                      {/* 10. Aksi */}
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button
-                            type="button"
+                        <div>
+                          <strong
                             onClick={() => handleOpenEdit(emp)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-navy hover:bg-slate-100 transition-colors"
-                            title="Ubah data karyawan"
+                            className="block text-xs font-semibold text-navy hover:text-[#c4a266] transition-colors cursor-pointer"
+                            title="Klik untuk ubah data karyawan"
                           >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(emp.id, emp.name)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                            title="Hapus karyawan"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                            {emp.name}
+                          </strong>
+                          <p className="text-[11px] text-slate-500 font-normal">
+                            <span className="font-mono text-slate-600 font-medium">{emp.nip}</span> • {emp.role}
+                          </p>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
+                      </div>
+                    </TableCell>
+
+                    {/* 3. Divisi */}
+                    <TableCell className="font-medium text-slate-700 text-xs">
+                      {emp.division}
+                    </TableCell>
+
+                    {/* 4. Lokasi Kerja */}
+                    <TableCell>
+                      <Badge
+                        className={
+                          emp.location.includes('Mariuk')
+                            ? 'bg-amber-50 text-amber-800 border-amber-200 text-[11px] font-bold px-2 py-0.5'
+                            : emp.location.includes('Cimalaka')
+                            ? 'bg-indigo-50 text-indigo-800 border-indigo-200 text-[11px] font-bold px-2 py-0.5'
+                            : 'bg-slate-100 text-slate-700 border-slate-200 text-[11px] font-medium px-2 py-0.5'
+                        }
+                      >
+                        <MapPin className="w-3 h-3 mr-1" />
+                        <span>{emp.location}</span>
+                      </Badge>
+                    </TableCell>
+
+                    {/* 5. Grup */}
+                    <TableCell className="text-center">
+                      <Badge
+                        className={
+                          emp.group === 'Grup A'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200 text-[11px] font-bold px-2 py-0.5'
+                            : emp.group === 'Grup B'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 text-[11px] font-bold px-2 py-0.5'
+                            : 'bg-slate-100 text-slate-600 border-slate-200 text-[11px] font-medium px-2 py-0.5'
+                        }
+                      >
+                        {emp.group}
+                      </Badge>
+                    </TableCell>
+
+                    {/* 6. Kategori Jadwal */}
+                    <TableCell>
+                      <Badge
+                        className={
+                          emp.scheduleCategory?.toLowerCase().includes('malam')
+                            ? 'bg-indigo-50 text-indigo-800 border-indigo-200 text-[11px] font-bold px-2 py-0.5'
+                            : emp.scheduleCategory?.toLowerCase().includes('pagi')
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 text-[11px] font-bold px-2 py-0.5'
+                            : 'bg-sky-50 text-sky-800 border-sky-200 text-[11px] font-medium px-2 py-0.5'
+                        }
+                      >
+                        <Clock className="w-3 h-3 mr-1" />
+                        <span>{emp.scheduleCategory}</span>
+                      </Badge>
+                    </TableCell>
+
+                    {/* 7. Jam Masuk */}
+                    <TableCell className="text-center">
+                      <span className="font-mono text-xs px-2 py-0.5 rounded text-emerald-800 bg-emerald-50 border border-emerald-200/60 font-semibold inline-block">
+                        {emp.checkInTime}
+                      </span>
+                    </TableCell>
+
+                    {/* 8. Jam Pulang */}
+                    <TableCell className="text-center">
+                      <span className="font-mono text-xs px-2 py-0.5 rounded text-slate-700 bg-slate-100 border border-slate-200 font-semibold inline-block">
+                        {emp.checkOutTime}
+                      </span>
+                    </TableCell>
+
+                    {/* 9. Status */}
+                    <TableCell className="text-center">
+                      <Badge
+                        className={
+                          emp.status === 'Aktif'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 text-[11px] font-bold px-2 py-0.5'
+                            : emp.status === 'Cuti'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200 text-[11px] font-bold px-2 py-0.5'
+                            : 'bg-rose-50 text-rose-800 border-rose-200 text-[11px] font-bold px-2 py-0.5'
+                        }
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full mr-1 ${emp.status === 'Aktif' ? 'bg-emerald-500' : emp.status === 'Cuti' ? 'bg-amber-500' : 'bg-rose-500'}`}></span>
+                        {emp.status}
+                      </Badge>
+                    </TableCell>
+
+                    {/* 10. Aksi */}
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenEdit(emp)}
+                          className="h-7 w-7 p-0 text-slate-500 hover:text-navy hover:bg-slate-100 border-slate-200 cursor-pointer"
+                          title="Ubah data karyawan"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-[#c4a266]" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(emp.id, emp.name)}
+                          className="h-7 w-7 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border-slate-200 cursor-pointer"
+                          title="Hapus karyawan"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>

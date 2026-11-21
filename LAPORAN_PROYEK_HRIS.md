@@ -205,12 +205,32 @@ Pintasan alur kerja eksekutif dengan ikon representatif:
 
 Lokasi: [`resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx`](resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx)
 
-- **10 Kolom Tabel Simetris**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
-- **Head Table Rapi & Terpusat**: Kolom data badge/jam/status terpusat simetris dengan kolom header.
-- **Fitur Aksi**:
-  - **Tambah Karyawan**: Menggunakan modal atomik `ModalFormKaryawan.jsx` dengan preset shift cepat.
-  - **Ubah & Hapus Karyawan**: Edit inline data dan konfirmasi hapus langsung.
-  - **Impor Excel (`ModalImporKaryawan.jsx`)**: Menggunakan modal atomik, unggah `.xlsx`/`.csv`, unduh template resmi, dan live preview validasi data.
+### A. Segmented Location Controller (Mariuk & Cimalaka)
+- **Tab Pengontrol Segmen 1-Sentuhan**:
+  - `Semua Lokasi (12)`: Pandangan makro seluruh personil lintas pabrik.
+  - `Mariuk (6)`: Filter cepat khusus personil Lokasi Mariuk dengan badge pill amber.
+  - `Cimalaka (6)`: Filter cepat khusus personil Lokasi Cimalaka dengan badge pill indigo.
+- **Detak Operasional Live**: *Direktori Personil 24/7 · 6 Mariuk + 6 Cimalaka*.
+
+### B. 4 Kartu KPI Metrik Karyawan Reaktif
+- Mengkalkulasi metrik secara real-time berdasarkan lokasi kerja yang dipilih:
+  1. **Total Personil**: Jumlah karyawan terdaftar (12 di semua, atau 6 per pabrik).
+  2. **Status Siap Dinas**: Personil aktif dengan indikator cuti transparan.
+  3. **Roster Grup A**: Personil kelompok rotasi hari ganjil (24/7).
+  4. **Roster Grup B**: Personil kelompok rotasi hari genap (24/7).
+
+### C. Tabel Direktori & Desain UI Atomik
+- **10 Kolom Terstandarisasi**: No, Nama Karyawan, Divisi, Lokasi Kerja, Grup, Kategori Jadwal, Jam Masuk, Jam Pulang, Status, Aksi.
+- **Avatar Inisial & Identitas**: Lingkaran avatar dengan kontras tinggi navy, nama berstatus tautan inline edit, NIP font-mono, dan jabatan.
+- **Badge Pill Terstandarisasi**:
+  - Lokasi: Mariuk (amber) dan Cimalaka (indigo).
+  - Grup: Grup A (amber-gold) dan Grup B (emerald).
+  - Shift 12 Jam: Shift Pagi 07:00–19:00 (emerald) dan Shift Malam 19:00–07:00 (indigo).
+  - Status: `<Badge>` atomik (Aktif, Cuti, Non-Aktif) dengan dot indikator warna.
+- **Aksi CRUD Terintegrasi**:
+  - **Tambah Karyawan**: Menggunakan modal atomik `ModalFormKaryawan.jsx` tersinkron dengan titik geofence dan shift settings.
+  - **Ubah & Hapus Karyawan**: Edit data via modal atomik atau tombol pensil/sampah ber-tooltip.
+  - **Impor Excel (`ModalImporKaryawan.jsx`)**: Unggah `.xlsx`/`.csv`, unduh template resmi (Mariuk & Cimalaka), dan validasi preview.
   - **Ekspor Excel**: 1-klik unduh `.xlsx` terfilter via SheetJS.
   - **Live Filter**: Pencarian teks nama/NIP + dropdown filter Divisi, Grup, dan Status.
   - **Notifikasi**: Menggunakan notifikasi atomik `<Toast />`.
