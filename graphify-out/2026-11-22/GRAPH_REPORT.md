@@ -1,12 +1,12 @@
 # Graph Report - hris  (2026-11-22)
 
 ## Corpus Check
-- 130 files · ~94,848 words
+- 131 files · ~97,561 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
 ## Summary
-- 637 nodes · 1406 edges · 54 communities (16 shown, 38 thin omitted)
+- 637 nodes · 1403 edges · 54 communities (16 shown, 38 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
@@ -49,7 +49,7 @@
 2. `cn()` - 37 edges
 3. `lucide-react` - 32 edges
 4. `@inertiajs/react` - 21 edges
-5. `Employee` - 18 edges
+5. `Employee` - 19 edges
 6. `Card()` - 18 edges
 7. `CardContent()` - 18 edges
 8. `CardDescription()` - 18 edges
@@ -57,15 +57,15 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `DataKaryawan()` --calls--> `ModalImporKaryawan()`  [EXTRACTED]
+  resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx → resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx
+- `CatatanKehadiran()` --calls--> `ModalImporFingerprint()`  [EXTRACTED]
+  resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx → resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx
 - `AuthController` --inherits--> `Controller`  [EXTRACTED]
   app/Http/Controllers/Auth/AuthController.php → app/Http/Controllers/Controller.php
+- `Badge()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/badge.jsx → resources/js/lib/utils.js
 - `Card()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardContent()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardDescription()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles

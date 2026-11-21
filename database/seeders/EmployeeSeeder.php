@@ -97,7 +97,6 @@ class EmployeeSeeder extends Seeder
 
                 $jabatanRaw = trim((string) ($row['Jabatan'] ?? 'Staff'));
                 $roleTitle = $jabatanRaw ?: 'Staff';
-                $division = ($jabatanRaw === 'CEO') ? 'Direksi & Manajemen' : 'Operasional & Lapangan';
                 $joinDate = trim((string) ($row['Tanggal Bergabung'] ?? ''));
                 $nip = is_numeric($idRaw) ? sprintf('HC-%04d', (int) $idRaw) : 'HC-'.$idRaw;
 
@@ -110,7 +109,7 @@ class EmployeeSeeder extends Seeder
                         'email' => null,
                         'phone' => trim((string) ($row['WhatsApp'] ?? '')) ?: null,
                         'role_title' => $roleTitle,
-                        'division' => $division,
+                        'division' => null, // KOSONG SESUAI INSTRUKSI
                         'location_id' => $locId,
                         'shift_id' => null,
                         'shift_group' => 'Belum Ditetapkan',

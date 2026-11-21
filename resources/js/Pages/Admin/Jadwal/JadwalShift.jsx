@@ -964,7 +964,7 @@ export default function JadwalShift({
                             </div>
                           </TableCell>
                           <TableCell>
-                            <p className="text-xs text-slate-800 font-medium">{emp.division}</p>
+                            <p className="text-xs text-slate-800 font-medium">{emp.division || '-'}</p>
                             <span
                               className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${
                                 emp.group === 'Grup A'

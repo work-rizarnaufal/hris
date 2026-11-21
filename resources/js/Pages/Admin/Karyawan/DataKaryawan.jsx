@@ -72,7 +72,7 @@ const normalizeEmployee = (emp) => {
     nip: emp.nip || '',
     biometricPin: String(emp.biometric_pin || emp.biometricPin || ''),
     role: emp.role || emp.role_title || 'Staff Operasional Lapangan',
-    division: emp.division || 'Operasional & Lapangan',
+    division: emp.division || '-',
     location: locName,
     group: emp.group || emp.shift_group || 'Grup A',
     scheduleCategory: shiftName,
@@ -572,7 +572,7 @@ export default function DataKaryawan({ employees: initialDbEmployees = [] }) {
 
                       {/* 3. Divisi */}
                       <TableCell className="font-medium text-slate-700">
-                        {emp.division}
+                        {emp.division || '-'}
                       </TableCell>
 
                       {/* 4. Lokasi Kerja */}

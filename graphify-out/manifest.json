@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/JadwalShift.jsx": {
-    "mtime": 1795282915.1374705,
-    "seen": 1795283155.4847665,
-    "ast_hash": "0cc19e6d296360105cfd4d0b83969c43",
+    "mtime": 1795291496.1638582,
+    "seen": 1795291543.9079523,
+    "ast_hash": "18385e68270e12f0eeb0b61d283ceb38",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx": {
-    "mtime": 1795291125.4775865,
-    "seen": 1795291257.9027627,
-    "ast_hash": "3bec515f7427f1d9dce1be7e8492a796",
+    "mtime": 1795291487.35836,
+    "seen": 1795291543.9079523,
+    "ast_hash": "c62399313570dbad7110c15dd669bde4",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
@@ -684,9 +684,9 @@
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795291233.4327133,
-    "seen": 1795291257.9027627,
-    "ast_hash": "3560099ed5f5f9ae6d424efb27481105",
+    "mtime": 1795291509.3591032,
+    "seen": 1795291543.9079523,
+    "ast_hash": "19f270d747f479a26586c1c13cba52ff",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {
@@ -789,6 +789,12 @@
     "mtime": 1795291161.885974,
     "seen": 1795291257.9027627,
     "ast_hash": "e117af4b9fb1b364851de2753414297d",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_22_030401_make_division_nullable_in_employees_table.php": {
+    "mtime": 1795291447.571929,
+    "seen": 1795291543.9079523,
+    "ast_hash": "da85dd3e94b3c09326835815a50055cb",
     "semantic_hash": ""
   },
   "package-lock.json": {

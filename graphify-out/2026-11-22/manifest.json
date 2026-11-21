@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx": {
-    "mtime": 1795283026.2924597,
-    "seen": 1795283155.4847665,
-    "ast_hash": "e5539b18a60185061842ca90b7a41df5",
+    "mtime": 1795291125.4775865,
+    "seen": 1795291257.9027627,
+    "ast_hash": "3bec515f7427f1d9dce1be7e8492a796",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "mtime": 1795289195.4749744,
-    "seen": 1795290292.4036763,
-    "ast_hash": "9b98a111893abfeac2758574dc848eca",
+    "mtime": 1795291135.4250336,
+    "seen": 1795291257.9027627,
+    "ast_hash": "3701e80ae739648f0ea0ebf2309d8d3f",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
@@ -576,9 +576,9 @@
     "semantic_hash": ""
   },
   "app/Models/Employee.php": {
-    "mtime": 1795285918.7415478,
-    "seen": 1795286710.161662,
-    "ast_hash": "f0ca5c0e55c5f1822ff64ea58d6fc50b",
+    "mtime": 1795291114.6665819,
+    "seen": 1795291257.9027627,
+    "ast_hash": "4003857f6bacdadc8c6cedb2e4132b6e",
     "semantic_hash": ""
   },
   "app/Models/Holiday.php": {
@@ -678,15 +678,15 @@
     "semantic_hash": ""
   },
   "database/seeders/DatabaseSeeder.php": {
-    "mtime": 1795289773.8762407,
-    "seen": 1795290292.4036763,
-    "ast_hash": "0e46f817fa20937e0323648bdfdc0318",
+    "mtime": 1795291227.6675675,
+    "seen": 1795291257.9027627,
+    "ast_hash": "43fcd80d898bd9239b5d94cc599193ea",
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795290251.9264488,
-    "seen": 1795290292.4036763,
-    "ast_hash": "f12e484cb8897fef8327421b767f2291",
+    "mtime": 1795291233.4327133,
+    "seen": 1795291257.9027627,
+    "ast_hash": "3560099ed5f5f9ae6d424efb27481105",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {
@@ -783,6 +783,12 @@
     "mtime": 1795285047.9144578,
     "seen": 1795286710.161662,
     "ast_hash": "55920244cfa4e51feea27bbcf1b69b65",
+    "semantic_hash": ""
+  },
+  "database/data/data_karyawan_clean.json": {
+    "mtime": 1795291161.885974,
+    "seen": 1795291257.9027627,
+    "ast_hash": "e117af4b9fb1b364851de2753414297d",
     "semantic_hash": ""
   },
   "package-lock.json": {

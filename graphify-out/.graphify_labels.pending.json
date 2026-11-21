@@ -1,7 +1,7 @@
 {
   "0": "@inertiajs/react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "Inertia\\Response",
+  "4": "SystemSetting",
   "5": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
@@ -12,13 +12,11 @@
   "42": "App\\Models\\Employee",
   "43": "Illuminate\\Database\\Seeder",
   "44": "KehadiranController.php",
-  "45": "Illuminate\\Http\\RedirectResponse",
+  "45": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "46": "web.php",
   "47": "sidebar.jsx",
   "48": "Location",
   "49": "HandleInertiaRequests.php",
   "50": "Illuminate\\Http\\Request",
-  "51": "User",
-  "52": "App\\Models\\Shift",
-  "53": "SystemSetting"
+  "51": "User"
 }
