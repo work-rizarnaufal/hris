@@ -258,7 +258,7 @@ class FingerprintImportService
                     'location_id' => $row['location_id'] ?? null,
                     'method' => 'fingerprint',
                     'import_batch_id' => $batchId,
-                    'notes' => ! empty($row['notes']) ? $row['notes'] : (! empty($row['anomaly_reason']) ? 'Fingerprint: '.$row['anomaly_reason'] : 'Presensi biometric fingerprint site'),
+                    'notes' => ! empty($row['anomaly_reason']) ? 'Fingerprint: '.$row['anomaly_reason'] : 'Presensi biometric fingerprint site',
                 ]
             );
             $savedCount++;

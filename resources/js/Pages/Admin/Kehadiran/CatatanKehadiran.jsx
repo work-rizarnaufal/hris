@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import { getShiftSettings } from '@/services/systemSettings.js';
 import {
@@ -101,10 +101,10 @@ export default function CatatanKehadiran({
         division: emp.division || '-',
         location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
         location_id: emp.location_id,
-        group: emp.group || 'Grup A',
-        scheduleCategory: emp.shift?.name || 'Shift Pagi (08:00 - 17:00)',
-        checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : '08:00',
-        checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : '17:00',
+        group: emp.group || emp.shift_group || 'Belum Ditetapkan',
+        scheduleCategory: emp.shift?.name || emp.scheduleCategory || '-',
+        checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : (emp.checkInTime || '-'),
+        checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : (emp.checkOutTime || '-'),
         status: emp.status || 'Aktif',
       }));
     }
@@ -349,14 +349,10 @@ export default function CatatanKehadiran({
       work_duration_hours: (r.checkIn && r.checkOut && r.checkIn !== '-' && r.checkOut !== '-') ? 8.0 : 0,
       location_id: r.location_id || (r.location?.includes('Mariuk') ? 1 : 2),
       anomaly_reason: r.anomalyReason || r.anomaly_reason || null,
-      notes: r.notes || r.anomalyReason || r.anomaly_reason || null,
     }));
 
-    if (importedRecords && importedRecords.length > 0) {
-      const dates = importedRecords.map((r) => r.date).filter(Boolean).sort();
-      if (dates.length > 0) {
-        setSelectedDate(dates[dates.length - 1]);
-      }
+    if (importedRecords[0]?.date) {
+      setSelectedDate(importedRecords[0].date);
     }
 
     router.post('/kehadiran/commit-fingerprint', {
@@ -469,13 +465,14 @@ export default function CatatanKehadiran({
         subtitle="Monitoring log presensi harian, tracking absensi, dan jam masuk/pulang karyawan operasional."
       >
         <div className="flex flex-wrap items-center gap-2.5">
-          <Link
-            href="/kehadiran/impor"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50/70 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all shadow-2xs"
+          <Button
+            variant="outline"
+            onClick={() => setIsFingerprintOpen(true)}
+            className="gap-2 bg-indigo-50/50 hover:bg-indigo-100/60 text-indigo-700 border-indigo-200 hover:border-indigo-300 font-semibold"
           >
             <Fingerprint className="w-4 h-4 text-indigo-600" />
             <span>Tarik Log Fingerprint</span>
-          </Link>
+          </Button>
           <Button
             variant="outline"
             onClick={handleExportExcel}
@@ -600,13 +597,15 @@ export default function CatatanKehadiran({
             </p>
           </div>
         </div>
-        <Link
-          href="/kehadiran/impor"
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-navy hover:bg-navy/90 text-white shadow-2xs hover:shadow-sm shrink-0 transition-all cursor-pointer"
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsFingerprintOpen(true)}
+          className="shrink-0 text-xs gap-1.5 font-medium border-indigo-200 text-indigo-700 hover:bg-indigo-50/80 bg-white"
         >
-          <Fingerprint className="w-4 h-4 text-[#c4a266]" />
-          <span>Tarik Log Mesin (Meja Kerja)</span>
-        </Link>
+          <Fingerprint className="w-3.5 h-3.5" />
+          <span>Tarik Log Mesin</span>
+        </Button>
       </div>
 
       {/* KPI Cards (5 Cards) */}
@@ -829,25 +828,16 @@ export default function CatatanKehadiran({
                         ? 'Tidak ada data kehadiran yang cocok dengan kriteria filter yang Anda tentukan.'
                         : `Belum ada presensi yang dicatat untuk tanggal ${formattedDateTitle}.`}
                     </p>
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <div className="flex items-center justify-center gap-2">
                       {hasActiveFilters ? (
                         <Button variant="outline" size="sm" onClick={handleResetFilters}>
                           Reset Filter
                         </Button>
                       ) : (
-                        <>
-                          <Link
-                            href="/kehadiran/impor"
-                            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-navy hover:bg-navy/90 text-white shadow-2xs cursor-pointer"
-                          >
-                            <Fingerprint className="w-4 h-4 text-[#c4a266]" />
-                            <span>Tarik Log Fingerprint</span>
-                          </Link>
-                          <Button variant="outline" size="sm" onClick={handleOpenAdd} className="gap-1.5">
-                            <Plus className="w-4 h-4" />
-                            <span>Catat Presensi Manual</span>
-                          </Button>
-                        </>
+                        <Button variant="default" size="sm" onClick={handleOpenAdd} className="gap-1.5">
+                          <Plus className="w-4 h-4" />
+                          <span>Catat Presensi Sekarang</span>
+                        </Button>
                       )}
                     </div>
                   </div>

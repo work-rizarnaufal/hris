@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "mtime": 1795288118.2097864,
-    "seen": 1795288167.6309545,
-    "ast_hash": "4688dd1efe195856b8f9e22dd431713d",
+    "mtime": 1795289195.4749744,
+    "seen": 1795290292.4036763,
+    "ast_hash": "9b98a111893abfeac2758574dc848eca",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1795287936.0515041,
-    "seen": 1795288167.6309545,
-    "ast_hash": "e5d3c46fe41f4f42bd9676dd6c11603e",
+    "mtime": 1795289195.4058843,
+    "seen": 1795290292.4036763,
+    "ast_hash": "7d6309cc292eaeb1e78c20372df8a942",
     "semantic_hash": ""
   },
   "storage/framework/views/33035f1adbd8fc13ef8a3b77d50480bf.php": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795288159.137234,
-    "seen": 1795288167.6309545,
-    "ast_hash": "c794a362a9ce0132ff1c5613112b8d56",
+    "mtime": 1795289195.4548678,
+    "seen": 1795290292.4036763,
+    "ast_hash": "3632a1618d0b1ac34f7263a5233d9f3c",
     "semantic_hash": ""
   },
   "README.md": {
@@ -678,15 +678,15 @@
     "semantic_hash": ""
   },
   "database/seeders/DatabaseSeeder.php": {
-    "mtime": 1795282419.2995453,
-    "seen": 1795283155.4847665,
+    "mtime": 1795289773.8762407,
+    "seen": 1795290292.4036763,
     "ast_hash": "0e46f817fa20937e0323648bdfdc0318",
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795276809.4230986,
-    "seen": 1795276984.7194755,
-    "ast_hash": "354723523682278db64a233a621f8faa",
+    "mtime": 1795290251.9264488,
+    "seen": 1795290292.4036763,
+    "ast_hash": "f12e484cb8897fef8327421b767f2291",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {
@@ -726,21 +726,21 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/KehadiranController.php": {
-    "mtime": 1795287926.6055312,
-    "seen": 1795288167.6309545,
-    "ast_hash": "190104897496626ce2e20be295f7a2d7",
+    "mtime": 1795289195.4090774,
+    "seen": 1795290292.4036763,
+    "ast_hash": "548f1ec46278f8bd3cd0c057d933c8f7",
     "semantic_hash": ""
   },
   "app/Services/FingerprintImportService.php": {
-    "mtime": 1795286557.9127676,
-    "seen": 1795286710.161662,
-    "ast_hash": "77e8089ce7e9338ff1ee1db4433e3d64",
+    "mtime": 1795289195.4776127,
+    "seen": 1795290292.4036763,
+    "ast_hash": "3e6e26ca6d4c926dcf62f3007d5593ac",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx": {
-    "mtime": 1795287284.4136152,
-    "seen": 1795287318.782204,
-    "ast_hash": "aa9fdef19ac125d8e690f94646e05672",
+    "mtime": 1795289195.4691644,
+    "seen": 1795290292.4036763,
+    "ast_hash": "6d88c32e76b00d931ddb5c6554885a13",
     "semantic_hash": ""
   },
   "tests/Feature/FingerprintAndManualAttendanceTest.php": {
@@ -750,9 +750,9 @@
     "semantic_hash": ""
   },
   "database/data/karyawan.json": {
-    "mtime": 1795276787.3611019,
-    "seen": 1795276984.7194755,
-    "ast_hash": "4540348eb5848a4f3d36d2097d709dce",
+    "mtime": 1795290231.3244262,
+    "seen": 1795290292.4036763,
+    "ast_hash": "0e2b7eafb369a15abf780c4eaffeca8e",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/JadwalController.php": {
@@ -783,12 +783,6 @@
     "mtime": 1795285047.9144578,
     "seen": 1795286710.161662,
     "ast_hash": "55920244cfa4e51feea27bbcf1b69b65",
-    "semantic_hash": ""
-  },
-  "resources/js/Pages/Admin/Kehadiran/ImporFingerprint.jsx": {
-    "mtime": 1795288059.2836835,
-    "seen": 1795288167.6309545,
-    "ast_hash": "4dd8bc588b1107726a68fd8d691bd684",
     "semantic_hash": ""
   },
   "package-lock.json": {

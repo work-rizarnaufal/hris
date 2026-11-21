@@ -249,17 +249,11 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
   - **Shift Pagi**: Jam kerja operasional `08:00 - 17:00 WIB`. Jendela absen dibuka mulai `07:00 WIB` dan ditutup pada `18:00 WIB`.
   - **Shift Malam**: Jam kerja operasional `20:00 - 05:00 WIB` (lintas hari). Jendela absen dibuka mulai `19:00 WIB` dan ditutup pada `06:00 WIB` pagi hari berikutnya.
   - Toleransi keterlambatan dikonfigurasi dinamis (default: 15 menit).
-- **Integrasi Impor Mesin Biometric Fingerprint & Dedicated Staging Workbench (`/kehadiran/impor`)**:
-  - Mendukung format ekstraksi mesin fingerprint resmi (`FORMAT MESIN FINGER.xlsx`) dan file tarikan raw multi-hari (`report_scan_*.xlsx`).
-  - **Pemisahan Logika & Menghapus Selector Manual**: Selector mesin radio button manual (`Site Mariuk` vs `Site Cimalaka`) telah dihapus. Sistem mencocokkan PIN biometrik secara global dan otomatis mendeteksi lokasi penempatan karyawan dari master database.
-  - **Halaman Meja Kerja Dedikasi (`resources/js/Pages/Admin/Kehadiran/ImporFingerprint.jsx`)**:
-    - Tombol **"Tarik Log Fingerprint"** di `CatatanKehadiran.jsx` kini mengarahkan langsung ke halaman staging khusus `/kehadiran/impor` (`admin.kehadiran.impor`).
-    - **Pita Navigasi Tanggal (Multi-Day Date Ribbon)**: Memecah rekaman multi-hari (misal: 630 baris tarikan 8 hari) menjadi tab harian yang nyaman dibaca dan tidak sesak (`Semua Tanggal`, `14 Nov`, `15 Nov`, ...).
-    - **4 Kartu Metrik Staging**: *Total Rekaman Presensi*, *Lengkap & Siap Simpan*, *Perlu Review (Anomali Missing Tap)*, dan *PIN Belum Terdaftar*.
-    - **Inline Edit Ergonomis**: Input Jam Masuk & Jam Pulang berukuran proporsional (`h-9 text-sm font-mono font-bold`) dengan auto-recalculate menit keterlambatan secara instan saat jam diedit.
-    - **1-Klik "Auto-Fill Jam Pulang"**: Tombol sakti (`Wand2`) untuk menyelesaikan anomali *Missing Out* (karyawan lupa tap pulang) dalam 1 klik (otomatis set 17:00 untuk Pagi atau 05:00 untuk Malam).
-    - **TablePagination Lengkap**: Mendukung 25, 50, dan 100 baris per halaman dengan nomor halaman kontinu.
-    - **Sticky Bottom Action Bar**: Menampilkan ringkasan rekaman siap simpan dan tombol eksekusi transaksi database `POST /kehadiran/commit-fingerprint` dengan pengalihan otomatis kembali ke Catatan Kehadiran.
+- **Integrasi Impor Mesin Biometric Fingerprint Fisik (`FingerprintImportService.php`)**:
+  - Mendukung format ekstraksi mesin fingerprint 9 kolom (`Cloud ID`, `ID/PIN`, `Nama`, `Tanggal Absensi`, `Jam Absensi`, `Verifikasi`, `Tipe Absensi`, `Jabatan`, `Kantor`).
+  - Pemisahan site otomatis (`MARIUK` vs `CIMALAKA`).
+  - Algoritma deduplikasi scan ganda dalam 5 menit, pengelompokan time-window cerdas (masuk & pulang), serta deteksi anomali single punch (lupa tap masuk/pulang).
+  - Alur commit langsung ke database via `POST /kehadiran/commit-fingerprint`.
 - **Komponen Atomik `<TablePagination>`**:
   - Dilengkapi kontrol navigasi halaman cerdas dengan ellipsis, pilihan ukuran baris (`10, 25, 50, 100`), dan penomoran baris kontinu `(currentPage - 1) * perPage + index + 1`.
   - Ukuran font dan tombol diperbesar sesuai preferensi operasional (`text-xs sm:text-sm`).

@@ -63,22 +63,22 @@ class Employee extends Model
 
     public function getGroupAttribute(): string
     {
-        return $this->shift_group ?? 'Grup A';
+        return $this->shift_group ?: 'Belum Ditetapkan';
     }
 
     public function getScheduleCategoryAttribute(): string
     {
-        return $this->shift?->name ?? 'Shift Pagi (12 Jam)';
+        return $this->shift?->name ?? '-';
     }
 
     public function getCheckInTimeAttribute(): string
     {
-        return $this->shift?->start_time ?? '07:00';
+        return $this->shift?->start_time ? substr($this->shift->start_time, 0, 5) : '-';
     }
 
     public function getCheckOutTimeAttribute(): string
     {
-        return $this->shift?->end_time ?? '19:00';
+        return $this->shift?->end_time ? substr($this->shift->end_time, 0, 5) : '-';
     }
 
     public function user(): BelongsTo

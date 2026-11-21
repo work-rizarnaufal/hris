@@ -38,26 +38,6 @@ class KehadiranController extends Controller
     }
 
     /**
-     * Halaman Meja Kerja Impor & Review Log Fingerprint.
-     */
-    public function imporView(Request $request): Response
-    {
-        $employees = Employee::with(['location', 'shift'])
-            ->where('status', 'Aktif')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        $locations = Location::where('status', 'Aktif')->get();
-        $shifts = Shift::where('is_active', true)->get();
-
-        return Inertia::render('Admin/Kehadiran/ImporFingerprint', [
-            'dbEmployees' => $employees,
-            'dbLocations' => $locations,
-            'dbShifts' => $shifts,
-        ]);
-    }
-
-    /**
      * Catat presensi manual oleh admin (lupa absen, koreksi, surat izin).
      */
     public function storeManual(Request $request): RedirectResponse
@@ -171,7 +151,7 @@ class KehadiranController extends Controller
 
         $count = $service->commitRecords($request->input('records'), $request->input('batch_id'));
 
-        return redirect()->route('admin.kehadiran')->with('success', "Berhasil menyimpan {$count} data presensi biometric fingerprint ke database.");
+        return back()->with('success', "Berhasil menyimpan {$count} data presensi biometric fingerprint ke database.");
     }
 
     /**

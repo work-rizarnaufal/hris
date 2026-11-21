@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             SystemSettingSeeder::class,
             HolidaySeeder::class,
             EmployeeSeeder::class,
-            AttendanceSeeder::class,
+            // AttendanceSeeder::class, // Presensi diimpor manual/real dari log mesin fingerprint
         ]);
     }
 }

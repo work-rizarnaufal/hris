@@ -53,17 +53,17 @@ const normalizeEmployee = (emp) => {
     ? (emp.location?.name || (emp.location_id === 2 ? 'Lokasi Cimalaka' : 'Lokasi Mariuk'))
     : (emp.location || (emp.location_id === 2 ? 'Lokasi Cimalaka' : 'Lokasi Mariuk'));
 
-  const shiftName = typeof emp.shift === 'object'
-    ? (emp.shift?.name || emp.scheduleCategory || 'Shift Pagi (08:00 - 17:00)')
-    : (emp.scheduleCategory || emp.shift || 'Shift Pagi (08:00 - 17:00)');
+  const shiftName = typeof emp.shift === 'object' && emp.shift?.name
+    ? emp.shift.name
+    : (emp.scheduleCategory || '-');
 
   const inTime = typeof emp.shift === 'object' && emp.shift?.start_time
     ? emp.shift.start_time.slice(0, 5)
-    : (emp.checkInTime || '08:00');
+    : (emp.checkInTime || '-');
 
   const outTime = typeof emp.shift === 'object' && emp.shift?.end_time
     ? emp.shift.end_time.slice(0, 5)
-    : (emp.checkOutTime || '17:00');
+    : (emp.checkOutTime || '-');
 
   return {
     ...emp,

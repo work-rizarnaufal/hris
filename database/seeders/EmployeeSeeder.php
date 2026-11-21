@@ -61,43 +61,69 @@ class EmployeeSeeder extends Seeder
         $locMariuk = Location::where('code', 'MRK')->first();
         $locCimalaka = Location::where('code', 'CML')->first();
 
-        $shifts = [
-            'PAGI_12H' => $shiftPagi?->id,
-            'MALAM_12H' => $shiftMalam?->id,
-            'OFFICE_8H' => $shiftOffice?->id,
-        ];
-
         $locations = [
-            'MRK' => $locMariuk?->id,
-            'CML' => $locCimalaka?->id,
+            'MRK' => $locMariuk?->id ?? 1,
+            'CML' => $locCimalaka?->id ?? 2,
+            'MARIUK' => $locMariuk?->id ?? 1,
+            'CIMALAKA' => $locCimalaka?->id ?? 2,
         ];
 
-        $jsonPath = database_path('data/karyawan.json');
-        if (File::exists($jsonPath)) {
-            $employees = json_decode(File::get($jsonPath), true);
-        } else {
-            $employees = [];
-        }
+        $cleanJsonPath = database_path('data/data_karyawan_clean.json');
+        if (File::exists($cleanJsonPath)) {
+            $rawEmployees = json_decode(File::get($cleanJsonPath), true);
+            $mariukCount = 0;
+            $cimalakaCount = 0;
 
-        foreach ($employees as $data) {
-            Employee::updateOrCreate(
-                ['nip' => $data['nip']],
-                [
-                    'biometric_pin' => (string) $data['biometric_pin'],
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'phone' => $data['phone'] ?? null,
-                    'role_title' => $data['role_title'],
-                    'division' => $data['division'],
-                    'location_id' => $locations[$data['location_code']] ?? null,
-                    'shift_id' => $shifts[$data['shift_code']] ?? null,
-                    'shift_group' => $data['shift_group'],
-                    'employment_status' => $data['employment_status'],
-                    'status' => $data['status'] ?? 'Aktif',
-                    'join_date' => $data['join_date'],
-                    'leave_quota' => $data['leave_quota'] ?? 12,
-                ]
-            );
+            foreach ($rawEmployees as $row) {
+                $idRaw = trim((string) ($row['ID'] ?? ''));
+                if ($idRaw === '') {
+                    continue;
+                }
+                $nikRaw = trim((string) ($row['NIK'] ?? $idRaw));
+                $nameRaw = trim((string) ($row['Nama di perangkat absensi'] ?? ''));
+                if ($nameRaw === '') {
+                    $depan = trim((string) ($row['Nama Depan'] ?? ''));
+                    $belakang = trim((string) ($row['Nama Belakang'] ?? ''));
+                    $nameRaw = trim($depan.' '.$belakang);
+                }
+
+                $kantorRaw = strtoupper(trim((string) ($row['Kantor'] ?? '')));
+                $locId = ($kantorRaw === 'MARIUK') ? $locations['MARIUK'] : $locations['CIMALAKA'];
+                if ($locId === 1) {
+                    $mariukCount++;
+                } else {
+                    $cimalakaCount++;
+                }
+
+                $jabatanRaw = trim((string) ($row['Jabatan'] ?? 'Staff'));
+                $roleTitle = $jabatanRaw ?: 'Staff';
+                $division = ($jabatanRaw === 'CEO') ? 'Direksi & Manajemen' : 'Operasional & Lapangan';
+                $joinDate = trim((string) ($row['Tanggal Bergabung'] ?? ''));
+                $nip = is_numeric($idRaw) ? sprintf('HC-%04d', (int) $idRaw) : 'HC-'.$idRaw;
+
+                Employee::updateOrCreate(
+                    ['nip' => $nip],
+                    [
+                        'biometric_pin' => $idRaw,
+                        'nik' => $nikRaw,
+                        'name' => $nameRaw,
+                        'email' => null,
+                        'phone' => trim((string) ($row['WhatsApp'] ?? '')) ?: null,
+                        'role_title' => $roleTitle,
+                        'division' => $division,
+                        'location_id' => $locId,
+                        'shift_id' => null,
+                        'shift_group' => 'Belum Ditetapkan',
+                        'employment_status' => 'PKWTT',
+                        'status' => 'Aktif',
+                        'join_date' => $joinDate ?: null,
+                        'leave_quota' => 12,
+                    ]
+                );
+            }
+
+            Location::where('id', 1)->update(['assigned_count' => $mariukCount]);
+            Location::where('id', 2)->update(['assigned_count' => $cimalakaCount]);
         }
     }
 }
