@@ -309,7 +309,15 @@ export function getShiftSettings() {
   if (!isClient) return DEFAULT_SHIFT_SETTINGS;
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.SHIFTS);
-    return raw ? JSON.parse(raw) : DEFAULT_SHIFT_SETTINGS;
+    if (!raw) return DEFAULT_SHIFT_SETTINGS;
+    const parsed = JSON.parse(raw);
+    // Auto-migrate stale 12-hour values (07:00 - 19:00) to current operational rules (08:00 - 17:00 & 20:00 - 05:00)
+    if (parsed.shiftPagiIn === '07:00' || parsed.shiftMalamIn === '19:00' || parsed.durationHours === 12) {
+      const upgraded = { ...DEFAULT_SHIFT_SETTINGS, ...parsed, ...DEFAULT_SHIFT_SETTINGS };
+      localStorage.setItem(STORAGE_KEYS.SHIFTS, JSON.stringify(upgraded));
+      return upgraded;
+    }
+    return parsed;
   } catch {
     return DEFAULT_SHIFT_SETTINGS;
   }

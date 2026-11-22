@@ -304,7 +304,7 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 - **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha.
 - **Kalender Visual Presensi 30 Hari (Heatmap Grid 24/7)**:
   - Kotak visual per tanggal (1 s/d 30) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu).
-  - Selaras dengan pola dinas 24/7 shift 12 jam (Shift Pagi `07:00–19:00` / Shift Malam `19:00–07:00`) dan rotasi selang-seling Grup A & B.
+  - Selaras dengan pola dinas operasional (Shift Pagi `08:00–17:00` / Shift Malam `20:00–05:00`) dan rotasi selang-seling Grup A & B.
 - **Grafik Tren Kedisiplinan 6 Bulan**: `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang.
 - **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**: Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi, dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
 
@@ -372,12 +372,12 @@ Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/j
 - Validasi wajib swafoto / selfie wajah dan proteksi Anti-Fake GPS / Mock Location.
 - Parameter lembur Depnaker (koefisien 1.5x jam pertama dan 2.0x jam berikutnya) serta kuota cuti tahunan (12 hari).
 
-### C. Tab 2: Konfigurasi Shift 12 Jam Fleksibel & Tukar Shift (`shift`)
-- **Panel Parameter Jam Shift Lapangan 12 Jam**:
-  - Konfigurasi fleksibel waktu mulai dan selesai untuk **Shift Pagi** (`07:00 – 19:00 WIB`) dan **Shift Malam** (`19:00 – 07:00 WIB`).
-  - Dilengkapi perhitungan durasi otomatis (12 jam per shift) dan indikator status *Non-Stop 24/7 Rolling Schedule*.
+### C. Tab 2: Konfigurasi Shift Fleksibel & Tukar Shift (`shift`)
+- **Panel Parameter Jam Shift Lapangan**:
+  - Konfigurasi fleksibel waktu mulai dan selesai untuk **Shift Pagi** (`08:00 – 17:00 WIB`) dan **Shift Malam** (`20:00 – 05:00 WIB`).
+  - Dilengkapi perhitungan durasi otomatis (9 jam per shift) dan indikator status *Operational Rolling Schedule*.
 - **Parameter Handover & Serah Terima Tugas**:
-  - Waktu tukar shift terjadwal tepat pukul `07:00` dan `19:00` WIB.
+  - Waktu tukar shift terjadwal tepat pukul `08:00` dan `20:00` WIB.
   - Durasi toleransi pergantian tugas shift (*handover*) 15 menit.
 - **Kebijakan Pengajuan Tukar Shift Antar-Karyawan**:
   - Batas waktu pengajuan tukar shift maksimal 4 jam sebelum shift dimulai.
@@ -522,16 +522,16 @@ Sistem memisahkan operasional menjadi 2 lokasi resmi dengan basis 12 personel ak
    - `Maya Indah Lestari` (HC-0108, Kelompok B, Shift Pagi)
    - `Nurul Aini` (HC-0112, Kelompok B, Shift Malam)
 
-### B. Shift Kerja 12 Jam & Operasional Non-Stop 7 Hari (24/7)
-- **Shift Pagi**: `07:00 – 19:00 WIB` (12 Jam kerja).
-- **Shift Malam**: `19:00 – 07:00 WIB` (12 Jam kerja).
-- **Tukar Shift (Handover)**: Tepat pukul `07:00 WIB` dan `19:00 WIB`.
+### B. Shift Kerja Operasional & Operasional Non-Stop 7 Hari
+- **Shift Pagi**: `08:00 – 17:00 WIB` (9 Jam kerja, jendela presensi 07:00–18:00).
+- **Shift Malam**: `20:00 – 05:00 WIB` (9 Jam kerja lintas hari, jendela presensi 19:00–06:00).
+- **Tukar Shift (Handover)**: Tepat pukul `08:00 WIB` dan `20:00 WIB`.
 - **Roster 7 Hari Tanpa Libur Pabrik**:
   - Operasional berjalan 7 hari penuh setiap minggu tanpa hari libur operasional bersama (Sabtu dan Minggu tetap beroperasi penuh).
   - Kelompok A masuk hari Senin, Kelompok B hari Selasa, Kelompok A hari Rabu, Kelompok B hari Kamis, dan seterusnya bergulir adil sehingga giliran dinas hari Minggu berganti setiap 2 minggu.
 
-### C. Panel Konfigurasi Fleksibel Shift 12 Jam (`PengaturanSistem.jsx`)
-- Disediakan tab khusus **"Jam Kerja & Shift 12 Jam"** pada [`PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx) yang terhubung ke service reaktif [`systemSettings.js`](resources/js/services/systemSettings.js).
+### C. Panel Konfigurasi Fleksibel Shift (`PengaturanSistem.jsx`)
+- Disediakan tab khusus **"Jam Kerja & Shift"** pada [`PengaturanSistem.jsx`](resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx) yang terhubung ke service reaktif [`systemSettings.js`](resources/js/services/systemSettings.js).
 - Administrator dapat mengubah nama shift, jam masuk, jam pulang, toleransi keterlambatan, dan jam handover sewaktu-waktu secara fleksibel tanpa mengubah kode sumber.
 - Perubahan tersinkronisasi otomatis secara instan ke seluruh antarmuka aplikasi via event bus `hris:settings-updated`.
 
@@ -563,7 +563,7 @@ Tahap backend telah resmi diaktifkan dengan mengimplementasikan fondasi database
 ### A. 9 Tabel Database & Migrations
 1. `users`: Autentikasi sistem, role (`super_admin`, `supervisor`, `karyawan`), NIP, avatar, is_active.
 2. `locations`: Data site operasional (Lokasi Mariuk & Lokasi Cimalaka), koordinat GPS, radius geofence (120m).
-3. `shifts`: Konfigurasi shift kerja (Shift Pagi 12 Jam `07:00–19:00`, Shift Malam 12 Jam `19:00–07:00`, Non-Shift Office `08:00–17:00`).
+3. `shifts`: Konfigurasi shift kerja (Shift Pagi `08:00–17:00`, Shift Malam `20:00–05:00`, Non-Shift Office `08:00–17:00`).
 4. `employees`: Master data induk 12 personel HCGA, relasi ke `users`, `locations`, dan `shifts`.
 5. `system_settings`: Penyimpanan fleksibel key-value JSON untuk kebijakan toleransi (15 menit), shift, dan profil korporat.
 6. `holidays`: Kalender 12 hari libur resmi nasional & operasional pabrik.
@@ -611,7 +611,7 @@ Menindaklanjuti kebutuhan operasional riil pabrik bahwa data absensi tidak diinp
 2. **Mesin Parser & Deduplikasi Log (`FingerprintImportService.php`)**:
    - **Multi-Format Ingestion**: Mendukung file Excel (`.xlsx`), CSV (`.csv`), dan format mesin ZKTeco/Solution (`.dat` / `.txt`).
    - **Deduplikasi 5 Menit**: Mengeliminasi scan ganda (double-punch) yang dilakukan karyawan dalam rentang waktu < 5 menit.
-   - **Windowing Shift 12 Jam & Midnight Crossing**: Mengelompokkan scan Shift Pagi (07:00–19:00) dan Shift Malam (19:00–07:00) hari berikutnya ke tanggal buku tugas yang tepat tanpa membuat duplikasi baris harian.
+   - **Windowing Shift & Midnight Crossing**: Mengelompokkan scan Shift Pagi (08:00–17:00) dan Shift Malam (20:00–05:00 hari berikutnya) ke tanggal buku tugas yang tepat tanpa membuat duplikasi baris harian.
    - **Deteksi Anomali Single-Punch**: Memisahkan presensi yang lengkap (*ready*) dengan presensi anomali (hanya tap masuk atau hanya tap pulang).
    - **Penanganan Unmapped PIN**: Menampung log dari nomor PIN baru yang belum terdaftar di database HRIS dan menyediakan aksi 1-klik untuk menautkannya ke karyawan.
 
@@ -674,7 +674,22 @@ Menindaklanjuti audit kode bahwa file `PengaturanSistem.jsx` membengkak hingga h
 
 ---
 
-## 20. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 20. Sinkronisasi Jam Operasional Shift Pagi (08:00–17:00) & Shift Malam (20:00–05:00)
+
+Menindaklanjuti penetapan jam operasional pabrik yang baru:
+1. **Penetapan Waktu Resmi**:
+   - **Shift Pagi**: Jam dinas `08:00 - 17:00 WIB` (durasi 9 jam). Jendela presensi dibuka pukul `07:00 WIB` dan ditutup pukul `18:00 WIB`.
+   - **Shift Malam**: Jam dinas `20:00 - 05:00 WIB` (durasi 9 jam lintas hari / midnight crossing). Jendela presensi dibuka pukul `19:00 WIB` dan ditutup pukul `06:00 WIB` pagi hari berikutnya.
+   - **Handover / Tukar Shift**: Tepat pukul `08:00 WIB` dan `20:00 WIB`.
+2. **Sinkronisasi Seluruh Lapisan Sistem**:
+   - **Database SQLite**: `shifts` table dan `system_settings` (`shift_configuration`) diselaraskan melalui `SystemSettingSeeder.php` dan `ShiftSeeder.php`.
+   - **Frontend Settings Service (`systemSettings.js`)**: Dilengkapi skema auto-migration agar cache lokal browser pengguna (`localStorage`) lama otomatis dimutakhirkan ke `08:00 - 17:00` dan `20:00 - 05:00`.
+   - **Tampilan Beranda, Jadwal, & Laporan**: Seluruh mock preview, badge indikator, dan rapor kehadiran diselaraskan secara konsisten.
+   - **Modal Form Karyawan (`ModalFormKaryawan.jsx`)**: Tombol preset dan time picker default menggunakan `08:00 - 17:00` dan `20:00 - 05:00`.
+
+---
+
+## 21. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 

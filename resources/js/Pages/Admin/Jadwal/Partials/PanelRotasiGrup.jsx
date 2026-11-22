@@ -503,12 +503,12 @@ export default function PanelRotasiGrup({
                         {emp.shiftCode === 'PAGI' || (emp.baseShift && emp.baseShift.toLowerCase().includes('pagi')) ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border bg-emerald-50 text-emerald-800 border-emerald-200 font-mono">
                             <Sun className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            Pagi (07:00 - 19:00)
+                            Pagi (08:00 - 17:00)
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border bg-indigo-50 text-indigo-800 border-indigo-200 font-mono">
                             <Moon className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                            Malam (19:00 - 07:00)
+                            Malam (20:00 - 05:00)
                           </span>
                         )}
                       </TableCell>

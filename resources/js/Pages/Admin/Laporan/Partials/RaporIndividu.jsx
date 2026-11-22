@@ -385,7 +385,7 @@ export default function RaporIndividu({
                   {employee.group}
                 </span>
                 <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-white/10 text-slate-200 border border-white/15">
-                  {employee.shiftCode === 'MALAM' ? 'Shift Malam (19:00 - 07:00)' : 'Shift Pagi (07:00 - 19:00)'}
+                  {employee.shiftCode === 'MALAM' ? 'Shift Malam (20:00 - 05:00)' : 'Shift Pagi (08:00 - 17:00)'}
                 </span>
                 <span className="flex items-center gap-1.5 text-slate-400">
                   <CalendarCheck className="w-3.5 h-3.5 text-[#c4a266]" />

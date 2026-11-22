@@ -93,7 +93,7 @@ Aplikasi ini beroperasi dalam mode **Operate** (Enterprise Workforce & Attendanc
 - **Densitas Informasi Tinggi**: Ruang layar dimanfaatkan optimal tanpa elemen dekoratif semu, tanpa kartu pastel generik, dan tanpa spasi terbuang.
 - **Konteks Operasional Khusus**:
   1. **Multi-Lokasi Nyata**: Membedakan personil dan data operasional antara **Lokasi Mariuk** (badge *amber*) dan **Lokasi Cimalaka** (badge *indigo*).
-  2. **Operasional 24/7 Non-Stop**: Pola 2 shift 12 jam (Shift Pagi `07:00–19:00` & Shift Malam `19:00–07:00`) dengan rotasi 2 regu (Grup A & Grup B) tanpa libur akhir pekan operasional.
+  2. **Operasional 24/7 Non-Stop**: Pola 2 shift (Shift Pagi `08:00–17:00` & Shift Malam `20:00–05:00`) dengan rotasi 2 regu (Grup A & Grup B) tanpa libur akhir pekan operasional.
   3. **Toleransi & Kedisiplinan**: Standardisasi toleransi masuk 15 menit, lembur, dan sanksi bertingkat (Teguran Lisan, Bimbingan Supervisor, SP-1).
 
 ### B. Prinsip Inti Rekayasa UI (Engineering Principles)
@@ -136,7 +136,7 @@ Identitas warna resmi HCGA dikunci pada [`resources/js/config/theme.js`](resourc
 Status presensi wajib menggunakan pasangan token resmi berikut (teks + latar belakang):
 | Status | Warna Teks | Warna Latar | Deskripsi Legalitas |
 | :--- | :--- | :--- | :--- |
-| **Hadir (Tepat Waktu)** | `#398872` | `#eef7f1` | Check-in sebelum batas toleransi toleran (07:15 / 19:15) |
+| **Hadir (Tepat Waktu)** | `#398872` | `#eef7f1` | Check-in sebelum batas toleransi toleran (08:15 / 20:15) |
 | **Terlambat** | `#ac8848` | `#fcf6e9` | Check-in melewati batas toleransi resmi |
 | **Izin Resmi** | `#698eb0` | `#eff5fa` | Izin operasional disetujui atasan & HCGA |
 | **Sakit (Surat Dokter)** | `#ab7b9b` | `#f7f0f7` | Ketidakhadiran sakit dengan legalitas medis |
@@ -151,8 +151,8 @@ Status presensi wajib menggunakan pasangan token resmi berikut (teks + latar bel
 | **Lokasi Cimalaka** | `text-indigo-800 border-indigo-200` | `bg-indigo-50` | Badge personil & filter pabrik Cimalaka |
 | **Grup Operasional A** | `text-emerald-800 border-emerald-200` | `bg-emerald-50` | Regu kerja A (Senin, Rabu, Jumat, Minggu*) |
 | **Grup Operasional B** | `text-amber-800 border-amber-200` | `bg-amber-50` | Regu kerja B (Selasa, Kamis, Sabtu, Minggu*) |
-| **Shift Pagi (12 Jam)** | `text-emerald-800 border-emerald-200` | `bg-emerald-50` | Dinas Pagi: 07:00 – 19:00 WIB |
-| **Shift Malam (12 Jam)** | `text-indigo-800 border-indigo-200` | `bg-indigo-50` | Dinas Malam: 19:00 – 07:00 WIB |
+| **Shift Pagi (08:00 - 17:00)** | `text-emerald-800 border-emerald-200` | `bg-emerald-50` | Dinas Pagi: 08:00 – 17:00 WIB (Buka 07:00, Tutup 18:00) |
+| **Shift Malam (20:00 - 05:00)** | `text-indigo-800 border-indigo-200` | `bg-indigo-50` | Dinas Malam: 20:00 – 05:00 WIB (Buka 19:00, Tutup 06:00) |
 
 ---
 
@@ -353,7 +353,7 @@ Komponen notifikasi responsif dengan auto-dismiss. Menerima prop objek `toast`: 
 ### DO (Wajib Dilakukan)
 - ✅ **Gunakan Komponen Atomik**: Selalu gunakan komponen dari `@/components/ui`.
 - ✅ **Sertakan Konteks Lokasi**: Tampilkan penanda lokasi (Mariuk vs Cimalaka) pada setiap data karyawan atau kehadiran.
-- ✅ **Gunakan Format Waktu 24 Jam**: Selalu gunakan format waktu JJ:MM (`07:00` dan `19:00`) untuk konsistensi operasional 12 jam.
+- ✅ **Gunakan Format Waktu 24 Jam**: Selalu gunakan format waktu JJ:MM (`08:00` dan `20:00`) untuk konsistensi operasional.
 - ✅ **Gunakan Monospace untuk Data Teknis**: Gunakan `font-mono` untuk NIP, jam digital, kalkulasi angka, dan persentase kehadiran.
 - ✅ **Terapkan Interaktivitas Baris**: Jadikan nama karyawan pada tabel dapat diklik untuk langsung membuka modal ubah (*inline edit affordance*).
 - ✅ **Update Dokumentasi & Graphify**: Jalankan `graphify update .` dan catat perubahan arsitektur pada `LAPORAN_PROYEK_HRIS.md` setiap selesai memodifikasi kode.

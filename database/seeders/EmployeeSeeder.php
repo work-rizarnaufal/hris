@@ -55,9 +55,9 @@ class EmployeeSeeder extends Seeder
             ]
         );
 
-        $shiftPagi = Shift::where('code', 'PAGI_12H')->first();
-        $shiftMalam = Shift::where('code', 'MALAM_12H')->first();
-        $shiftOffice = Shift::where('code', 'OFFICE_8H')->first();
+        $shiftPagi = Shift::where('code', 'PAGI')->first();
+        $shiftMalam = Shift::where('code', 'MALAM')->first();
+        $shiftOffice = Shift::where('code', 'OFFICE')->first();
         $locMariuk = Location::where('code', 'MRK')->first();
         $locCimalaka = Location::where('code', 'CML')->first();
 
