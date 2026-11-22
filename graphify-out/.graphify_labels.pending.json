@@ -2,7 +2,6 @@
   "0": "@inertiajs/react",
   "1": "package.json",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
-  "4": "Employee",
   "5": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
@@ -17,10 +16,7 @@
   "46": "web.php",
   "47": "sidebar.jsx",
   "48": "LaporanBackendTest.php",
-  "49": "HandleInertiaRequests.php",
-  "50": "Illuminate\\Http\\Request",
-  "51": "SystemSetting",
+  "50": "Illuminate\\Http\\RedirectResponse",
   "52": "PengaturanSistem.jsx",
-  "53": "User",
-  "54": ".updateSetting"
+  "53": "User"
 }
