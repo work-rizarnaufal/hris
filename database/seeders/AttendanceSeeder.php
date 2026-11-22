@@ -13,7 +13,10 @@ class AttendanceSeeder extends Seeder
      */
     public function run(): void
     {
-        $filePath = database_path('data/scans_report.json');
+        $filePath = database_path('data/scans_report_week.json');
+        if (! file_exists($filePath)) {
+            $filePath = database_path('data/scans_report.json');
+        }
         if (! file_exists($filePath)) {
             return;
         }

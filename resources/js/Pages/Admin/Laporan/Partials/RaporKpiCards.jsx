@@ -11,16 +11,41 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui';
 
-export default function RaporKpiCards({ employee }) {
-  const presentDays = employee.presentDays || 0;
-  const workDays = employee.workDays || 22;
-  const lateCount = employee.lateCount || 0;
+export default function RaporKpiCards({ employee, calendarDays = [] }) {
+  // Hitung metrik tersinkronisasi langsung dari kalender presensi 30 hari untuk konsistensi visual 100%
+  const onTimeDays = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status === 'Hadir').length
+    : (employee.onTimeDays ?? Math.max(0, (employee.presentDays || 0) - (employee.lateCount || 0)));
+
+  const lateCount = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status === 'Terlambat').length
+    : (employee.lateCount || 0);
+
+  const presentDays = calendarDays.length > 0
+    ? (onTimeDays + lateCount)
+    : (employee.presentDays || 0);
+
+  const izinDays = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status === 'Izin').length
+    : (employee.izinDays ?? 0);
+
+  const sakitDays = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status === 'Sakit').length
+    : (employee.sakitDays ?? 0);
+
+  const cutiDays = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status === 'Cuti').length
+    : (employee.cutiDays ?? Math.max(0, (employee.leaveDays || 0) - izinDays - sakitDays));
+
+  const alpaDays = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status === 'Alpha' || d.status === 'Alpa').length
+    : (employee.alpaDays || 0);
+
+  const workDays = calendarDays.length > 0
+    ? calendarDays.filter((d) => d.status !== 'Libur').length
+    : (employee.workDays || 22);
+
   const totalLateMinutes = employee.totalLateMinutes || 0;
-  const onTimeDays = employee.onTimeDays ?? Math.max(0, presentDays - lateCount);
-  const izinDays = employee.izinDays ?? 0;
-  const sakitDays = employee.sakitDays ?? 0;
-  const cutiDays = employee.cutiDays ?? Math.max(0, (employee.leaveDays || 0) - izinDays - sakitDays);
-  const alpaDays = employee.alpaDays || 0;
 
   const cards = [
     {

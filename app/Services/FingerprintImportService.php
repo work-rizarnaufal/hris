@@ -187,6 +187,11 @@ class FingerprintImportService
             $lateMinutes = 0;
             $status = 'hadir';
 
+            // Jika scan masuk dilakukan pagi hari (< 12:00), maka pasti bertugas shift pagi
+            if ($firstIn && (int) explode(':', $firstIn)[0] < 12) {
+                $isNight = false;
+            }
+
             $targetInHour = $isNight ? 20 : 8; // Shift Malam 20:00, Shift Pagi 08:00
             $shiftName = $isNight ? 'Shift Malam (20:00 - 05:00)' : 'Shift Pagi (08:00 - 17:00)';
 
@@ -244,23 +249,35 @@ class FingerprintImportService
         $savedCount = 0;
 
         foreach ($records as $row) {
-            Attendance::updateOrCreate(
-                [
-                    'employee_id' => $row['employee_id'],
-                    'date' => $row['date'],
-                ],
-                [
-                    'check_in_time' => $row['check_in_time'] ?? null,
-                    'check_out_time' => $row['check_out_time'] ?? null,
-                    'status' => $row['status'] ?? 'hadir',
-                    'late_minutes' => $row['late_minutes'] ?? 0,
-                    'work_duration_hours' => $row['work_duration_hours'] ?? 0,
-                    'location_id' => $row['location_id'] ?? null,
-                    'method' => 'fingerprint',
-                    'import_batch_id' => $batchId,
-                    'notes' => ! empty($row['anomaly_reason']) ? 'Fingerprint: '.$row['anomaly_reason'] : 'Presensi biometric fingerprint site',
-                ]
-            );
+            $dateClean = substr((string) ($row['date'] ?? ''), 0, 10);
+            if (! $dateClean || empty($row['employee_id'])) {
+                continue;
+            }
+
+            $payload = [
+                'employee_id' => $row['employee_id'],
+                'date' => $dateClean,
+                'check_in_time' => $row['check_in_time'] ?? null,
+                'check_out_time' => $row['check_out_time'] ?? null,
+                'status' => $row['status'] ?? 'hadir',
+                'late_minutes' => $row['late_minutes'] ?? 0,
+                'work_duration_hours' => $row['work_duration_hours'] ?? 0,
+                'location_id' => $row['location_id'] ?? null,
+                'method' => 'fingerprint',
+                'import_batch_id' => $batchId,
+                'notes' => ! empty($row['anomaly_reason']) ? 'Fingerprint: '.$row['anomaly_reason'] : 'Presensi biometric fingerprint site',
+            ];
+
+            $existing = Attendance::where('employee_id', $row['employee_id'])
+                ->whereDate('date', $dateClean)
+                ->first();
+
+            if ($existing) {
+                $existing->update($payload);
+            } else {
+                Attendance::create($payload);
+            }
+
             $savedCount++;
         }
 

@@ -182,6 +182,13 @@ export default function RaporIndividu({
             Peringatan / SP
           </Badge>
         );
+      case 'Belum Ada Data':
+        return (
+          <Badge variant="neutral" className="bg-white/15 text-slate-200 border-white/20 font-medium">
+            <Info className="w-3.5 h-3.5 mr-1 text-slate-300 inline" />
+            Belum Ada Data
+          </Badge>
+        );
       default:
         return <Badge variant="neutral">{status}</Badge>;
     }
@@ -298,7 +305,9 @@ export default function RaporIndividu({
                   {employee.group}
                 </span>
                 <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-white/10 text-slate-200 border border-white/15">
-                  {employee.shiftCode === 'MALAM' ? 'Shift Malam (20:00 - 05:00)' : 'Shift Pagi (08:00 - 17:00)'}
+                  {employee.group === 'Belum Ditetapkan'
+                    ? 'Shift Belum Ditetapkan'
+                    : (employee.baseShift || (employee.shiftCode === 'MALAM' ? 'Shift Malam (20:00 - 05:00)' : 'Shift Pagi (08:00 - 17:00)'))}
                 </span>
                 <span className="flex items-center gap-1.5 text-slate-400">
                   <CalendarCheck className="w-3.5 h-3.5 text-[#c4a266]" />
@@ -313,14 +322,18 @@ export default function RaporIndividu({
             <div className="text-right">
               <p className="text-xs text-slate-300 font-medium">Skor Kedisiplinan</p>
               <p className="text-3xl font-bold font-display text-[#c4a266] mt-0.5">
-                {employee.score}%
+                {employee.score > 0 ? `${employee.score}%` : '0%'}
               </p>
               <p className="text-[11px] text-slate-400">
                 {employee.score >= 95
                   ? 'Predikat Teladan'
                   : employee.score >= 85
                   ? 'Kepatuhan Standar'
-                  : 'Perlu Pengawasan'}
+                  : employee.score >= 70
+                  ? 'Perlu Pengawasan'
+                  : employee.score > 0
+                  ? 'Peringatan Disiplin'
+                  : 'Nihil Presensi'}
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-[#c4a266]/20 border border-[#c4a266]/40 flex items-center justify-center text-[#c4a266]">
@@ -328,8 +341,10 @@ export default function RaporIndividu({
                 <Award className="w-6 h-6" />
               ) : employee.score >= 85 ? (
                 <UserCheck className="w-6 h-6" />
+              ) : employee.score > 0 ? (
+                <AlertTriangle className="w-6 h-6 text-amber-400" />
               ) : (
-                <AlertTriangle className="w-6 h-6 text-rose-400" />
+                <Info className="w-6 h-6 text-slate-300" />
               )}
             </div>
           </div>
@@ -346,7 +361,7 @@ export default function RaporIndividu({
       </Card>
 
       {/* 8 Scorecards KPI Khusus Karyawan */}
-      <RaporKpiCards employee={employee} />
+      <RaporKpiCards employee={employee} calendarDays={calendarDays} />
 
       {/* Matriks Kalender Harian Presensi & Tren 6 Bulan */}
       <RaporCalendarGrid

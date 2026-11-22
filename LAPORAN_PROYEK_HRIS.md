@@ -308,14 +308,15 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 
 ### C. Tab 2: Rapor Evaluasi Individu / Dossier Personel (Mikro)
 - **Toolbar Navigasi Cepat**: Tombol kembali ke rekap organisasi, dropdown pemilih karyawan aktif (seluruh 86 personil riil), cetak rapor (`window.print()`), dan ekspor XLSX personal (profil lengkap + log dinamis).
-- **Dossier Header Card**:
-  - Profil korporat lengkap dengan avatar inisial, NIP font-mono, badge lokasi kerja (Mariuk/Cimalaka), badge kelompok regu (Grup A/B), dan badge shift operasional (Pagi/Malam).
+- **Dossier Header Card (Card Hero)**:
+  - Profil korporat lengkap dengan avatar inisial, NIP font-mono, badge lokasi kerja (Mariuk/Cimalaka), badge kelompok regu (Grup A/B / Belum Ditetapkan), dan badge shift operasional dinamis.
   - Skor kedisiplinan (0–100%) dan kotak rekomendasi resmi tindakan manajemen HCGA.
-- **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha.
+  - **Sinkronisasi Total dengan Matriks 30 Hari**: Mengeliminasi anomali lama di mana karyawan dengan presensi nihil mendapat predikat "100% Teladan". Kini karyawan tanpa rekam presensi berstatus faktual *Belum Ada Data* (Skor 0%, Predikat: Nihil Presensi), dan karyawan dengan presensi tercatat memiliki skor yang proporsional dengan riwayat kehadiran dan deviasi keterlambatannya.
+- **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha yang diderivasi secara terpadu dari sel matriks 30 hari sehingga menjamin keselarasan visual mutlak.
 - **Kalender Visual Presensi Harian Dinamis (Heatmap Grid 24/7)**:
   - Kotak visual per tanggal (1 s/d 28/30/31 hari sesuai bulan aktif) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu), Terjadwal (Biru Muda), Belum Ada Log (Border Putus Abu-abu).
-  - Terkoneksi 100% ke `dailyAttendances` riil database SQLite, menampilkan waktu tap masuk/pulang serta toleransi keterlambatan.
-  - Mengeliminasi fallback sintetis pemalsu status "Hadir", sehingga hari kerja lampau yang belum memiliki log presensi ditampilkan secara faktual sebagai "Belum Ada Log", sinkron presisi dengan kartu KPI kehadiran.
+  - Terkoneksi 100% ke `dailyAttendances` riil database SQLite dengan pemformatan tanggal `Y-m-d` ISO murni dan pencocokan status case-insensitive, menampilkan waktu tap masuk/pulang serta toleransi keterlambatan secara presisi.
+  - Mengeliminasi fallback sintetis pemalsu status "Hadir", sehingga hari kerja lampau yang belum memiliki log presensi ditampilkan secara faktual sebagai "Belum Ada Log", sinkron presisi dengan kartu KPI kehadiran dan total hari kerja dinas efektif (15 hari untuk Grup A/B, 22 hari reguler).
   - Selaras dengan pola dinas operasional (Shift Pagi `08:00–17:00` / Shift Malam `20:00–05:00`) dan rotasi selang-seling Grup A & B.
 - **Grafik Tren Kedisiplinan 6 Bulan Terhubung Database**: `BarChart` Recharts menampilkan histori riil skor kedisiplinan 6 bulan ke belakang yang dihitung dinamis dari log presensi database via `LaporanController.php`.
 - **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log) Reaktif**:

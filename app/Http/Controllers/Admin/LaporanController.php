@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Location;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,58 +44,85 @@ class LaporanController extends Controller
         $evaluations = $employees->map(function ($emp) use ($attendances, $sixMonthsAttendances, $periodDate) {
             $empAttendances = $attendances->where('employee_id', $emp->id);
 
-            $workDays = 22; // Standar 22 hari kerja efektif per bulan
-            $presentDays = $empAttendances->whereIn('status', ['Hadir', 'Terlambat'])->count();
-            $lateRecords = $empAttendances->where('status', 'Terlambat');
+            $isGroupA = ($emp->shift_group === 'Grup A');
+            $isGroupB = ($emp->shift_group === 'Grup B');
+            $workDays = ($isGroupA || $isGroupB) ? 15 : 22;
+
+            $presentDays = $empAttendances->filter(fn ($a) => in_array(strtolower($a->status), ['hadir', 'terlambat']))->count();
+            $lateRecords = $empAttendances->filter(fn ($a) => strtolower($a->status) === 'terlambat');
             $lateCount = $lateRecords->count();
             $totalLateMinutes = (int) $lateRecords->sum('late_minutes');
-            $izinDays = $empAttendances->where('status', 'Izin')->count();
-            $sakitDays = $empAttendances->where('status', 'Sakit')->count();
-            $cutiDays = $empAttendances->where('status', 'Cuti')->count();
+            $izinDays = $empAttendances->filter(fn ($a) => strtolower($a->status) === 'izin')->count();
+            $sakitDays = $empAttendances->filter(fn ($a) => strtolower($a->status) === 'sakit')->count();
+            $cutiDays = $empAttendances->filter(fn ($a) => strtolower($a->status) === 'cuti')->count();
             $leaveDays = $izinDays + $sakitDays + $cutiDays;
-            $alpaDays = $empAttendances->where('status', 'Alpha')->count();
+            $alpaDays = $empAttendances->filter(fn ($a) => in_array(strtolower($a->status), ['alpha', 'alpa']))->count();
 
-            // Kalkulasi Skor Kedisiplinan (0 - 100%)
-            $scoreDeductions = ($lateCount * 2) + ($alpaDays * 15) + (int) floor($totalLateMinutes / 15);
-            $score = max(50, 100 - $scoreDeductions);
+            // Kalkulasi Skor Kedisiplinan & Status
+            if ($presentDays === 0 && $leaveDays === 0 && $alpaDays === 0) {
+                $score = 0;
+                $status = 'Belum Ada Data';
+                $actionRecommendation = 'Belum ada rekaman presensi pada periode aktif. Verifikasi jadwal kerja dan mesin biometric.';
+            } else {
+                $scoreDeductions = ($lateCount * 2) + ($alpaDays * 15) + (int) floor($totalLateMinutes / 15);
+                $score = max(50, min(100, 100 - $scoreDeductions));
 
-            // Klasifikasi Status Evaluasi Disiplin
-            $status = match (true) {
-                $score >= 95 => 'Sangat Baik',
-                $score >= 85 => 'Disiplin Baik',
-                $score >= 70 => 'Perlu Pembinaan',
-                default => 'Peringatan / SP',
-            };
+                $status = match (true) {
+                    $score >= 95 => 'Sangat Baik',
+                    $score >= 85 => 'Disiplin Baik',
+                    $score >= 70 => 'Perlu Pembinaan',
+                    default => 'Peringatan / SP',
+                };
 
-            // Rekomendasi Tindakan Manajemen HCGA
-            $actionRecommendation = match ($status) {
-                'Sangat Baik' => 'Pertahankan Performa (Nominasi Best Attendance)',
-                'Disiplin Baik' => 'Kinerja baik, tingkatkan ketepatan waktu check-in',
-                'Perlu Pembinaan' => 'Bimbingan supervisor terkait konsistensi shift kerja',
-                default => 'Penerbitan Surat Peringatan (SP-1) & Konseling Disiplin',
-            };
+                $actionRecommendation = match ($status) {
+                    'Sangat Baik' => 'Pertahankan Performa (Nominasi Best Attendance)',
+                    'Disiplin Baik' => 'Kinerja baik, tingkatkan ketepatan waktu check-in',
+                    'Perlu Pembinaan' => 'Bimbingan supervisor terkait konsistensi shift kerja',
+                    default => 'Penerbitan Surat Peringatan (SP-1) & Konseling Disiplin',
+                };
+            }
 
             // Riwayat Insiden Pelanggaran & Legalitas Kehadiran
-            $incidents = $empAttendances->filter(fn ($a) => in_array($a->status, ['Terlambat', 'Izin', 'Sakit', 'Cuti', 'Alpha']))
-                ->map(fn ($a) => [
-                    'date' => Carbon::parse($a->date)->locale('id')->isoFormat('DD MMM Y'),
-                    'type' => $a->status,
-                    'detail' => $a->status === 'Terlambat'
-                        ? "{$a->late_minutes} Menit - ".($a->notes ?: 'Terkendala jam masuk')
-                        : ($a->notes ?: 'Tercatat dalam log sistem'),
-                ])
+            $incidents = $empAttendances->filter(fn ($a) => in_array(strtolower($a->status), ['terlambat', 'izin', 'sakit', 'cuti', 'alpha', 'alpa']))
+                ->map(function ($a) {
+                    $dateCarbon = $a->date instanceof CarbonInterface
+                        ? $a->date
+                        : Carbon::parse($a->date);
+                    $statusStr = ucfirst(strtolower($a->status));
+                    if ($statusStr === 'Alpa') {
+                        $statusStr = 'Alpha';
+                    }
+
+                    return [
+                        'date' => $dateCarbon->locale('id')->isoFormat('DD MMM Y'),
+                        'type' => $statusStr,
+                        'detail' => strtolower($a->status) === 'terlambat'
+                            ? "{$a->late_minutes} Menit - ".($a->notes ?: 'Keterlambatan jam masuk')
+                            : ($a->notes ?: 'Tercatat dalam log sistem'),
+                    ];
+                })
                 ->values()
                 ->toArray();
 
             // Catatan presensi harian di bulan berjalan
-            $dailyAttendances = $empAttendances->map(fn ($a) => [
-                'date' => $a->date,
-                'status' => $a->status,
-                'check_in_time' => $a->check_in_time ? substr($a->check_in_time, 0, 5) : null,
-                'check_out_time' => $a->check_out_time ? substr($a->check_out_time, 0, 5) : null,
-                'late_minutes' => (int) $a->late_minutes,
-                'notes' => $a->notes,
-            ])->values()->toArray();
+            $dailyAttendances = $empAttendances->map(function ($a) {
+                $dateStr = $a->date instanceof CarbonInterface
+                    ? $a->date->format('Y-m-d')
+                    : substr((string) $a->date, 0, 10);
+                $statusStr = ucfirst(strtolower($a->status));
+                if ($statusStr === 'Alpa') {
+                    $statusStr = 'Alpha';
+                }
+
+                return [
+                    'date' => $dateStr,
+                    'status' => $statusStr,
+                    'check_in_time' => $a->check_in_time ? substr($a->check_in_time, 0, 5) : null,
+                    'check_out_time' => $a->check_out_time ? substr($a->check_out_time, 0, 5) : null,
+                    'late_minutes' => (int) $a->late_minutes,
+                    'notes' => $a->notes,
+                ];
+            })->values()->toArray();
 
             // Hitung tren riwayat 6 bulan riil
             $monthlyHistory = [];
@@ -107,14 +135,25 @@ class LaporanController extends Controller
 
                 $mEmpAtt = $sixMonthsAttendances
                     ->where('employee_id', $emp->id)
-                    ->whereBetween('date', [$mStart, $mEnd]);
+                    ->filter(function ($a) use ($mStart, $mEnd) {
+                        $d = $a->date instanceof CarbonInterface
+                            ? $a->date->format('Y-m-d')
+                            : substr((string) $a->date, 0, 10);
 
-                $mLate = $mEmpAtt->where('status', 'Terlambat')->count();
-                $mLateMinutes = (int) $mEmpAtt->where('status', 'Terlambat')->sum('late_minutes');
-                $mAlpa = $mEmpAtt->where('status', 'Alpha')->count();
+                        return $d >= $mStart && $d <= $mEnd;
+                    });
 
-                $mScoreDeduction = ($mLate * 2) + ($mAlpa * 15) + (int) floor($mLateMinutes / 15);
-                $mScore = max(50, 100 - $mScoreDeduction);
+                $mPresent = $mEmpAtt->filter(fn ($a) => in_array(strtolower($a->status), ['hadir', 'terlambat']))->count();
+                $mLate = $mEmpAtt->filter(fn ($a) => strtolower($a->status) === 'terlambat')->count();
+                $mLateMinutes = (int) $mEmpAtt->filter(fn ($a) => strtolower($a->status) === 'terlambat')->sum('late_minutes');
+                $mAlpa = $mEmpAtt->filter(fn ($a) => in_array(strtolower($a->status), ['alpha', 'alpa']))->count();
+
+                if ($mPresent === 0 && $mAlpa === 0) {
+                    $mScore = 100;
+                } else {
+                    $mScoreDeduction = ($mLate * 2) + ($mAlpa * 15) + (int) floor($mLateMinutes / 15);
+                    $mScore = max(50, min(100, 100 - $mScoreDeduction));
+                }
 
                 $monthlyHistory[] = [
                     'month' => $mLabel,

@@ -51,41 +51,55 @@ export function generateCalendarDays(employee, selectedPeriod) {
     const dayOfWeek = dateObj.getDay();
 
     const isWorkingRoster = isGroupA ? d % 2 === 1 : isGroupB ? d % 2 === 0 : dayOfWeek !== 0 && dayOfWeek !== 6;
-    const realAtt = dailyAttendances.find((a) => a.date === dateIso);
+    const realAtt = dailyAttendances.find((a) => {
+      if (!a.date) return false;
+      const attDate = typeof a.date === 'string' ? a.date.slice(0, 10) : '';
+      return attDate === dateIso;
+    });
     const incident = incidents.find((inc) => inc.date && inc.date.includes(`${dayStr} ${monthShort}`));
 
     let status = 'Libur';
     let detail = 'Libur Pasca-Dinas (Rotasi 24/7)';
 
     if (realAtt) {
-      status = realAtt.status;
-      if (realAtt.status === 'Hadir') {
+      const rawStatus = (realAtt.status || '').toLowerCase();
+      if (rawStatus === 'hadir') {
+        status = 'Hadir';
         detail = `Masuk: ${realAtt.check_in_time || '-'} • Pulang: ${realAtt.check_out_time || '-'} (Tepat Waktu)`;
-      } else if (realAtt.status === 'Terlambat') {
+      } else if (rawStatus === 'terlambat') {
+        status = 'Terlambat';
         detail = `Masuk: ${realAtt.check_in_time || '-'} (Terlambat ${realAtt.late_minutes} mnt) • Pulang: ${realAtt.check_out_time || '-'}`;
-      } else if (realAtt.status === 'Alpha' || realAtt.status === 'Alpa') {
+      } else if (rawStatus === 'alpha' || rawStatus === 'alpa') {
+        status = 'Alpha';
         detail = realAtt.notes || 'Tidak hadir tanpa keterangan (Alpha)';
-      } else if (realAtt.status === 'Izin') {
+      } else if (rawStatus === 'izin') {
+        status = 'Izin';
         detail = realAtt.notes || 'Izin dinas/pribadi resmi disetujui';
-      } else if (realAtt.status === 'Sakit') {
+      } else if (rawStatus === 'sakit') {
+        status = 'Sakit';
         detail = realAtt.notes || 'Sakit dengan surat keterangan dokter';
-      } else if (realAtt.status === 'Cuti') {
+      } else if (rawStatus === 'cuti') {
+        status = 'Cuti';
         detail = realAtt.notes || 'Cuti tahunan resmi disetujui';
+      } else {
+        status = realAtt.status;
+        detail = realAtt.notes || 'Presensi tercatat';
       }
     } else if (incident) {
-      if (incident.type.includes('Terlambat')) {
+      const incType = (incident.type || '').toLowerCase();
+      if (incType.includes('terlambat')) {
         status = 'Terlambat';
         detail = `${isMalam ? 'Shift Malam 20:00' : 'Shift Pagi 08:00'} - ${incident.detail}`;
-      } else if (incident.type.includes('Alpa') || incident.type.includes('Alpha')) {
+      } else if (incType.includes('alpa') || incType.includes('alpha')) {
         status = 'Alpha';
         detail = incident.detail;
-      } else if (incident.type.includes('Cuti')) {
+      } else if (incType.includes('cuti')) {
         status = 'Cuti';
         detail = incident.detail;
-      } else if (incident.type.includes('Sakit')) {
+      } else if (incType.includes('sakit')) {
         status = 'Sakit';
         detail = incident.detail;
-      } else if (incident.type.includes('Izin')) {
+      } else if (incType.includes('izin')) {
         status = 'Izin';
         detail = incident.detail;
       }
