@@ -47,44 +47,24 @@ export default function RaporIndividu({
   ];
   const currentMonthLong = monthNamesLong[month - 1] || 'November';
 
-  // State catatan pembinaan tersinkronisasi per karyawan aktif
+  // State catatan pembinaan tersinkronisasi per karyawan aktif (dari log presensi riil database SQLite)
   const [coachingLogs, setCoachingLogs] = useState([]);
 
   useEffect(() => {
     setSelectedDay(null);
-    const initialLogs = [];
 
-    if (employee.status === 'Peringatan / SP') {
-      initialLogs.push({
-        id: 1,
-        date: `02 ${currentMonthLong.slice(0, 3)} ${year}`,
-        type: 'Surat Peringatan (SP-1)',
-        officer: 'Tim Human Capital & GA',
-        note: employee.actionRecommendation || 'Penerbitan SP-1 terkait ketidakhadiran berulang.',
-        status: 'Aktif (Masa Berlaku 6 Bulan)',
-      });
-    } else if (employee.status === 'Perlu Pembinaan') {
-      initialLogs.push({
-        id: 1,
-        date: `05 ${currentMonthLong.slice(0, 3)} ${year}`,
-        type: 'Konseling Supervisor',
-        officer: 'Tim Human Capital & GA',
-        note: employee.actionRecommendation || 'Bimbingan kedisiplinan dan evaluasi kesiapan shift kerja.',
-        status: 'Dalam Pengawasan',
-      });
-    } else {
-      initialLogs.push({
-        id: 1,
-        date: `01 ${currentMonthLong.slice(0, 3)} ${year}`,
-        type: 'Apresiasi Kedisiplinan',
-        officer: 'Tim Human Capital & GA',
-        note: employee.actionRecommendation || 'Rekam jejak kehadiran sangat baik, pertahankan konsistensi.',
-        status: 'Selesai',
-      });
-    }
+    // Muat insiden riil dari database (Keterlambatan, Alpa, Izin, Sakit, Cuti)
+    const dbIncidentLogs = (employee.incidents || []).map((inc, idx) => ({
+      id: `incident-${idx}`,
+      date: inc.date,
+      type: inc.type === 'Alpha' ? 'Pelanggaran Alpa' : inc.type === 'Terlambat' ? 'Keterlambatan Shift' : `Legalitas ${inc.type}`,
+      officer: 'Sistem Log Presensi SQLite',
+      note: inc.detail,
+      status: inc.type === 'Alpha' ? 'Indisipliner' : inc.type === 'Terlambat' ? 'Perhatian Supervisor' : 'Disetujui',
+    }));
 
-    setCoachingLogs(initialLogs);
-  }, [employee.id, employee.status, employee.actionRecommendation, currentMonthLong, year]);
+    setCoachingLogs(dbIncidentLogs);
+  }, [employee.id, employee.incidents]);
 
   // Generate kalender kehadiran untuk karyawan aktif
   const calendarDays = useMemo(() => generateCalendarDays(employee, selectedPeriod), [employee, selectedPeriod]);

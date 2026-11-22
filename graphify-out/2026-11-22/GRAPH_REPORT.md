@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-22)
 
 ## Corpus Check
-- 152 files · ~99,697 words
+- 155 files · ~99,660 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
 ## Summary
-- 698 nodes · 1660 edges · 51 communities (19 shown, 32 thin omitted)
+- 704 nodes · 1695 edges · 56 communities (17 shown, 39 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e43ae910`
+- Built from commit: `6e67be4f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,6 +20,7 @@
 - package.json
 - Backend Composer Dependencies
 - HCGA HRIS Enterprise Design System (DESIGN.md)
+- Illuminate\Http\Request
 - Illuminate\Database\Eloquent\Factories\HasFactory
 - Employee
 - Illuminate\Database\Schema\Blueprint
@@ -33,17 +34,21 @@
 - PengaturanSistem.jsx
 - App\Models\Employee
 - Illuminate\Database\Seeder
-- KehadiranController.php
-- web.php
+- App\Http\Controllers\Admin\KehadiranController
+- App\Http\Controllers\Admin\BerandaController
 - sidebar.jsx
 - LaporanBackendTest.php
-- Illuminate\Http\RedirectResponse
+- Employee
+- Inertia\Response
+- LaporanController.php
 - PengaturanSistem.jsx
 - User
+- HandleInertiaRequests.php
+- SystemSetting
 
 ## God Nodes (most connected - your core abstractions)
-1. `react` - 58 edges
-2. `lucide-react` - 49 edges
+1. `react` - 61 edges
+2. `lucide-react` - 52 edges
 3. `cn()` - 37 edges
 4. `@inertiajs/react` - 21 edges
 5. `PengaturanSistem()` - 19 edges
@@ -68,7 +73,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (51 total, 32 thin omitted)
+## Communities (56 total, 39 thin omitted)
 
 ### Community 0 - "@inertiajs/react"
 Cohesion: 0.41
@@ -87,12 +92,8 @@ Cohesion: 0.06
 Nodes (34): 1. Overview, 2. Colors, 3. Typography, 4. Layout, 5. Elevation & Depth, 6. Shapes & Form Controls, 7. Atomic UI Component Catalog, 8. Do's and Don'ts (+26 more)
 
 ### Community 5 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.13
-Nodes (5): Attendance, Holiday, ShiftSchedule, ShiftSwap, SystemSetting
-
-### Community 6 - "Employee"
-Cohesion: 0.11
-Nodes (3): Employee, Location, Shift
+Cohesion: 0.17
+Nodes (4): Attendance, Holiday, ShiftSchedule, ShiftSwap
 
 ### Community 7 - "Illuminate\Database\Schema\Blueprint"
 Cohesion: 0.07
@@ -119,16 +120,12 @@ Cohesion: 0.40
 Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, Ponytail (Companion Pragmatism Skill), The Decision Ladder
 
 ### Community 41 - "PengaturanSistem.jsx"
-Cohesion: 0.13
-Nodes (14): lucide-react, react, recharts, xlsx, DEFAULT_DATE, ModalImporFingerprint(), AVAILABLE_PERIODS, LaporanRekap() (+6 more)
+Cohesion: 0.10
+Nodes (27): lucide-react, react, recharts, xlsx, SHIFT_12H_OPTIONS, DIVISIONS, GROUPS, CatatanKehadiran() (+19 more)
 
 ### Community 43 - "Illuminate\Database\Seeder"
-Cohesion: 0.12
-Nodes (7): AttendanceSeeder, DatabaseSeeder, EmployeeSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder, SystemSettingSeeder
-
-### Community 44 - "KehadiranController.php"
-Cohesion: 0.14
-Nodes (3): KehadiranController, HandleInertiaRequests, FingerprintImportService
+Cohesion: 0.13
+Nodes (6): AttendanceSeeder, DatabaseSeeder, EmployeeSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder
 
 ### Community 47 - "sidebar.jsx"
 Cohesion: 0.10
@@ -138,33 +135,33 @@ Nodes (16): renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar
 Cohesion: 0.07
 Nodes (9): BerandaBackendTest, {closure#1}(), {closure#2}(), FingerprintAndManualAttendanceTest, KaryawanBackendTest, {closure#1}(), {closure#5}(), LaporanBackendTest (+1 more)
 
-### Community 50 - "Illuminate\Http\RedirectResponse"
-Cohesion: 0.12
-Nodes (5): BerandaController, JadwalController, PengaturanController, AuthController, Controller
+### Community 50 - "Inertia\Response"
+Cohesion: 0.23
+Nodes (3): PengaturanController, AuthController, Controller
 
 ### Community 52 - "PengaturanSistem.jsx"
-Cohesion: 0.07
-Nodes (56): JadwalShift(), WEEKS, JadwalExceptionsTab(), JadwalKpiCards(), JadwalRosterTab(), getDynamicShift12HOptions(), ModalFormTukarShift(), SHIFT_12H_OPTIONS (+48 more)
+Cohesion: 0.09
+Nodes (46): JadwalShift(), WEEKS, JadwalExceptionsTab(), JadwalKpiCards(), JadwalRosterTab(), getDynamicShift12HOptions(), ModalFormTukarShift(), PanelRotasiGrup() (+38 more)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 243 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **39 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `PengaturanSistem.jsx` to `@inertiajs/react`, `package.json`, `cn`, `sidebar.jsx`, `PengaturanSistem.jsx`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
+  _High betweenness centrality (0.071) - this node is a cross-community bridge._
 - **What connects `Aturan Antislop & Ponytail` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `package.json` be split into smaller, more focused modules?**
   _Cohesion score 0.07563025210084033 - nodes in this community are weakly interconnected._
 - **Why does `lucide-react` connect `PengaturanSistem.jsx` to `@inertiajs/react`, `package.json`, `cn`, `sidebar.jsx`, `PengaturanSistem.jsx`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Should `Backend Composer Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
 - **Should `HCGA HRIS Enterprise Design System (DESIGN.md)` be split into smaller, more focused modules?**
   _Cohesion score 0.05547652916073969 - nodes in this community are weakly interconnected._
-- **Should `Illuminate\Database\Eloquent\Factories\HasFactory` be split into smaller, more focused modules?**
-  _Cohesion score 0.12962962962962962 - nodes in this community are weakly interconnected._
+- **Should `Illuminate\Database\Schema\Blueprint` be split into smaller, more focused modules?**
+  _Cohesion score 0.06887755102040816 - nodes in this community are weakly interconnected._

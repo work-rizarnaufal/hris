@@ -40,7 +40,8 @@ export function generateCalendarDays(employee, selectedPeriod) {
 
   const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const monthShort = monthNamesShort[month - 1] || 'Nov';
-  const today = new Date();
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dayStr = d < 10 ? `0${d}` : `${d}`;
@@ -53,12 +54,8 @@ export function generateCalendarDays(employee, selectedPeriod) {
     const realAtt = dailyAttendances.find((a) => a.date === dateIso);
     const incident = incidents.find((inc) => inc.date && inc.date.includes(`${dayStr} ${monthShort}`));
 
-    let status = isWorkingRoster ? 'Hadir' : 'Libur';
-    let detail = isWorkingRoster
-      ? isMalam
-        ? '20:00 - 05:00 WIB (Shift Malam 9 Jam)'
-        : '08:00 - 17:00 WIB (Shift Pagi 9 Jam)'
-      : 'Libur Pasca-Dinas (Rotasi 24/7)';
+    let status = 'Libur';
+    let detail = 'Libur Pasca-Dinas (Rotasi 24/7)';
 
     if (realAtt) {
       status = realAtt.status;
@@ -93,14 +90,14 @@ export function generateCalendarDays(employee, selectedPeriod) {
         detail = incident.detail;
       }
     } else if (isWorkingRoster) {
-      if (employee.presentDays > 0) {
-        status = 'Hadir';
-        detail = isMalam ? '20:00 - 05:00 WIB (Shift Malam 9 Jam)' : '08:00 - 17:00 WIB (Shift Pagi 9 Jam)';
+      if (dateObj > todayStart) {
+        status = 'Terjadwal';
+        detail = isMalam ? 'Jadwal Shift Malam (20:00 - 05:00 WIB)' : 'Jadwal Shift Pagi (08:00 - 17:00 WIB)';
       } else {
-        status = dateObj > today ? 'Terjadwal' : 'Libur';
-        detail = dateObj > today
-          ? (isMalam ? 'Jadwal Shift Malam (20:00 - 05:00 WIB)' : 'Jadwal Shift Pagi (08:00 - 17:00 WIB)')
-          : 'Libur Pasca-Dinas / Belum Ada Log';
+        status = 'Belum Ada Log';
+        detail = isMalam
+          ? 'Jadwal Shift Malam (Belum ada rekaman log presensi)'
+          : 'Jadwal Shift Pagi (Belum ada rekaman log presensi)';
       }
     }
 
@@ -162,7 +159,10 @@ export default function RaporCalendarGrid({
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Alpha
               </span>
               <span className="flex items-center gap-1 text-slate-600">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" /> Libur
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block" /> Terjadwal
+              </span>
+              <span className="flex items-center gap-1 text-slate-600">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" /> Libur / Belum Ada Log
               </span>
             </div>
           </div>
@@ -173,10 +173,13 @@ export default function RaporCalendarGrid({
           <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2">
             {calendarDays.map((dayItem) => {
               const isSelected = selectedDay?.day === dayItem.day;
-              let bgStyle = 'bg-emerald-50 border-emerald-200 text-emerald-900';
-              let dotStyle = 'bg-emerald-500';
+              let bgStyle = 'bg-slate-50 border-slate-200 text-slate-400';
+              let dotStyle = 'bg-slate-300';
 
-              if (dayItem.status === 'Terlambat') {
+              if (dayItem.status === 'Hadir') {
+                bgStyle = 'bg-emerald-50 border-emerald-200 text-emerald-900';
+                dotStyle = 'bg-emerald-500';
+              } else if (dayItem.status === 'Terlambat') {
                 bgStyle = 'bg-amber-50 border-amber-300 text-amber-900 font-semibold';
                 dotStyle = 'bg-amber-500';
               } else if (dayItem.status === 'Alpha' || dayItem.status === 'Alpa') {
@@ -194,6 +197,9 @@ export default function RaporCalendarGrid({
               } else if (dayItem.status === 'Terjadwal') {
                 bgStyle = 'bg-sky-50/70 border-sky-200 text-sky-800';
                 dotStyle = 'bg-sky-400';
+              } else if (dayItem.status === 'Belum Ada Log') {
+                bgStyle = 'bg-slate-50 border-dashed border-slate-300 text-slate-500';
+                dotStyle = 'bg-slate-400';
               } else if (dayItem.status === 'Libur') {
                 bgStyle = 'bg-slate-50 border-slate-200 text-slate-400';
                 dotStyle = 'bg-slate-300';

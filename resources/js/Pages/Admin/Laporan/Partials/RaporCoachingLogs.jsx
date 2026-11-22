@@ -20,6 +20,16 @@ export default function RaporCoachingLogs({
   onNoteChange,
   onAddLog,
 }) {
+  const getBadgeClass = (type) => {
+    if (type.includes('SP') || type.includes('Pelanggaran') || type.includes('Alpa')) {
+      return 'bg-rose-50 text-rose-700 border-rose-200 text-[10px]';
+    }
+    if (type.includes('Teguran') || type.includes('Terlambat') || type.includes('Keterlambatan') || type.includes('Konseling')) {
+      return 'bg-amber-50 text-amber-700 border-amber-200 text-[10px]';
+    }
+    return 'bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]';
+  };
+
   return (
     <Card className="border-slate-200 shadow-2xs">
       <CardHeader className="border-b border-slate-100 pb-4">
@@ -99,15 +109,7 @@ export default function RaporCoachingLogs({
                     <span className="font-bold text-slate-900">{log.type}</span>
                     <span className="text-slate-400">•</span>
                     <span className="text-slate-500 font-medium">{log.date}</span>
-                    <Badge
-                      className={
-                        log.type.includes('SP')
-                          ? 'bg-rose-50 text-rose-700 border-rose-200 text-[10px]'
-                          : log.type.includes('Teguran')
-                          ? 'bg-amber-50 text-amber-700 border-amber-200 text-[10px]'
-                          : 'bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]'
-                      }
-                    >
+                    <Badge className={getBadgeClass(log.type)}>
                       {log.status}
                     </Badge>
                   </div>
@@ -117,8 +119,8 @@ export default function RaporCoachingLogs({
               </div>
             ))
           ) : (
-            <p className="text-center text-xs text-slate-400 py-3 italic">
-              Belum ada catatan pembinaan tersimpan.
+            <p className="text-center text-xs text-slate-500 py-6 italic bg-slate-50/50 rounded-lg border border-dashed border-slate-200">
+              Nihil catatan pelanggaran atau sanksi indisipliner untuk karyawan ini pada periode aktif.
             </p>
           )}
         </div>
