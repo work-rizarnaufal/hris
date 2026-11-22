@@ -1,7 +1,7 @@
 # Graph Report - hris  (2026-11-22)
 
 ## Corpus Check
-- 139 files · ~98,243 words
+- 139 files · ~98,721 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c18a1d0a`
+- Built from commit: `1dd8364f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -55,15 +55,15 @@
 10. `CardHeader()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `calculateTardiness()` --calls--> `getAttendanceSettings()`  [EXTRACTED]
+  resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx → resources/js/services/systemSettings.js
+- `getDynamicShiftOptions()` --calls--> `getShiftSettings()`  [EXTRACTED]
+  resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx → resources/js/services/systemSettings.js
 - `AuthController` --inherits--> `Controller`  [EXTRACTED]
   app/Http/Controllers/Auth/AuthController.php → app/Http/Controllers/Controller.php
 - `Card()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardDescription()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles

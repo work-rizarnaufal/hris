@@ -187,30 +187,29 @@ Spesifikasi desain sistem lengkap dan token mesin telah dikunci pada dokumen ped
 
 Lokasi: [`resources/js/Pages/Admin/Beranda/Beranda.jsx`](resources/js/Pages/Admin/Beranda/Beranda.jsx)
 
-### A. Metrik Realistis Berbasis 12 Karyawan Master
-- Menghapus angka hardcoded fiktif (48 orang) menjadi basis **12 Personel Aktif** yang 100% selaras dengan Master Karyawan, Roster Shift 2-Grup, dan Log Kehadiran.
+### A. Metrik Realistis Berbasis 86 Karyawan Riil Database SQLite
+- Menghapus 100% data dummy hardcoded (12 nama personel lama) dan menghubungkan Beranda langsung ke controller backend `BerandaController.php`.
+- Metrik real-time: **86 Personil Aktif** (35 di Site Mariuk dan 51 di Site Cimalaka).
 - **Deteksi Dinamis Status Rotasi Shift Hari Ini**:
-  - Hari Senin, Rabu, Jumat: **Grup A Dinas** (5 personel), Grup B Libur.
-  - Hari Selasa, Kamis, Sabtu: **Grup B Dinas** (4 personel), Grup A Libur.
-  - Hari Minggu: Seluruh lini libur reguler.
-  - Personel Kantor Non-Shift (3 orang) selalu terjadwal Senin-Jumat.
+  - Menghitung jadwal bergulir Kelompok A dan Kelompok B secara otomatis.
+  - Menampilkan ringkasan jam kerja operasional Shift Pagi (`08:00 – 17:00 WIB`) dan Shift Malam (`20:00 – 05:00 WIB`).
 
 ### B. 4 Kartu KPI Eksekutif Real-Time
-1. **Total Karyawan Aktif**: 12 Personel (100% terdata di master).
-2. **Jadwal Dinas Hari Ini**: Menghitung personel yang aktif bertugas hari ini berdasarkan hari berjalan (misal: 8 personel di hari dinas Grup A).
-3. **Presensi Tepat Waktu**: Rasio kedisiplinan dan jumlah personel yang hadir tanpa keterlambatan.
-4. **Perhatian Disiplin**: Pemantauan personel terlambat atau berstatus alpa.
+1. **Total Personel Aktif**: Menghitung dinamis total personil (86 orang gabungan, 35 Mariuk, 51 Cimalaka).
+2. **Tingkat Kehadiran**: Rasio kehadiran harian riil dari tabel `attendances` database.
+3. **Terlambat Masuk**: Pemantauan presensi dengan deviasi waktu keterlambatan.
+4. **Tidak Hadir (Legalitas)**: Rekapitulasi personel izin, sakit, atau cuti resmi.
 
 ### C. 4 Kartu Navigasi Cepat (Quick Nav Cards)
-Pintasan alur kerja eksekutif dengan ikon representatif:
-- *Log Kehadiran* $\to$ Akses cepat pencatatan presensi hari ini.
-- *Roster & Shift* $\to$ Akses pengaturan rotasi Grup A & Grup B.
-- *Direktori Karyawan* $\to$ Akses master data karyawan.
-- *Laporan & Evaluasi* $\to$ Akses dual-tab rekapitulasi & rapor individu.
+Pintasan alur kerja eksekutif dengan badge dinamis:
+- *Catatan Kehadiran* $\to$ Akses cepat pencatatan presensi hari ini.
+- *Jadwal & Shift Kerja* $\to$ Akses pengaturan rotasi dan roster shift.
+- *Data Karyawan* $\to$ Akses master data karyawan (badge dinamis 86 personil).
+- *Laporan & Rekap* $\to$ Akses dual-tab rekapitulasi & rapor individu.
 
 ### D. Visual Analytics & Feed Kehadiran Hari Ini
-- **Grafik Tren Kehadiran Mingguan (Recharts)**: `BarChart` proporsional dengan domain skala `[0, 14]` yang merefleksikan tren kehadiran 7 hari ke belakang.
-- **Tabel Feed Presensi Hari Ini**: Menggunakan `<Table>` atomik lengkap dengan avatar personel, jam check-in berformat monospace, lokasi kerja, dan badge status presensi.
+- **Grafik Tren Kehadiran Mingguan (Recharts)**: `BarChart` dinamis berbasis data presensi riil 7 hari terakhir dari database.
+- **Tabel Feed Presensi Hari Ini**: Menggunakan `<Table>` atomik. Menampilkan empty state terstruktur jika belum ada catatan presensi hari ini dan menyajikan feed presensi riil karyawan saat data tercatat.
 
 ---
 
