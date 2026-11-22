@@ -264,7 +264,7 @@ export default function ModalFormTukarShift({
             >
               {employees.map((emp) => (
                 <option key={emp.id} value={emp.id}>
-                  {emp.nip} — {emp.name} ({emp.location || 'Mariuk'} · {emp.group || 'Grup A'} · {emp.role})
+                  {emp.nip} — {emp.name} ({emp.location || 'Mariuk'} · {emp.group || 'Belum Ditetapkan'} · {emp.role})
                 </option>
               ))}
             </select>
@@ -292,7 +292,7 @@ export default function ModalFormTukarShift({
                     {sourceEmp.location || 'Mariuk'}
                   </span>
                   <span className="px-2 py-0.5 rounded text-[10px] bg-white border border-slate-200 text-slate-600 font-medium">
-                    {sourceEmp.group || 'Grup A'}
+                    {sourceEmp.group || 'Belum Ditetapkan'}
                   </span>
                 </div>
               </div>
@@ -319,7 +319,7 @@ export default function ModalFormTukarShift({
                   .filter((e) => e.id !== Number(formData.employeeId))
                   .map((emp) => (
                     <option key={emp.id} value={emp.id}>
-                      {emp.nip} — {emp.name} ({emp.location || 'Mariuk'} · {emp.group || 'Grup B'} · {emp.role})
+                      {emp.nip} — {emp.name} ({emp.location || 'Mariuk'} · {emp.group || 'Belum Ditetapkan'} · {emp.role})
                     </option>
                   ))}
               </select>
@@ -350,7 +350,7 @@ export default function ModalFormTukarShift({
                       {targetEmp.location || 'Mariuk'}
                     </span>
                     <span className="px-2 py-0.5 rounded text-[10px] bg-white border border-slate-200 text-slate-600 font-medium">
-                      {targetEmp.group || 'Grup B'}
+                      {targetEmp.group || 'Belum Ditetapkan'}
                     </span>
                   </div>
                 </div>

@@ -38,7 +38,7 @@ class JadwalController extends Controller
     public function updateGroup(Request $request, Employee $employee): RedirectResponse
     {
         $validated = $request->validate([
-            'group' => ['required', 'string', 'max:50'],
+            'group' => ['required', 'string', 'in:Grup A,Grup B,Belum Ditetapkan,Non-Shift'],
         ]);
 
         $employee->update(['shift_group' => $validated['group']]);
@@ -52,9 +52,9 @@ class JadwalController extends Controller
     public function bulkUpdateGroup(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'employee_ids' => ['required', 'array'],
+            'employee_ids' => ['required', 'array', 'min:1'],
             'employee_ids.*' => ['exists:employees,id'],
-            'group' => ['required', 'string', 'max:50'],
+            'group' => ['required', 'string', 'in:Grup A,Grup B,Belum Ditetapkan,Non-Shift'],
         ]);
 
         Employee::whereIn('id', $validated['employee_ids'])
@@ -72,6 +72,10 @@ class JadwalController extends Controller
     {
         $groupA = Employee::where('shift_group', 'Grup A')->pluck('id')->toArray();
         $groupB = Employee::where('shift_group', 'Grup B')->pluck('id')->toArray();
+
+        if (count($groupA) === 0 && count($groupB) === 0) {
+            return back()->with('warning', 'Belum ada personil di Grup A maupun Grup B untuk ditukar. Tetapkan grup personil terlebih dahulu.');
+        }
 
         // Gunakan nilai sementara agar tidak tumpang tindih
         Employee::whereIn('id', $groupA)->update(['shift_group' => 'TEMP_SWAP']);

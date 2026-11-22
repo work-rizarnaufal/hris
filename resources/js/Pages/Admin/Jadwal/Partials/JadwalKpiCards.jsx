@@ -16,9 +16,9 @@ export default function JadwalKpiCards({ stats, filterLocation }) {
               {stats.total} <span className="text-sm font-normal text-slate-400">Personel</span>
             </p>
             <p className="text-[11px] text-slate-500 font-medium mt-0.5">
-              {filterLocation === 'ALL'
-                ? `${stats.groupA} Grup A + ${stats.groupB} Grup B · ${stats.nonShift} Non-Shift`
-                : `${stats.groupA} Grup A + ${stats.groupB} Grup B`}
+              {stats.unassigned > 0
+                ? `${stats.groupA} Grup A · ${stats.groupB} Grup B · ${stats.unassigned} Belum Ditetapkan`
+                : `${stats.groupA} Grup A · ${stats.groupB} Grup B${stats.nonShift > 0 ? ` · ${stats.nonShift} Non-Shift` : ''}`}
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-navy/5 text-navy flex items-center justify-center">

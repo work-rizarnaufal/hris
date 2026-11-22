@@ -742,21 +742,51 @@ Menindaklanjuti penetapan jam operasional pabrik yang baru:
 
 ---
 
-## 21. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 22. Audit & Sinkronisasi Jadwal & Roster Shift (Rotasi Grup & Jadwal Manual)
+
+Menindaklanjuti audit berkala modul **Jadwal & Shift Kerja** (`JadwalShift.jsx`) dan tab **Rotasi Grup & Jadwal Manual** (`PanelRotasiGrup.jsx`):
+
+1. **Pembersihan Log Presensi & Kalender Libur Lama**:
+   - Seluruh catatan log presensi lama telah dikosongkan dari basis data SQLite (`attendances`: 0 baris) agar siap menampung data absensi aktual dari mesin fingerprint.
+   - Seluruh hari libur nasional bawaan dikosongkan (`holidays`: 0 baris, `INITIAL_HOLIDAYS = []`) untuk memungkinkan admin menginput kalender libur operasional secara manual dari tab Pengaturan.
+   - Seluruh 86 personil riil pabrik dipertahankan dengan grup awal `'Belum Ditetapkan'`.
+
+2. **Dinamisasi Matriks Pola Rotasi 7 Hari (`PanelRotasiGrup.jsx`)**:
+   - **Eliminasi Tanggal Statis**: Menghapus tanggal statis hardcoded lama (`02/11/2026` s/d `08/11/2026`) dan menggantinya dengan komputasi dinamis berbasis minggu aktif yang dipilih (`currentWeek.days[idx].date`).
+   - **Siklus Roster Bergantian (Minggu Ganjil vs Minggu Genap)**: Matriks alur kerja kini otomatis merefleksikan giliran dinas mingguan:
+     - *Minggu Ganjil*: Grup A dinas (Sen, Rab, Jum, Min); Grup B dinas (Sel, Kam, Sab).
+     - *Minggu Genap*: Grup B dinas (Sen, Rab, Jum, Min); Grup A dinas (Sel, Kam, Sab).
+   - Header kartu dan header tabel menyesuaikan penanda hari dinas secara otomatis.
+
+3. **Penetapan Personil Operasional & Netralisasi Status Shift**:
+   - **Status "Belum Ditentukan"**: Karyawan dengan grup `'Belum Ditetapkan'` kini menampilkan badge netral `<Clock> Belum Ditentukan` pada kolom *Shift Operasional*, bukan lagi mengasumsikan Shift Pagi (08:00 - 17:00).
+   - **Dukungan Kelompok Non-Shift (Staf Kantor)**: Dropdown pemindahan individual dan aksi massal kini menyertakan opsi `'Non-Shift'`, memungkinkan admin mengelompokkan personil ke staf kantor berjadwal Senin–Jumat 08:00–17:00.
+   - **Empty State Staf Kantor**: Disediakan fallback teks informatif jika belum ada personil non-shift terdaftar.
+
+4. **Persistensi State Jadwal Manual & Pengecualian Shift**:
+   - State perubahan jadwal operasional manual (`manualSchedules`) dan log tukar shift (`exceptions`) kini terhubung persisten ke `localStorage` (`hris_manual_schedules` dan `hris_shift_exceptions`), sehingga data yang diinput admin tidak hilang saat halaman disegarkan (reload).
+   - Prop backend `dbLocations` dan `dbShifts` kini diterima dan dinormalisasi langsung di `JadwalShift.jsx`.
+
+5. **Penguatan Backend & Validasi Roster (`JadwalController.php`)**:
+   - Menambahkan validasi whitelist grup: `in:Grup A,Grup B,Belum Ditetapkan,Non-Shift`.
+   - Menambahkan pengecekan proteksi pada `swapGroup()`: Jika kedua grup (A dan B) masih kosong, sistem mengembalikan notifikasi warning yang informatif tanpa memicu update palsu.
+   - Dibuat rangkaian pengujian otomatis Feature Test [`JadwalBackendTest.php`](tests/Feature/JadwalBackendTest.php) (5 skenario pengujian: render halaman, update grup individu, bulk update, swap grup sukses, dan swap grup kosong).
+   - Seluruh test suite (22 tests, 164 assertions) dan Laravel Pint lolos 100% tanpa catatan.
+
+---
+
+## 23. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
-1. **Backend Engine Roster Rotasi 2-Grup (`JadwalController`)**:
-   - Generator otomatis jadwal dinas bergantian 12 jam (Senin, Rabu, Jumat Grup A; Selasa, Kamis, Sabtu Grup B).
-   - Logika verifikasi dan persetujuan tukar shift antar rekan kerja.
-2. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
+1. **Pengembangan Modul Lembur & SPL ([`LemburOvertime.jsx`](resources/js/Pages/Admin/Lembur/LemburOvertime.jsx))**:
    - Membangun formulir permohonan Surat Perintah Lembur (SPL).
    - Mengkalkulasi tarif upah lembur otomatis berdasarkan formula Depnaker yang telah disetel di Pengaturan Sistem.
-3. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
+2. **Pengembangan Alur Cuti & Saldo Cuti ([`PengajuanCutiIzin.jsx`](resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx))**:
    - Menyediakan form permohonan cuti tahunan dengan validasi sisa kuota (12 hari).
    - Alur persetujuan bertingkat (Supervisor $\to$ HCGA Manager).
-4. **Otomatisasi Penarikan Log Mesin (Background Sync)**:
+3. **Otomatisasi Penarikan Log Mesin (Background Sync)**:
    - Menyediakan scheduled command (`php artisan attendance:pull-fingerprint`) atau webhook listener jika mesin absensi site mendukung direct push via ADMS/Cloud.
 
 ---
-*Laporan handover ini diperbarui secara komprehensif pada 21 November 2026 sebagai dokumentasi resmi arsitektur sistem HRIS.*
+*Laporan handover ini diperbarui secara komprehensif pada 22 November 2026 sebagai dokumentasi resmi arsitektur sistem HRIS.*

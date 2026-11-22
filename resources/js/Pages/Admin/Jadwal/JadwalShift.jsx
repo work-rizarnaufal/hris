@@ -79,22 +79,38 @@ const WEEKS = [
 
 export default function JadwalShift({
   dbEmployees = [],
+  dbLocations = [],
+  dbShifts = [],
 }) {
   // Normalisasi data karyawan langsung via useMemo tanpa mirroring state
   const employees = useMemo(() => {
     if (!dbEmployees || dbEmployees.length === 0) return [];
-    return dbEmployees.map((emp) => ({
-      id: emp.id,
-      name: emp.name,
-      nip: emp.nip,
-      role: emp.role || emp.position || emp.role_title || '-',
-      division: emp.division || '-',
-      location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
-      location_id: emp.location_id,
-      group: emp.shift_group || emp.group || 'Grup A',
-      baseShift: emp.shift?.name || 'Shift Pagi (08:00 - 17:00)',
-      shiftCode: emp.shift?.code || 'PAGI',
-    }));
+    return dbEmployees.map((emp) => {
+      const group = emp.shift_group || emp.group || 'Belum Ditetapkan';
+      const isNonShift = group === 'Non-Shift';
+      const isUnset = group === 'Belum Ditetapkan';
+
+      return {
+        id: emp.id,
+        name: emp.name,
+        nip: emp.nip,
+        role: emp.role || emp.position || emp.role_title || '-',
+        division: emp.division || '-',
+        location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+        location_id: emp.location_id,
+        group,
+        baseShift: isNonShift
+          ? 'Non-Shift Kantor (08:00 - 17:00)'
+          : isUnset
+          ? (emp.shift?.name || 'Belum Ditentukan')
+          : (emp.shift?.name || 'Shift Pagi (08:00 - 17:00)'),
+        shiftCode: isNonShift
+          ? 'OFFICE'
+          : isUnset
+          ? (emp.shift?.code || '-')
+          : (emp.shift?.code || 'PAGI'),
+      };
+    });
   }, [dbEmployees]);
 
   // Ekstraksi divisi dinamis langsung dari master data karyawan
@@ -132,11 +148,44 @@ export default function JadwalShift({
     setIsModalOpen(true);
   };
 
-  // Daftar Pengecualian & Tukar Shift Aktif
-  const [exceptions, setExceptions] = useState([]);
+  const STORAGE_KEYS_JADWAL = {
+    MANUAL_SCHEDULES: 'hris_manual_schedules',
+    EXCEPTIONS: 'hris_shift_exceptions',
+  };
 
-  // Daftar Perubahan Jadwal Operasional Manual
-  const [manualSchedules, setManualSchedules] = useState([]);
+  // Daftar Pengecualian & Tukar Shift Aktif (Persisten)
+  const [exceptions, setExceptions] = useState(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS_JADWAL.EXCEPTIONS);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Daftar Perubahan Jadwal Operasional Manual (Persisten)
+  const [manualSchedules, setManualSchedules] = useState(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS_JADWAL.MANUAL_SCHEDULES);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS_JADWAL.EXCEPTIONS, JSON.stringify(exceptions));
+    }
+  }, [exceptions]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEYS_JADWAL.MANUAL_SCHEDULES, JSON.stringify(manualSchedules));
+    }
+  }, [manualSchedules]);
 
   // Kalender Hari Libur & Konfigurasi Shift yang Disinkronkan dari Modul Pengaturan Sistem
   const [holidays, setHolidays] = useState(() => getHolidays());
@@ -206,10 +255,11 @@ export default function JadwalShift({
     const targetEmp = employees.find((e) => e.id === empId);
     router.put(`/jadwal/employee/${empId}/group`, { group: newGroup }, {
       preserveScroll: true,
-      onSuccess: () => {
+      onSuccess: (page) => {
+        const flash = page.props?.flash;
         setAlertInfo({
           type: 'success',
-          message: `Grup kerja ${targetEmp?.name || 'personil'} berhasil diubah menjadi ${newGroup}.`,
+          message: flash?.success || `Grup kerja ${targetEmp?.name || 'personil'} berhasil diubah menjadi ${newGroup}.`,
         });
       },
       onError: () => {
@@ -222,10 +272,11 @@ export default function JadwalShift({
   const handleBulkUpdateGroup = (selectedIds, targetGroup) => {
     router.post('/jadwal/bulk-update-group', { employee_ids: selectedIds, group: targetGroup }, {
       preserveScroll: true,
-      onSuccess: () => {
+      onSuccess: (page) => {
+        const flash = page.props?.flash;
         setAlertInfo({
           type: 'success',
-          message: `${selectedIds.length} personil berhasil dipindahkan ke ${targetGroup}.`,
+          message: flash?.success || `${selectedIds.length} personil berhasil dipindahkan ke ${targetGroup}.`,
         });
       },
       onError: () => {
@@ -238,11 +289,19 @@ export default function JadwalShift({
   const handleSwapAllGroups = () => {
     router.post('/jadwal/swap-group', {}, {
       preserveScroll: true,
-      onSuccess: () => {
-        setAlertInfo({
-          type: 'success',
-          message: 'Rotasi siklus berhasil: Seluruh personil Grup A & B berhasil ditukar jadwal gilirannya.',
-        });
+      onSuccess: (page) => {
+        const flash = page.props?.flash;
+        if (flash?.warning) {
+          setAlertInfo({
+            type: 'warning',
+            message: flash.warning,
+          });
+        } else {
+          setAlertInfo({
+            type: 'success',
+            message: flash?.success || 'Rotasi siklus berhasil: Seluruh personil Grup A & B berhasil ditukar jadwal gilirannya.',
+          });
+        }
       },
       onError: () => {
         setAlertInfo({ type: 'error', message: 'Gagal melakukan rotasi grup.' });
@@ -666,6 +725,8 @@ export default function JadwalShift({
             manualSchedules={manualSchedules}
             onSaveManualSchedule={handleSaveManualSchedule}
             onDeleteManualSchedule={handleDeleteManualSchedule}
+            currentWeek={currentWeek}
+            selectedWeekIndex={selectedWeekIndex}
           />
         )}
 

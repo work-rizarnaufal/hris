@@ -1,7 +1,7 @@
 # Graph Report - hris  (2026-11-22)
 
 ## Corpus Check
-- 155 files · ~100,266 words
+- 155 files · ~100,113 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `507d7680`
+- Built from commit: `78ad2591`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -58,8 +58,6 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `RaporIndividu()` --calls--> `RaporCoachingLogs()`  [EXTRACTED]
-  resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx → resources/js/Pages/Admin/Laporan/Partials/RaporCoachingLogs.jsx
 - `Card()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
@@ -67,6 +65,8 @@
 - `CardDescription()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardHeader()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardTitle()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles

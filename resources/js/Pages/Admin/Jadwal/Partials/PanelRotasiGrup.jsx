@@ -40,20 +40,30 @@ export default function PanelRotasiGrup({
   manualSchedules = [],
   onSaveManualSchedule,
   onDeleteManualSchedule,
+  currentWeek,
+  selectedWeekIndex = 0,
 }) {
   const [selectedIds, setSelectedIds] = useState([]);
   const [filterGroupTab, setFilterGroupTab] = useState('ALL'); // 'ALL' | 'Grup A' | 'Grup B' | 'Belum Ditetapkan'
   const [bulkTargetGroup, setBulkTargetGroup] = useState('Grup A');
 
+  const isWeekEven = selectedWeekIndex % 2 === 1;
+
   // Form State Perubahan Jadwal Operasional Manual (Sesuai 7 Kriteria Revisi)
-  const [startDate, setStartDate] = useState(
-    new Intl.DateTimeFormat('en-CA', {
+  const [startDate, setStartDate] = useState(() => {
+    if (currentWeek?.days?.[0]?.date) {
+      const parts = currentWeek.days[0].date.split('/');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+    return new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Jakarta',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
-    }).format(new Date())
-  );
+    }).format(new Date());
+  });
   const [targetGroup, setTargetGroup] = useState('Grup A');
   const [shift1In, setShift1In] = useState('08:00');
   const [shift1Out, setShift1Out] = useState('17:00');
@@ -132,79 +142,54 @@ export default function PanelRotasiGrup({
     setReason('');
   };
 
-  // Matriks Aturan Permanen 7 Hari (Senin s/d Minggu Non-Stop)
-  const permanentScheduleRows = [
-    {
-      day: 'Senin',
-      date: '02/11/2026',
-      grupAStatus: 'MASUK (Pagi & Malam)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A berdinas shift operasional (Pagi & Malam). Grup B libur otomatis.',
-    },
-    {
-      day: 'Selasa',
-      date: '03/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (Pagi & Malam)',
-      grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A otomatis libur paska dinas Senin. Giliran Grup B masuk shift operasional.',
-    },
-    {
-      day: 'Rabu',
-      date: '04/11/2026',
-      grupAStatus: 'MASUK (Pagi & Malam)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A kembali berdinas operasional. Grup B libur.',
-    },
-    {
-      day: 'Kamis',
-      date: '05/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (Pagi & Malam)',
-      grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup B kembali berdinas operasional. Grup A libur.',
-    },
-    {
-      day: 'Jumat',
-      date: '06/11/2026',
-      grupAStatus: 'MASUK (Pagi & Malam)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'MASUK (08:00 - 17:00)',
-      note: 'Grup A berdinas operasional. Grup B libur.',
-    },
-    {
-      day: 'Sabtu',
-      date: '07/11/2026',
-      grupAStatus: 'LIBUR (OFF)',
-      grupABadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      grupBStatus: 'MASUK (Pagi & Malam)',
-      grupBBadge: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-      officeStatus: 'LIBUR (OFF)',
-      note: 'Grup B berdinas operasional. Grup A libur.',
-    },
-    {
-      day: 'Minggu',
-      date: '08/11/2026',
-      grupAStatus: 'MASUK (Pagi & Malam)',
-      grupABadge: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold',
-      grupBStatus: 'LIBUR (OFF)',
-      grupBBadge: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      officeStatus: 'LIBUR (OFF)',
-      note: 'Operasional 7 hari non-stop: Grup A bertugas di Minggu 1; bergantian dengan Grup B di Minggu 2.',
-    },
-  ];
+  // Matriks Aturan 7 Hari Dinamis (Senin s/d Minggu Sesuai Siklus Roster Minggu Aktif)
+  const permanentScheduleRows = useMemo(() => {
+    const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+    return dayNames.map((dayName, idx) => {
+      const dayNum = idx + 1;
+      const dateStr = currentWeek?.days?.[idx]?.date || '-';
+      const isWeekend = idx >= 5;
+
+      // Rotasi pola: Minggu Ganjil (Grup A hari ganjil: Sen, Rab, Jum, Min)
+      // Minggu Genap (Grup B hari ganjil: Sen, Rab, Jum, Min)
+      const isGroupAWorking = !isWeekEven ? dayNum % 2 === 1 : dayNum % 2 === 0;
+
+      const grupAStatus = isGroupAWorking ? 'MASUK (Pagi & Malam)' : 'LIBUR (OFF)';
+      const grupABadge = isGroupAWorking
+        ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold'
+        : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold';
+
+      const grupBStatus = !isGroupAWorking ? 'MASUK (Pagi & Malam)' : 'LIBUR (OFF)';
+      const grupBBadge = !isGroupAWorking
+        ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold'
+        : 'bg-slate-100 text-slate-500 border-slate-200 font-semibold';
+
+      const officeStatus = isWeekend ? 'LIBUR (OFF)' : 'MASUK (08:00 - 17:00)';
+
+      let note = '';
+      if (dayNum === 7) {
+        note = isGroupAWorking
+          ? 'Rotasi 24/7 Akhir Pekan: Giliran Grup A berdinas; Grup B libur otomatis.'
+          : 'Rotasi 24/7 Akhir Pekan: Giliran Grup B berdinas; Grup A libur otomatis.';
+      } else {
+        note = isGroupAWorking
+          ? 'Grup A berdinas shift operasional (Pagi & Malam). Grup B libur otomatis.'
+          : 'Grup B berdinas shift operasional (Pagi & Malam). Grup A libur otomatis.';
+      }
+
+      return {
+        day: dayName,
+        date: dateStr,
+        grupAStatus,
+        grupABadge,
+        grupBStatus,
+        grupBBadge,
+        officeStatus,
+        note,
+      };
+    });
+  }, [currentWeek, isWeekEven]);
 
   return (
     <div className="space-y-6">
@@ -254,11 +239,11 @@ export default function PanelRotasiGrup({
           <div className="flex items-center gap-2 text-xs">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold text-[11px]">
               <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
-              Grup A: Sen, Rab, Jum ({countA} Personil)
+              Grup A: {!isWeekEven ? 'Sen, Rab, Jum, Min' : 'Sel, Kam, Sab'} ({countA} Personil)
             </span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-semibold text-[11px]">
               <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" />
-              Grup B: Sel, Kam, Sab ({countB} Personil)
+              Grup B: {!isWeekEven ? 'Sel, Kam, Sab' : 'Sen, Rab, Jum, Min'} ({countB} Personil)
             </span>
           </div>
         </CardHeader>
@@ -269,10 +254,10 @@ export default function PanelRotasiGrup({
               <TableRow className="bg-slate-50/80 border-b border-slate-200">
                 <TableHead className="w-32 text-xs font-semibold text-slate-600">Hari & Tanggal</TableHead>
                 <TableHead className="text-xs font-semibold text-emerald-900 min-w-[170px]">
-                  Grup A (Hari Ganjil)
+                  Grup A {!isWeekEven ? '(Hari Ganjil)' : '(Hari Genap)'}
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-amber-900 min-w-[170px]">
-                  Grup B (Hari Genap)
+                  Grup B {!isWeekEven ? '(Hari Genap)' : '(Hari Ganjil)'}
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-slate-600 min-w-[160px]">
                   Staf Kantor (Non-Shift)
@@ -404,6 +389,7 @@ export default function PanelRotasiGrup({
                 <option value="Grup A">Grup A</option>
                 <option value="Grup B">Grup B</option>
                 <option value="Belum Ditetapkan">Belum Ditetapkan</option>
+                <option value="Non-Shift">Non-Shift</option>
               </TableSelect>
 
               <Button
@@ -500,7 +486,12 @@ export default function PanelRotasiGrup({
                       </TableCell>
 
                       <TableCell>
-                        {emp.shiftCode === 'PAGI' || (emp.baseShift && emp.baseShift.toLowerCase().includes('pagi')) ? (
+                        {isUnassigned ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border bg-slate-100 text-slate-500 border-slate-200">
+                            <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            Belum Ditentukan
+                          </span>
+                        ) : emp.shiftCode === 'PAGI' || (emp.baseShift && emp.baseShift.toLowerCase().includes('pagi')) ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border bg-emerald-50 text-emerald-800 border-emerald-200 font-mono">
                             <Sun className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                             Pagi (08:00 - 17:00)
@@ -544,6 +535,7 @@ export default function PanelRotasiGrup({
                           <option value="Grup A">Grup A</option>
                           <option value="Grup B">Grup B</option>
                           <option value="Belum Ditetapkan">Belum Ditetapkan</option>
+                          <option value="Non-Shift">Non-Shift</option>
                         </TableSelect>
                       </TableCell>
                     </TableRow>
@@ -819,7 +811,9 @@ export default function PanelRotasiGrup({
                 Staf General Office / Non-Shift ({nonShiftEmployees.length} Karyawan)
               </p>
               <p className="text-[11px] text-slate-500">
-                {nonShiftEmployees.map((e) => e.name).join(', ')}
+                {nonShiftEmployees.length > 0
+                  ? nonShiftEmployees.map((e) => e.name).join(', ')
+                  : 'Belum ada personil yang ditugaskan ke kelompok Non-Shift (Staf Kantor).'}
               </p>
             </div>
           </div>
