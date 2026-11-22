@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             ShiftSeeder::class,
             SystemSettingSeeder::class,
-            HolidaySeeder::class,
+            // HolidaySeeder::class, // Kalender hari libur nasional diinput manual nanti
             EmployeeSeeder::class,
             // AttendanceSeeder::class, // Presensi diimpor manual/real dari log mesin fingerprint
         ]);

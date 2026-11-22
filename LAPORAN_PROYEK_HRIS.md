@@ -437,9 +437,9 @@ Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/j
   - Opsi wajib persetujuan atasan (*supervisor approval*) sebelum jadwal dinyatakan efektif.
 
 ### D. Tab 3: Kalender Libur & Cuti Bersama (`holiday`)
-- Daftar Hari Libur Resmi 2026 dengan format standar `dd/mm/yyyy`.
+- **Status Bersih (Siap Input Manual)**: Seluruh data libur nasional bawaan telah dikosongkan dari basis data SQLite (`holidays`: 0 baris) dan `INITIAL_HOLIDAYS = []`, memberikan kendali penuh kepada admin untuk menginput hari libur nasional atau cuti bersama resmi secara manual sesuai SKB 3 Menteri terkini.
 - Modal atomik tambah, edit, dan hapus hari libur dengan pilihan pemotongan cuti (*Tidak Potong Cuti* vs *Potong Cuti Tahunan*).
-- **Sinkronisasi Otomatis ke Jadwal & Roster**: Tanggal libur resmi otomatis ditandai `LIBUR (Hari Libur Resmi)` di Roster Mingguan tanpa perlu ubah jadwal satu per satu.
+- **Sinkronisasi Otomatis ke Jadwal & Roster**: Tanggal libur resmi yang ditambahkan secara manual otomatis ditandai `LIBUR (Hari Libur Resmi)` di Roster Mingguan tanpa perlu ubah jadwal satu per satu.
 
 ### E. Tab 4: Geofencing & Lokasi Pabrik (`location`)
 - **Master Switch / Toggle Penonaktifan Geofence**:

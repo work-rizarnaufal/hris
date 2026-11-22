@@ -150,9 +150,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx": {
-    "mtime": 1795331301.0622396,
-    "seen": 1795331415.2266195,
-    "ast_hash": "d45fc294feb2bcbb29eef28eeda5d31a",
+    "mtime": 1795332455.9374006,
+    "seen": 1795332492.1657653,
+    "ast_hash": "a0c84111aa070b5c022c4166bbc269cb",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Lembur/LemburOvertime.jsx": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795330886.4387505,
-    "seen": 1795330904.9159415,
-    "ast_hash": "8264b8273cb2c1295a753b87758b4862",
+    "mtime": 1795331433.6957517,
+    "seen": 1795332492.1657653,
+    "ast_hash": "ce079d93c25374dc995907c69e5b7444",
     "semantic_hash": ""
   },
   "README.md": {
@@ -732,9 +732,9 @@
     "semantic_hash": ""
   },
   "app/Services/FingerprintImportService.php": {
-    "mtime": 1795289195.4776127,
-    "seen": 1795290292.4036763,
-    "ast_hash": "3e6e26ca6d4c926dcf62f3007d5593ac",
+    "mtime": 1795332347.9433641,
+    "seen": 1795332492.1657653,
+    "ast_hash": "3be44f147f40689fd8e1737244aab7ff",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx": {
@@ -768,9 +768,9 @@
     "semantic_hash": ""
   },
   "database/seeders/AttendanceSeeder.php": {
-    "mtime": 1795284919.0786777,
-    "seen": 1795286710.161662,
-    "ast_hash": "d861caefe68bb42c50cdf2ffff2234ae",
+    "mtime": 1795332352.3332605,
+    "seen": 1795332492.1657653,
+    "ast_hash": "ff38da7dc0042a05a580c4b1874a78a9",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_22_010938_add_shift_to_attendances_table.php": {
@@ -906,9 +906,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/LaporanController.php": {
-    "mtime": 1795330122.4319046,
-    "seen": 1795330275.6241302,
-    "ast_hash": "1e7785de3177d60e61e25994df781880",
+    "mtime": 1795332478.5733502,
+    "seen": 1795332492.1657653,
+    "ast_hash": "175863f451dc96aa9c713f4e0635165c",
     "semantic_hash": ""
   },
   "tests/Feature/LaporanBackendTest.php": {
@@ -918,9 +918,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporCalendarGrid.jsx": {
-    "mtime": 1795331287.6061037,
-    "seen": 1795331415.2266195,
-    "ast_hash": "3367b7d1fb37bfaea80a94ed1de8140d",
+    "mtime": 1795332413.9573803,
+    "seen": 1795332492.1657653,
+    "ast_hash": "51379f74d485fb68f0ca0e19c1aa08e5",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporCoachingLogs.jsx": {
@@ -930,9 +930,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporKpiCards.jsx": {
-    "mtime": 1795330813.301065,
-    "seen": 1795330904.9159415,
-    "ast_hash": "d044adbc0bdff03ef90c3846780a0722",
+    "mtime": 1795332425.93573,
+    "seen": 1795332492.1657653,
+    "ast_hash": "8bc12a9bd64da166151f74bb7d1bc05a",
     "semantic_hash": ""
   },
   "package-lock.json": {
