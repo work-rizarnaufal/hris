@@ -9,8 +9,6 @@ import {
   CheckCircle2,
   AlertCircle,
   UserCheck,
-  Plus,
-  Trash2,
   MapPin,
 } from 'lucide-react';
 import {
@@ -21,7 +19,6 @@ import {
   CardContent,
   Button,
   Badge,
-  Input,
   Table,
   TableHeader,
   TableBody,
@@ -29,11 +26,12 @@ import {
   TableHead,
   TableCell,
   TableSelect,
+  TableEmpty,
 } from '@/components/ui';
-import { formatDateDMY } from '@/services/systemSettings.js';
+import PanelJadwalManual from './PanelJadwalManual.jsx';
 
 export default function PanelRotasiGrup({
-  employees,
+  employees = [],
   onUpdateEmployeeGroup,
   onBulkUpdateGroup,
   onSwapAll,
@@ -48,28 +46,6 @@ export default function PanelRotasiGrup({
   const [bulkTargetGroup, setBulkTargetGroup] = useState('Grup A');
 
   const isWeekEven = selectedWeekIndex % 2 === 1;
-
-  // Form State Perubahan Jadwal Operasional Manual (Sesuai 7 Kriteria Revisi)
-  const [startDate, setStartDate] = useState(() => {
-    if (currentWeek?.days?.[0]?.date) {
-      const parts = currentWeek.days[0].date.split('/');
-      if (parts.length === 3) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-    }
-    return new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Jakarta',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(new Date());
-  });
-  const [targetGroup, setTargetGroup] = useState('Grup A');
-  const [shift1In, setShift1In] = useState('08:00');
-  const [shift1Out, setShift1Out] = useState('17:00');
-  const [shift2In, setShift2In] = useState('20:00');
-  const [shift2Out, setShift2Out] = useState('05:00');
-  const [reason, setReason] = useState('');
 
   // Pisahkan personil operasional (yang ikut rotasi) dan staf kantor (non-shift)
   const operationalEmployees = useMemo(
@@ -122,26 +98,6 @@ export default function PanelRotasiGrup({
     setSelectedIds([]);
   };
 
-  // Submit Perubahan Manual Operasional
-  const handleManualSubmit = (e) => {
-    e.preventDefault();
-    if (!reason.trim() || !startDate) return;
-
-    if (onSaveManualSchedule) {
-      onSaveManualSchedule({
-        startDate,
-        targetGroup,
-        shift1In,
-        shift1Out,
-        shift2In,
-        shift2Out,
-        reason: reason.trim(),
-      });
-    }
-
-    setReason('');
-  };
-
   // Matriks Aturan 7 Hari Dinamis (Senin s/d Minggu Sesuai Siklus Roster Minggu Aktif)
   const permanentScheduleRows = useMemo(() => {
     const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -151,8 +107,6 @@ export default function PanelRotasiGrup({
       const dateStr = currentWeek?.days?.[idx]?.date || '-';
       const isWeekend = idx >= 5;
 
-      // Rotasi pola: Minggu Ganjil (Grup A hari ganjil: Sen, Rab, Jum, Min)
-      // Minggu Genap (Grup B hari ganjil: Sen, Rab, Jum, Min)
       const isGroupAWorking = !isWeekEven ? dayNum % 2 === 1 : dayNum % 2 === 0;
 
       const grupAStatus = isGroupAWorking ? 'MASUK (Pagi & Malam)' : 'LIBUR (OFF)';
@@ -430,11 +384,9 @@ export default function PanelRotasiGrup({
 
             <TableBody>
               {filteredOperational.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-slate-400 italic text-xs">
-                    Tidak ada personil pada kategori ini.
-                  </TableCell>
-                </TableRow>
+                <TableEmpty colSpan={7}>
+                  Tidak ada personil pada kategori ini.
+                </TableEmpty>
               ) : (
                 filteredOperational.map((emp, index) => {
                   const isSelected = selectedIds.includes(emp.id);
@@ -508,13 +460,13 @@ export default function PanelRotasiGrup({
                         {isGroupA && (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            Masuk: Sen, Rab, Jum (Min*)
+                            {!isWeekEven ? 'Masuk: Sen, Rab, Jum, Min' : 'Masuk: Sel, Kam, Sab'}
                           </span>
                         )}
                         {isGroupB && (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                             <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                            Masuk: Sel, Kam, Sab (Min*)
+                            {!isWeekEven ? 'Masuk: Sel, Kam, Sab' : 'Masuk: Sen, Rab, Jum, Min'}
                           </span>
                         )}
                         {isUnassigned && (
@@ -547,257 +499,13 @@ export default function PanelRotasiGrup({
         </CardContent>
       </Card>
 
-      {/* 4. CARD PERUBAHAN JADWAL OPERASIONAL MANUAL (REVISI 7 KRITERIA) */}
-      <Card className="border-slate-200 shadow-2xs">
-        <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#c4a266]" />
-              Perubahan Jadwal Operasional Manual
-            </CardTitle>
-            <CardDescription className="text-xs mt-0.5">
-              Penyesuaian ad-hoc tanggal mulai, grup bertugas, dan rentang jam kerja operasional Shift 1 & Shift 2.
-            </CardDescription>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-4 sm:p-5 space-y-5">
-          {/* Form Revisi 7 Kriteria */}
-          <form
-            onSubmit={handleManualSubmit}
-            className="bg-slate-50/70 border border-slate-200/90 rounded-xl p-4 sm:p-5 space-y-4"
-          >
-            {/* Baris 1: Informasi Penugasan & Tanggal */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* 1. Tanggal Mulai Shift */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  1. Tanggal Mulai Shift <span className="text-rose-500">*</span>
-                </label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="h-9 text-xs bg-white text-slate-700"
-                  required
-                />
-              </div>
-
-              {/* 2. Grup Yang Bekerja */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  2. Grup Yang Bekerja <span className="text-rose-500">*</span>
-                </label>
-                <TableSelect
-                  value={targetGroup}
-                  onChange={(e) => setTargetGroup(e.target.value)}
-                  className="h-9 text-xs text-slate-700"
-                  containerClassName="w-full"
-                >
-                  <option value="Grup A">Grup A</option>
-                  <option value="Grup B">Grup B</option>
-                  <option value="Semua Grup (A & B)">Semua Grup (Grup A & Grup B)</option>
-                </TableSelect>
-              </div>
-
-              {/* 7. Alasan Perubahan */}
-              <div className="sm:col-span-2 lg:col-span-1">
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  7. Alasan Perubahan <span className="text-rose-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Contoh: Percepatan kuota ekspor / maintenance mesin CNC..."
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="h-9 text-xs bg-white text-slate-700 placeholder:text-slate-400"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Baris 2: Jam Operasional Shift 1 & Shift 2 (Format TIME) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-              {/* Blok Shift 1 (Pagi 9 Jam) */}
-              <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
-                  <Sun className="w-4 h-4 text-emerald-600" />
-                  <span className="text-xs font-bold text-slate-800">
-                    Konfigurasi Shift Pagi (08:00 - 17:00 WIB)
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      3. Masuk Shift Pagi
-                    </label>
-                    <Input
-                      type="time"
-                      value={shift1In}
-                      onChange={(e) => setShift1In(e.target.value)}
-                      className="h-9 text-xs bg-slate-50/50 font-mono"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      4. Pulang Shift Pagi
-                    </label>
-                    <Input
-                      type="time"
-                      value={shift1Out}
-                      onChange={(e) => setShift1Out(e.target.value)}
-                      className="h-9 text-xs bg-slate-50/50 font-mono"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Blok Shift 2 (Malam 9 Jam) */}
-              <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
-                  <Moon className="w-4 h-4 text-indigo-600" />
-                  <span className="text-xs font-bold text-slate-800">
-                    Konfigurasi Shift Malam (20:00 - 05:00 WIB)
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      5. Masuk Shift Malam
-                    </label>
-                    <Input
-                      type="time"
-                      value={shift2In}
-                      onChange={(e) => setShift2In(e.target.value)}
-                      className="h-9 text-xs bg-slate-50/50 font-mono"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      6. Pulang Shift Malam
-                    </label>
-                    <Input
-                      type="time"
-                      value={shift2Out}
-                      onChange={(e) => setShift2Out(e.target.value)}
-                      className="h-9 text-xs bg-slate-50/50 font-mono"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tombol Simpan & Catatan Petunjuk */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-              <p className="text-[11px] text-slate-400 italic">
-                * Format waktu 24-jam (JJ:MM). Perubahan langsung aktif dan tercatat pada matriks roster mingguan.
-              </p>
-              <Button
-                type="submit"
-                size="sm"
-                className="text-xs font-semibold gap-1.5 cursor-pointer bg-navy hover:bg-[#193750] text-white self-end sm:self-auto"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Terapkan Perubahan Jadwal Manual</span>
-              </Button>
-            </div>
-          </form>
-
-          {/* Tabel Riwayat Perubahan Jadwal Operasional Manual Aktif */}
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <h5 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Daftar Perubahan Jadwal Operasional Manual Aktif ({manualSchedules.length})
-              </h5>
-              <span className="text-[11px] text-slate-400">
-                Otomatis disinkronkan ke Matriks Roster Mingguan
-              </span>
-            </div>
-
-            <div className="border border-slate-200 rounded-xl overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-slate-50/80 border-b border-slate-200">
-                    <TableHead className="w-12 text-center text-xs font-semibold text-slate-600">No</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[130px]">Tanggal Mulai Shift</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[140px]">Grup Yang Bekerja</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[170px]">Jam Shift 1 (Pagi)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[170px]">Jam Shift 2 (Malam)</TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-600 min-w-[200px]">Alasan Perubahan</TableHead>
-                    <TableHead className="text-center text-xs font-semibold text-slate-600 w-24">Status</TableHead>
-                    <TableHead className="text-right pr-4 text-xs font-semibold text-slate-600 w-20">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {manualSchedules.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-6 text-slate-400 italic text-xs">
-                        Belum ada jadwal operasional manual aktif. Jadwal berjalan sesuai pola rotasi permanen normal.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    manualSchedules.map((item, idx) => (
-                      <TableRow key={item.id} className="text-xs hover:bg-slate-50/70">
-                        <TableCell className="text-center font-medium text-slate-500">{idx + 1}</TableCell>
-                        <TableCell className="font-bold text-navy">
-                          {formatDateDMY(item.startDateFormatted || item.startDate)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              item.targetGroup === 'Grup A'
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold'
-                                : item.targetGroup === 'Grup B'
-                                ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold'
-                                : 'bg-purple-50 text-purple-800 border-purple-200 font-bold'
-                            }
-                          >
-                            {item.targetGroup}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-mono text-slate-700 font-medium">
-                          <span className="inline-flex items-center gap-1">
-                            <Sun className="w-3.5 h-3.5 text-emerald-600" />
-                            {item.shift1In} - {item.shift1Out} WIB
-                          </span>
-                        </TableCell>
-                        <TableCell className="font-mono text-slate-700 font-medium">
-                          <span className="inline-flex items-center gap-1">
-                            <Moon className="w-3.5 h-3.5 text-amber-600" />
-                            {item.shift2In} - {item.shift2Out} WIB
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-slate-600 max-w-xs truncate">{item.reason}</TableCell>
-                        <TableCell className="text-center">
-                          <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 text-[10px]">
-                            <CheckCircle2 className="w-3 h-3 mr-1 inline text-emerald-600" />
-                            {item.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right pr-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onDeleteManualSchedule && onDeleteManualSchedule(item.id)}
-                            className="h-7 w-7 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
-                            title="Hapus Jadwal Manual"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* 4. CARD PERUBAHAN JADWAL OPERASIONAL MANUAL (SUB-KOMPONEN TERISOLASI) */}
+      <PanelJadwalManual
+        manualSchedules={manualSchedules}
+        onSaveManualSchedule={onSaveManualSchedule}
+        onDeleteManualSchedule={onDeleteManualSchedule}
+        currentWeek={currentWeek}
+      />
 
       {/* 5. CARD INFORMASI STAF GENERAL OFFICE (NON-SHIFT) */}
       <Card className="border-slate-200 shadow-2xs bg-slate-50/70">

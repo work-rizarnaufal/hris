@@ -773,6 +773,14 @@ Menindaklanjuti audit berkala modul **Jadwal & Shift Kerja** (`JadwalShift.jsx`)
    - Dibuat rangkaian pengujian otomatis Feature Test [`JadwalBackendTest.php`](tests/Feature/JadwalBackendTest.php) (5 skenario pengujian: render halaman, update grup individu, bulk update, swap grup sukses, dan swap grup kosong).
    - Seluruh test suite (22 tests, 164 assertions) dan Laravel Pint lolos 100% tanpa catatan.
 
+6. **Dekomposisi & Eliminasi Dead Code `PanelRotasiGrup.jsx` (Turun dari 827 ke 403 Baris)**:
+   - **Ekstraksi Sub-Komponen Modular**: Memisahkan kartu *Perubahan Jadwal Operasional Manual* (form dan riwayat tabel jadwal manual) menjadi sub-komponen terisolasi [`PanelJadwalManual.jsx`](resources/js/Pages/Admin/Jadwal/Partials/PanelJadwalManual.jsx) (~290 baris).
+   - **Pembersihan Import Tak Terpakai**: Menghapus import usang di `PanelRotasiGrup.jsx` (`Plus`, `Trash2`, `Input`, `formatDateDMY`).
+   - **Pembersihan State Redundan**: Mengeliminasi 7 state formulir dari komponen induk (`startDate`, `targetGroup`, `shift1In`, `shift1Out`, `shift2In`, `shift2Out`, `reason`) langsung ke dalam sub-komponen.
+   - **Standarisasi Komponen Atomik**: Mengganti markup raw `<tr><td colSpan={...}>` dengan komponen atomik `<TableEmpty>`.
+   - **Sinkronisasi Teks Alur Masuk**: Menyelaraskan teks jadwal dinas tabel karyawan (Grup A & B) secara dinamis mengikuti siklus minggu aktif (`!isWeekEven`).
+   - **Efisiensi Bundle**: Ukuran *chunk JS bundle* `PanelRotasiGrup` berkurang drastis dari **24.09 kB menjadi 14.86 kB** (turun >38%).
+
 ---
 
 ## 23. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
