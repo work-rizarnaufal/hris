@@ -327,10 +327,14 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
     - [`LaporanKpiCards.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanKpiCards.jsx): 4 kartu metrik evaluasi kehadiran reaktif.
     - [`LaporanAnalyticsGrid.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanAnalyticsGrid.jsx): Visual analytics Recharts per divisi dan panel sorotan Duta Keteladanan / Early Warning.
     - [`LaporanEvaluasiTable.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanEvaluasiTable.jsx): Toolbar pencarian/filter, matriks evaluasi 10 kolom, dan dilengkapi komponen atomik `<TablePagination>` untuk menavigasi 86 baris data.
-- **Pembersihan Import Usang**:
+  - Memecah sub-modul [RaporIndividu.jsx](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx) dari 939 baris menjadi 359 baris (>61% reduksi baris kode) menjadi 3 sub-komponen terisolasi:
+    - [`RaporKpiCards.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporKpiCards.jsx) (~95 baris): 8 Scorecards KPI individu (kehadiran, ketepatan, keterlambatan, izin, sakit, cuti, alpha) yang di-render secara DRY berbasis map array.
+    - [`RaporCalendarGrid.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporCalendarGrid.jsx) (~200 baris): Matriks kalender harian interaktif, kartu rincian tanggal, dan grafik Recharts tren kepatuhan 6 bulan terhubung backend.
+    - [`RaporCoachingLogs.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporCoachingLogs.jsx) (~115 baris): Form penambahan catatan dan buku riwayat pembinaan kedisiplinan HCGA.
+- **Pembersihan Import & Dead Code**:
   - Menghapus 6 import usang di [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) (`Download`, `Search`, `Filter`, `X`, `Info`, `colors`).
-  - Menghapus 2 import usang di [RaporIndividu.jsx](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx) (`TrendingDown`, `Sparkles`), serta mengganti hardcoded NIP malam dan supervisor mock dengan resolusi dinamis.
-- **Dampak Performa**: Ukuran *JS chunk bundle* [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) menyusut drastis dari **31.05 kB menjadi 16.31 kB** (~48% lebih ringan).
+  - Menghapus 2 import usang di [RaporIndividu.jsx](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx) (`TrendingDown`, `Sparkles`), 16 mutasi variabel mati `typeClass`, serta percabangan mati `incident.type.includes('Tepat Waktu')`.
+- **Dampak Performa**: Ukuran *JS chunk bundle* [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) menyusut drastis dari **31.05 kB menjadi 16.31 kB** dan `RaporIndividu` kini terbagi rapi dengan chunk terpisah yang jauh lebih modular.
 
 ---
 
