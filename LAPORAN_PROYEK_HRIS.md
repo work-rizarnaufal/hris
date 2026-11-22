@@ -309,6 +309,17 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 - **Grafik Tren Kedisiplinan 6 Bulan**: `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang.
 - **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**: Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi, dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
 
+### C. Dekomposisi Modular & Sanitasi Total Dead Code
+- **Perampingan Kode**: Memecah file utama [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) dari 1.245 baris menjadi 342 baris (>72% reduksi baris kode) dengan memisahkan dataset dan 3 sub-komponen modular di `Partials/`:
+  - [`evaluationDataset.js`](resources/js/Pages/Admin/Laporan/data/evaluationDataset.js) (~340 baris): Data agregasi evaluasi karyawan dan daftar periode.
+  - [`LaporanKpiCards.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanKpiCards.jsx) (~100 baris): 4 kartu metrik evaluasi kehadiran reaktif.
+  - [`LaporanAnalyticsGrid.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanAnalyticsGrid.jsx) (~170 baris): Visual analytics Recharts per divisi dan panel sorotan Duta Keteladanan / Early Warning.
+  - [`LaporanEvaluasiTable.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanEvaluasiTable.jsx) (~260 baris): Toolbar pencarian/filter dan matriks evaluasi 10 kolom.
+- **Pembersihan Import Usang**:
+  - Menghapus 6 import usang di [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) (`Download`, `Search`, `Filter`, `X`, `Info`, `colors`).
+  - Menghapus 2 import usang di [RaporIndividu.jsx](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx) (`TrendingDown`, `Sparkles`).
+- **Dampak Performa**: Ukuran *JS chunk bundle* [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) menyusut drastis dari **31.05 kB menjadi 16.31 kB** (~48% lebih ringan).
+
 ---
 
 ## 8. Modul Jadwal & Roster Shift Operasional (`JadwalShift.jsx`)
