@@ -1,7 +1,7 @@
 # Graph Report - hris  (2026-11-22)
 
 ## Corpus Check
-- 140 files · ~98,611 words
+- 140 files · ~98,572 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bedcef42`
+- Built from commit: `33d91cb0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -55,16 +55,16 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Card()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardContent()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardDescription()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardTitle()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CatatanKehadiran()` --calls--> `ModalImporFingerprint()`  [EXTRACTED]
+  resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx → resources/js/Pages/Admin/Kehadiran/Partials/ModalImporFingerprint.jsx
+- `Table` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/table.jsx → resources/js/lib/utils.js
+- `TableHeader` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/table.jsx → resources/js/lib/utils.js
+- `TableBody` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/table.jsx → resources/js/lib/utils.js
+- `TableFooter` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/table.jsx → resources/js/lib/utils.js
 
 ## Import Cycles
 - None detected.

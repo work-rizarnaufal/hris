@@ -4,23 +4,10 @@ import * as XLSX from 'xlsx';
 import { getShiftSettings } from '@/services/systemSettings.js';
 import {
   CalendarCheck,
-  Calendar,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   Plus,
-  Users,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-  CalendarX2,
-  Search,
-  Filter,
-  RotateCcw,
   FileSpreadsheet,
   Pencil,
   Trash2,
-  Building,
   MapPin,
   Sparkles,
   Fingerprint,
@@ -28,13 +15,8 @@ import {
 } from 'lucide-react';
 import {
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
   Button,
-  Badge,
-  Input,
   PageHeader,
   Table,
   TableHeader,
@@ -44,19 +26,15 @@ import {
   TableCell,
   TableEmpty,
   Text,
-  TableToolbar,
-  TableSearch,
-  TableFilterGroup,
-  TableSelect,
   TablePagination,
   Toast,
 } from '@/components/ui';
 import ModalFormPresensi from './Partials/ModalFormPresensi.jsx';
 import ModalPresensiMassal from './Partials/ModalPresensiMassal.jsx';
 import ModalImporFingerprint from './Partials/ModalImporFingerprint.jsx';
-
-// Master data fallback kosong
-const MASTER_EMPLOYEES = [];
+import AttendanceDateRibbon from './Partials/AttendanceDateRibbon.jsx';
+import AttendanceKpiCards from './Partials/AttendanceKpiCards.jsx';
+import AttendanceToolbar from './Partials/AttendanceToolbar.jsx';
 
 // Tanggal hari ini standar WIB (YYYY-MM-DD)
 const getTodayDateString = () => {
@@ -70,9 +48,6 @@ const getTodayDateString = () => {
 
 const DEFAULT_DATE = getTodayDateString();
 
-// Data Awal Presensi Kosong
-const INITIAL_ATTENDANCES = [];
-
 export default function CatatanKehadiran({
   dbEmployees = [],
   dbLocations = [],
@@ -81,7 +56,9 @@ export default function CatatanKehadiran({
 }) {
   const defaultDate = useMemo(() => {
     if (dbAttendances && dbAttendances.length > 0) {
-      const dates = dbAttendances.map((a) => (typeof a.date === 'string' ? a.date.slice(0, 10) : new Date(a.date).toISOString().slice(0, 10)));
+      const dates = dbAttendances.map((a) =>
+        typeof a.date === 'string' ? a.date.slice(0, 10) : new Date(a.date).toISOString().slice(0, 10)
+      );
       dates.sort().reverse();
       return dates[0];
     }
@@ -90,59 +67,61 @@ export default function CatatanKehadiran({
 
   const [selectedDate, setSelectedDate] = useState(defaultDate);
 
-  const initialEmployeesList = useMemo(() => {
-    if (dbEmployees && dbEmployees.length > 0) {
-      return dbEmployees.map((emp) => ({
-        id: emp.id,
-        name: emp.name,
-        nip: emp.nip,
-        biometricPin: emp.biometric_pin || emp.biometricPin || '-',
-        role: emp.role || emp.position || '-',
-        division: emp.division || '-',
-        location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
-        location_id: emp.location_id,
-        group: emp.group || emp.shift_group || 'Belum Ditetapkan',
-        scheduleCategory: emp.shift?.name || emp.scheduleCategory || '-',
-        checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : (emp.checkInTime || '-'),
-        checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : (emp.checkOutTime || '-'),
-        status: emp.status || 'Aktif',
-      }));
-    }
-    return [];
+  // Normalisasi data master karyawan
+  const employees = useMemo(() => {
+    if (!dbEmployees || dbEmployees.length === 0) return [];
+    return dbEmployees.map((emp) => ({
+      id: emp.id,
+      name: emp.name,
+      nip: emp.nip,
+      biometricPin: emp.biometric_pin || emp.biometricPin || '-',
+      role: emp.role || emp.position || '-',
+      division: emp.division || '-',
+      location: emp.location?.name || (emp.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+      location_id: emp.location_id,
+      group: emp.group || emp.shift_group || 'Belum Ditetapkan',
+      scheduleCategory: emp.shift?.name || emp.scheduleCategory || '-',
+      checkInTime: emp.shift?.start_time ? emp.shift.start_time.slice(0, 5) : (emp.checkInTime || '-'),
+      checkOutTime: emp.shift?.end_time ? emp.shift.end_time.slice(0, 5) : (emp.checkOutTime || '-'),
+      status: emp.status || 'Aktif',
+    }));
   }, [dbEmployees]);
 
-  const initialAttendancesList = useMemo(() => {
-    if (dbAttendances && dbAttendances.length > 0) {
-      return dbAttendances.map((att) => ({
-        id: att.id,
-        employeeId: att.employee_id,
-        employeeName: att.employee?.name || '-',
-        nip: att.employee?.nip || '-',
-        division: att.employee?.division || '-',
-        role: att.employee?.role || '-',
-        location: att.location?.name || (att.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
-        location_id: att.location_id,
-        group: att.employee?.group || 'Grup A',
-        date: typeof att.date === 'string' ? att.date.slice(0, 10) : new Date(att.date).toISOString().slice(0, 10),
-        shift: att.shift || att.employee?.shift?.name || 'Shift Pagi (08:00 - 17:00)',
-        status: att.status ? (att.status.charAt(0).toUpperCase() + att.status.slice(1).toLowerCase()) : 'Hadir',
-        checkIn: att.check_in_time ? att.check_in_time.slice(0, 5) : '-',
-        checkOut: att.check_out_time ? att.check_out_time.slice(0, 5) : '-',
-        lateMinutes: att.late_minutes || 0,
-        deviation: att.late_minutes > 0 ? `+${att.late_minutes}m` : (att.check_in_time ? 'Tepat Waktu' : '-'),
-        notes: att.notes || '-',
-        method: att.method || 'fingerprint',
-      }));
-    }
-    return [];
+  // Normalisasi data log presensi langsung dari database
+  const attendances = useMemo(() => {
+    if (!dbAttendances || dbAttendances.length === 0) return [];
+    return dbAttendances.map((att) => ({
+      id: att.id,
+      employeeId: att.employee_id,
+      employeeName: att.employee?.name || '-',
+      nip: att.employee?.nip || '-',
+      division: att.employee?.division || '-',
+      role: att.employee?.role || '-',
+      location: att.location?.name || (att.location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka'),
+      location_id: att.location_id,
+      group: att.employee?.group || 'Grup A',
+      date: typeof att.date === 'string' ? att.date.slice(0, 10) : new Date(att.date).toISOString().slice(0, 10),
+      shift: att.shift || att.employee?.shift?.name || 'Shift Pagi (08:00 - 17:00)',
+      status: att.status ? (att.status.charAt(0).toUpperCase() + att.status.slice(1).toLowerCase()) : 'Hadir',
+      checkIn: att.check_in_time ? att.check_in_time.slice(0, 5) : '-',
+      checkOut: att.check_out_time ? att.check_out_time.slice(0, 5) : '-',
+      lateMinutes: att.late_minutes || 0,
+      deviation: att.late_minutes > 0 ? `+${att.late_minutes}m` : (att.check_in_time ? 'Tepat Waktu' : '-'),
+      notes: att.notes || '-',
+      method: att.method || 'fingerprint',
+    }));
   }, [dbAttendances]);
 
-  const [attendances, setAttendances] = useState(initialAttendancesList);
-  const employees = initialEmployeesList;
-
-  useEffect(() => {
-    setAttendances(initialAttendancesList);
-  }, [initialAttendancesList]);
+  // Daftar divisi unik yang ada pada master data karyawan
+  const availableDivisions = useMemo(() => {
+    const set = new Set();
+    employees.forEach((e) => {
+      if (e.division && e.division !== '-' && e.division !== 'Belum Ditetapkan') {
+        set.add(e.division);
+      }
+    });
+    return Array.from(set).sort();
+  }, [employees]);
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
@@ -184,8 +163,7 @@ export default function CatatanKehadiran({
   const handleDateChange = (daysDelta) => {
     const current = new Date(`${selectedDate}T00:00:00Z`);
     current.setUTCDate(current.getUTCDate() + daysDelta);
-    const newDate = current.toISOString().slice(0, 10);
-    setSelectedDate(newDate);
+    setSelectedDate(current.toISOString().slice(0, 10));
   };
 
   const handleResetToToday = () => {
@@ -346,7 +324,7 @@ export default function CatatanKehadiran({
       check_out_time: (r.checkOut && r.checkOut !== '-') ? r.checkOut : (r.check_out_time || null),
       status: r.status ? r.status.toLowerCase() : 'hadir',
       late_minutes: r.lateMinutes ?? r.late_minutes ?? 0,
-      work_duration_hours: (r.checkIn && r.checkOut && r.checkIn !== '-' && r.checkOut !== '-') ? 8.0 : 0,
+      work_duration_hours: (r.checkIn && r.checkOut && r.checkIn !== '-' && r.checkOut !== '-') ? 9.0 : 0,
       location_id: r.location_id || (r.location?.includes('Mariuk') ? 1 : 2),
       anomaly_reason: r.anomalyReason || r.anomaly_reason || null,
     }));
@@ -435,7 +413,7 @@ export default function CatatanKehadiran({
     showAlert('File rekap kehadiran Excel berhasil diunduh.');
   };
 
-  // Helper Helper Badge Status
+  // Helper Badge Status
   const getStatusBadge = (status) => {
     let className = 'status-hadir';
     if (status === 'Terlambat') className = 'status-terlambat';
@@ -500,87 +478,18 @@ export default function CatatanKehadiran({
         </div>
       </PageHeader>
 
-      {/* Date Navigation Ribbon */}
-      <div className="mb-6 bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        {/* Left: Active Day Header & Status Badge */}
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-navy/5 text-navy border border-navy/10 flex items-center justify-center shrink-0">
-            <CalendarDays className="w-5 h-5 text-navy" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="text-base font-bold text-navy tracking-tight">
-                {formattedDateTitle}
-              </h2>
-              {selectedDate === DEFAULT_DATE ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/70">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Hari Operasional Aktif
-                </span>
-              ) : (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                  Arsip Presensi
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Roster 9 Jam: {shiftSettings.shiftPagiName} ({shiftSettings.shiftPagiIn}–{shiftSettings.shiftPagiOut}) & {shiftSettings.shiftMalamName} ({shiftSettings.shiftMalamIn}–{shiftSettings.shiftMalamOut}) · Lokasi Mariuk & Cimalaka
-            </p>
-          </div>
-        </div>
+      {/* Date Navigation Ribbon Component */}
+      <AttendanceDateRibbon
+        selectedDate={selectedDate}
+        defaultDate={DEFAULT_DATE}
+        formattedDateTitle={formattedDateTitle}
+        shiftSettings={shiftSettings}
+        onDateChange={handleDateChange}
+        onResetToday={handleResetToToday}
+        onSelectDate={(newDate) => setSelectedDate(newDate)}
+      />
 
-        {/* Right: Segmented Controller & Date Picker */}
-        <div className="flex items-center gap-2.5 self-start md:self-auto flex-wrap">
-          {/* Segmented Stepper */}
-          <div className="inline-flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200/70">
-            <button
-              type="button"
-              onClick={() => handleDateChange(-1)}
-              className="h-8 px-2.5 rounded-md text-slate-600 hover:text-navy hover:bg-white text-xs font-medium transition-all flex items-center gap-1"
-              title="Hari Sebelumnya"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Kemarin</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResetToToday}
-              className={`h-8 px-3 rounded-md text-xs font-semibold transition-all ${
-                selectedDate === DEFAULT_DATE
-                  ? 'bg-white text-navy shadow-xs border border-slate-200/60'
-                  : 'text-slate-600 hover:text-navy hover:bg-white/60'
-              }`}
-            >
-              Hari Ini
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleDateChange(1)}
-              className="h-8 px-2.5 rounded-md text-slate-600 hover:text-navy hover:bg-white text-xs font-medium transition-all flex items-center gap-1"
-              title="Hari Berikutnya"
-            >
-              <span className="hidden sm:inline">Besok</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Clean Custom Date Input with Icon */}
-          <div className="relative inline-flex items-center">
-            <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
-            <input
-              type="date"
-              aria-label="Pilih tanggal spesifik"
-              value={selectedDate}
-              onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
-              className="h-9 pl-8 pr-3 text-xs font-medium bg-white hover:bg-slate-50/80 border border-slate-200 hover:border-slate-300 rounded-lg text-slate-700 cursor-pointer focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy transition-all"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Notice Mode Site Fingerprint (Validasi GPS Dinonaktifkan) */}
+      {/* Notice Mode Site Fingerprint */}
       <div className="mb-6 px-4 py-3 bg-gradient-to-r from-slate-50 via-indigo-50/25 to-slate-50 border border-slate-200/90 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-indigo-100/80 text-indigo-700 flex items-center justify-center shrink-0">
@@ -588,9 +497,15 @@ export default function CatatanKehadiran({
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-slate-800">Mode Operasional: Presensi Mesin Biometric Fingerprint (Site Mariuk & Cimalaka)</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80">Aktif</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Validasi GPS Dinonaktifkan</span>
+              <span className="text-xs font-bold text-slate-800">
+                Mode Operasional: Presensi Mesin Biometric Fingerprint (Site Mariuk & Cimalaka)
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+                Aktif
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                Validasi GPS Dinonaktifkan
+              </span>
             </div>
             <p className="text-[11px] text-slate-500 mt-0.5">
               Presensi dicatat otomatis dari tarikan log mesin sidik jari atau diinput/dikoreksi manual oleh Admin jika karyawan berhalangan tap.
@@ -608,175 +523,28 @@ export default function CatatanKehadiran({
         </Button>
       </div>
 
-      {/* KPI Cards (5 Cards) */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 mb-6">
-        {/* 1. Total Terjadwal */}
-        <Card className="border border-slate-200/80 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span className="font-medium">Total Jadwal</span>
-              <span className="w-7 h-7 rounded-lg bg-slate-100 text-navy flex items-center justify-center">
-                <Users className="w-3.5 h-3.5" />
-              </span>
-            </div>
-            <strong className="text-2xl font-bold text-navy block tracking-tight">
-              {stats.totalScheduled}
-            </strong>
-            <small className="text-[11px] text-slate-500 font-medium mt-1 block">
-              Tingkat Kehadiran: <span className="text-emerald-700 font-bold">{stats.attendanceRate}%</span>
-            </small>
-          </CardContent>
-        </Card>
-
-        {/* 2. Tepat Waktu */}
-        <Card className="border border-slate-200/80 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span className="font-medium">Tepat Waktu</span>
-              <span className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-              </span>
-            </div>
-            <strong className="text-2xl font-bold text-emerald-800 block tracking-tight">
-              {stats.presentOnTime}
-            </strong>
-            <small className="text-[11px] text-slate-500 font-medium mt-1 block">
-              Check-in sesuai shift
-            </small>
-          </CardContent>
-        </Card>
-
-        {/* 3. Terlambat */}
-        <Card className="border border-slate-200/80 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span className="font-medium">Terlambat</span>
-              <span className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
-                <Clock className="w-3.5 h-3.5" />
-              </span>
-            </div>
-            <strong className="text-2xl font-bold text-amber-800 block tracking-tight">
-              {stats.lateCount}
-            </strong>
-            <small className="text-[11px] text-amber-700 font-medium mt-1 block">
-              Total {stats.totalLateMinutes} menit deviasi
-            </small>
-          </CardContent>
-        </Card>
-
-        {/* 4. Izin / Sakit / Cuti */}
-        <Card className="border border-slate-200/80 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span className="font-medium">Izin / Cuti / Sakit</span>
-              <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center">
-                <CalendarX2 className="w-3.5 h-3.5" />
-              </span>
-            </div>
-            <strong className="text-2xl font-bold text-blue-800 block tracking-tight">
-              {stats.permissionOrLeave}
-            </strong>
-            <small className="text-[11px] text-slate-500 font-medium mt-1 block">
-              Ketidakhadiran resmi
-            </small>
-          </CardContent>
-        </Card>
-
-        {/* 5. Alpha / Belum Presensi */}
-        <Card className="border border-slate-200/80 shadow-sm col-span-2 md:col-span-1">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between text-slate-500 text-xs mb-2">
-              <span className="font-medium">Alpha / Mangkir</span>
-              <span className="w-7 h-7 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center">
-                <AlertTriangle className="w-3.5 h-3.5" />
-              </span>
-            </div>
-            <strong className="text-2xl font-bold text-rose-800 block tracking-tight">
-              {stats.alphaCount}
-            </strong>
-            <small className="text-[11px] text-rose-700 font-medium mt-1 block">
-              {stats.unrecordedCount > 0 ? `${stats.unrecordedCount} belum check-in` : 'Tanpa keterangan'}
-            </small>
-          </CardContent>
-        </Card>
-      </div>
+      {/* KPI Cards Component */}
+      <AttendanceKpiCards stats={stats} />
 
       {/* Main Table Card */}
       <Card className="overflow-hidden border border-slate-200/90 shadow-xs">
-        {/* Toolbar Pencarian & Filter Terstandarisasi */}
-        <TableToolbar>
-          <TableSearch
-            placeholder="Cari berdasarkan nama karyawan, NIP, atau jabatan..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-
-          <TableFilterGroup>
-            {/* Filter Lokasi Kerja */}
-            <TableSelect
-              value={filterLocation}
-              onChange={(e) => setFilterLocation(e.target.value)}
-              title="Filter Lokasi Kerja"
-            >
-              <option value="ALL">Semua Lokasi (Mariuk & Cimalaka)</option>
-              <option value="Lokasi Mariuk">📍 Lokasi Mariuk</option>
-              <option value="Lokasi Cimalaka">📍 Lokasi Cimalaka</option>
-            </TableSelect>
-
-            {/* Filter Status */}
-            <TableSelect
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              title="Filter Status"
-            >
-              <option value="ALL">Semua Status</option>
-              <option value="Hadir">Hadir</option>
-              <option value="Terlambat">Terlambat</option>
-              <option value="Izin">Izin</option>
-              <option value="Sakit">Sakit</option>
-              <option value="Cuti">Cuti</option>
-              <option value="Alpha">Alpha</option>
-            </TableSelect>
-
-            {/* Filter Divisi */}
-            <TableSelect
-              value={filterDivision}
-              onChange={(e) => setFilterDivision(e.target.value)}
-              title="Filter Divisi"
-            >
-              <option value="ALL">Semua Divisi</option>
-              <option value="Operasional & Lapangan">Operasional & Lapangan</option>
-              <option value="Human Capital & GA">Human Capital & GA</option>
-              <option value="Logistik & Gudang">Logistik & Gudang</option>
-              <option value="Security & Safety">Security & Safety</option>
-            </TableSelect>
-
-            {/* Filter Shift Operasional */}
-            <TableSelect
-              value={filterShift}
-              onChange={(e) => setFilterShift(e.target.value)}
-              title="Filter Shift"
-            >
-              <option value="ALL">Semua Shift</option>
-              <option value="Pagi">{shiftSettings.shiftPagiName} ({shiftSettings.shiftPagiIn} - {shiftSettings.shiftPagiOut})</option>
-              <option value="Malam">{shiftSettings.shiftMalamName} ({shiftSettings.shiftMalamIn} - {shiftSettings.shiftMalamOut})</option>
-            </TableSelect>
-
-            {/* Reset Button */}
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleResetFilters}
-                className="h-9 px-2.5 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 gap-1.5"
-                title="Reset seluruh filter"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>Reset</span>
-              </Button>
-            )}
-          </TableFilterGroup>
-        </TableToolbar>
+        {/* Toolbar & Filter Component */}
+        <AttendanceToolbar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          filterLocation={filterLocation}
+          onLocationChange={setFilterLocation}
+          filterStatus={filterStatus}
+          onStatusChange={setFilterStatus}
+          filterDivision={filterDivision}
+          onDivisionChange={setFilterDivision}
+          availableDivisions={availableDivisions}
+          filterShift={filterShift}
+          onShiftChange={setFilterShift}
+          shiftSettings={shiftSettings}
+          hasActiveFilters={hasActiveFilters}
+          onResetFilters={handleResetFilters}
+        />
 
         {/* Tabel Catatan Kehadiran */}
         <CardContent className="p-0">
@@ -1028,16 +796,15 @@ export default function CatatanKehadiran({
         onExecute={handleExecuteMass}
         employees={employees}
         currentDate={selectedDate}
-        existingAttendances={currentDayAttendances}
       />
 
-      {/* Modal Impor / Tarik Log Fingerprint */}
+      {/* Modal Impor Fingerprint */}
       <ModalImporFingerprint
         isOpen={isFingerprintOpen}
         onClose={() => setIsFingerprintOpen(false)}
         onSuccess={handleFingerprintImportSuccess}
         employees={employees}
-        locations={dbLocations}
+        currentDate={selectedDate}
       />
     </>
   );

@@ -1,140 +1,140 @@
 {
-  "_BarChart-Bo2IuNCM.js": {
-    "file": "assets/BarChart-Bo2IuNCM.js",
+  "_BarChart-6u8DQj5W.js": {
+    "file": "assets/BarChart-6u8DQj5W.js",
     "name": "BarChart",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_ModalImporFingerprint-DNGl84DZ.js": {
-    "file": "assets/ModalImporFingerprint-DNGl84DZ.js",
+  "_ModalImporFingerprint-DF0RMsSQ.js": {
+    "file": "assets/ModalImporFingerprint-DF0RMsSQ.js",
     "name": "ModalImporFingerprint",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
       "_xlsx-DTAVMkyz.js",
-      "_modal-Dx2XlEfs.js",
-      "_upload-Cwnx2rhm.js",
-      "_save-On_psYcx.js"
+      "_modal-Bds1vUiT.js",
+      "_upload-BOoWBCoE.js",
+      "_save-7LSTGGGI.js"
     ]
   },
-  "_RaporIndividu--aB3aNlQ.js": {
-    "file": "assets/RaporIndividu--aB3aNlQ.js",
+  "_RaporIndividu-CW464VH7.js": {
+    "file": "assets/RaporIndividu-CW464VH7.js",
     "name": "RaporIndividu",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
       "_xlsx-DTAVMkyz.js",
-      "_rotate-ccw-DC1yzbT4.js",
-      "_building-Ds4_qH2t.js",
-      "_user-check-MNyZLzDG.js",
-      "_calendar-BCB5ec4v.js",
-      "_heart-pulse-Dix44pYJ.js",
-      "_trending-up-DyhtmaJ0.js",
-      "_BarChart-Bo2IuNCM.js",
-      "_plus-a6RKFiq2.js"
+      "_rotate-ccw-CcPqrH9Y.js",
+      "_building-q9ig40bN.js",
+      "_user-check-CxGfyMAR.js",
+      "_calendar-B2xxPWZb.js",
+      "_heart-pulse-CjhfAAzZ.js",
+      "_trending-up-CQvgQfrf.js",
+      "_BarChart-6u8DQj5W.js",
+      "_plus-BlgcTZH2.js"
     ]
   },
-  "_arrow-left-right-CGtZje67.js": {
-    "file": "assets/arrow-left-right-CGtZje67.js",
+  "_arrow-left-right-gJgKBrWH.js": {
+    "file": "assets/arrow-left-right-gJgKBrWH.js",
     "name": "arrow-left-right",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_building-Ds4_qH2t.js": {
-    "file": "assets/building-Ds4_qH2t.js",
+  "_building-q9ig40bN.js": {
+    "file": "assets/building-q9ig40bN.js",
     "name": "building",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_calendar-BCB5ec4v.js": {
-    "file": "assets/calendar-BCB5ec4v.js",
+  "_calendar-B2xxPWZb.js": {
+    "file": "assets/calendar-B2xxPWZb.js",
     "name": "calendar",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_database-UQI9veqf.js": {
-    "file": "assets/database-UQI9veqf.js",
+  "_database-BTAy5KhB.js": {
+    "file": "assets/database-BTAy5KhB.js",
     "name": "database",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_download-CRnkIXim.js": {
-    "file": "assets/download-CRnkIXim.js",
+  "_download-DgQ4W1kW.js": {
+    "file": "assets/download-DgQ4W1kW.js",
     "name": "download",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_file-check-BpqW3A6W.js": {
-    "file": "assets/file-check-BpqW3A6W.js",
+  "_file-check-1XXs376O.js": {
+    "file": "assets/file-check-1XXs376O.js",
     "name": "file-check",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_heart-pulse-Dix44pYJ.js": {
-    "file": "assets/heart-pulse-Dix44pYJ.js",
+  "_heart-pulse-CjhfAAzZ.js": {
+    "file": "assets/heart-pulse-CjhfAAzZ.js",
     "name": "heart-pulse",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_input-CCRjW-V3.js": {
-    "file": "assets/input-CCRjW-V3.js",
+  "_input-C58CBsXj.js": {
+    "file": "assets/input-C58CBsXj.js",
     "name": "input",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_layers-1ULPWwvs.js": {
-    "file": "assets/layers-1ULPWwvs.js",
+  "_layers-kdmJITh_.js": {
+    "file": "assets/layers-kdmJITh_.js",
     "name": "layers",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_lock-DRsEnqLD.js": {
-    "file": "assets/lock-DRsEnqLD.js",
+  "_lock-45k7BMOT.js": {
+    "file": "assets/lock-45k7BMOT.js",
     "name": "lock",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_modal-Dx2XlEfs.js": {
-    "file": "assets/modal-Dx2XlEfs.js",
+  "_modal-Bds1vUiT.js": {
+    "file": "assets/modal-Bds1vUiT.js",
     "name": "modal",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_pencil-ZK_M-L_K.js": {
-    "file": "assets/pencil-ZK_M-L_K.js",
+  "_pencil-Cxt-eJwA.js": {
+    "file": "assets/pencil-Cxt-eJwA.js",
     "name": "pencil",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_plus-a6RKFiq2.js": {
-    "file": "assets/plus-a6RKFiq2.js",
+  "_plus-BlgcTZH2.js": {
+    "file": "assets/plus-BlgcTZH2.js",
     "name": "plus",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_rotate-ccw-DC1yzbT4.js": {
-    "file": "assets/rotate-ccw-DC1yzbT4.js",
+  "_rotate-ccw-CcPqrH9Y.js": {
+    "file": "assets/rotate-ccw-CcPqrH9Y.js",
     "name": "rotate-ccw",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_save-On_psYcx.js": {
-    "file": "assets/save-On_psYcx.js",
+  "_save-7LSTGGGI.js": {
+    "file": "assets/save-7LSTGGGI.js",
     "name": "save",
     "imports": [
       "resources/js/app.jsx"
@@ -144,29 +144,29 @@
     "file": "assets/systemSettings-B21O7BDs.js",
     "name": "systemSettings"
   },
-  "_trash-2-DesW8pz3.js": {
-    "file": "assets/trash-2-DesW8pz3.js",
+  "_trash-2-wxBbv_2b.js": {
+    "file": "assets/trash-2-wxBbv_2b.js",
     "name": "trash-2",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_trending-up-DyhtmaJ0.js": {
-    "file": "assets/trending-up-DyhtmaJ0.js",
+  "_trending-up-CQvgQfrf.js": {
+    "file": "assets/trending-up-CQvgQfrf.js",
     "name": "trending-up",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_upload-Cwnx2rhm.js": {
-    "file": "assets/upload-Cwnx2rhm.js",
+  "_upload-BOoWBCoE.js": {
+    "file": "assets/upload-BOoWBCoE.js",
     "name": "upload",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_user-check-MNyZLzDG.js": {
-    "file": "assets/user-check-MNyZLzDG.js",
+  "_user-check-CxGfyMAR.js": {
+    "file": "assets/user-check-CxGfyMAR.js",
     "name": "user-check",
     "imports": [
       "resources/js/app.jsx"
@@ -182,42 +182,42 @@
     "isEntry": true
   },
   "resources/js/Pages/Admin/Audit/LogAudit.jsx": {
-    "file": "assets/LogAudit-C_idWTS-.js",
+    "file": "assets/LogAudit-ykNkpuef.js",
     "name": "LogAudit",
     "src": "resources/js/Pages/Admin/Audit/LogAudit.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_database-UQI9veqf.js",
-      "_file-check-BpqW3A6W.js",
-      "_lock-DRsEnqLD.js"
+      "_database-BTAy5KhB.js",
+      "_file-check-1XXs376O.js",
+      "_lock-45k7BMOT.js"
     ]
   },
   "resources/js/Pages/Admin/Beranda/Beranda.jsx": {
-    "file": "assets/Beranda-zeoSHPq6.js",
+    "file": "assets/Beranda-B84KHu0-.js",
     "name": "Beranda",
     "src": "resources/js/Pages/Admin/Beranda/Beranda.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_plus-a6RKFiq2.js",
-      "_user-check-MNyZLzDG.js",
-      "_layers-1ULPWwvs.js",
-      "_BarChart-Bo2IuNCM.js"
+      "_plus-BlgcTZH2.js",
+      "_user-check-CxGfyMAR.js",
+      "_layers-kdmJITh_.js",
+      "_BarChart-6u8DQj5W.js"
     ]
   },
   "resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx": {
-    "file": "assets/PengajuanCutiIzin-cUUwxLCN.js",
+    "file": "assets/PengajuanCutiIzin-CjB6neGU.js",
     "name": "PengajuanCutiIzin",
     "src": "resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_heart-pulse-Dix44pYJ.js"
+      "_heart-pulse-CjhfAAzZ.js"
     ]
   },
   "resources/js/Pages/Admin/Jadwal/JadwalShift.jsx": {
-    "file": "assets/JadwalShift-DaOCNo5X.js",
+    "file": "assets/JadwalShift-BY02tUY7.js",
     "name": "JadwalShift",
     "src": "resources/js/Pages/Admin/Jadwal/JadwalShift.jsx",
     "isDynamicEntry": true,
@@ -227,50 +227,50 @@
       "_systemSettings-B21O7BDs.js",
       "resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx",
       "resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx",
-      "_plus-a6RKFiq2.js",
-      "_arrow-left-right-CGtZje67.js",
-      "_rotate-ccw-DC1yzbT4.js",
-      "_pencil-ZK_M-L_K.js",
-      "_trash-2-DesW8pz3.js",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
-      "_save-On_psYcx.js",
-      "_user-check-MNyZLzDG.js",
-      "_building-Ds4_qH2t.js"
+      "_plus-BlgcTZH2.js",
+      "_arrow-left-right-gJgKBrWH.js",
+      "_rotate-ccw-CcPqrH9Y.js",
+      "_pencil-Cxt-eJwA.js",
+      "_trash-2-wxBbv_2b.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
+      "_save-7LSTGGGI.js",
+      "_user-check-CxGfyMAR.js",
+      "_building-q9ig40bN.js"
     ]
   },
   "resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx": {
-    "file": "assets/ModalFormTukarShift-C4VKomYq.js",
+    "file": "assets/ModalFormTukarShift-BL-iIRpW.js",
     "name": "ModalFormTukarShift",
     "src": "resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
       "_systemSettings-B21O7BDs.js",
-      "_arrow-left-right-CGtZje67.js",
-      "_save-On_psYcx.js"
+      "_arrow-left-right-gJgKBrWH.js",
+      "_save-7LSTGGGI.js"
     ]
   },
   "resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx": {
-    "file": "assets/PanelRotasiGrup-Cv7YGn8o.js",
+    "file": "assets/PanelRotasiGrup-C6SS_yEm.js",
     "name": "PanelRotasiGrup",
     "src": "resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
+      "_input-C58CBsXj.js",
       "_systemSettings-B21O7BDs.js",
-      "_arrow-left-right-CGtZje67.js",
-      "_user-check-MNyZLzDG.js",
-      "_plus-a6RKFiq2.js",
-      "_trash-2-DesW8pz3.js",
-      "_building-Ds4_qH2t.js"
+      "_arrow-left-right-gJgKBrWH.js",
+      "_user-check-CxGfyMAR.js",
+      "_plus-BlgcTZH2.js",
+      "_trash-2-wxBbv_2b.js",
+      "_building-q9ig40bN.js"
     ]
   },
   "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx": {
-    "file": "assets/DataKaryawan-GGddLsRI.js",
+    "file": "assets/DataKaryawan-DDKHVeyt.js",
     "name": "DataKaryawan",
     "src": "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx",
     "isDynamicEntry": true,
@@ -280,48 +280,48 @@
       "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx",
       "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx",
       "_systemSettings-B21O7BDs.js",
-      "_upload-Cwnx2rhm.js",
-      "_download-CRnkIXim.js",
-      "_plus-a6RKFiq2.js",
-      "_rotate-ccw-DC1yzbT4.js",
-      "_pencil-ZK_M-L_K.js",
-      "_trash-2-DesW8pz3.js",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
-      "_user-check-MNyZLzDG.js",
-      "_save-On_psYcx.js"
+      "_upload-BOoWBCoE.js",
+      "_download-DgQ4W1kW.js",
+      "_plus-BlgcTZH2.js",
+      "_rotate-ccw-CcPqrH9Y.js",
+      "_pencil-Cxt-eJwA.js",
+      "_trash-2-wxBbv_2b.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
+      "_user-check-CxGfyMAR.js",
+      "_save-7LSTGGGI.js"
     ]
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
-    "file": "assets/ModalFormKaryawan-BPbxGlWv.js",
+    "file": "assets/ModalFormKaryawan-DZx_G3Ec.js",
     "name": "ModalFormKaryawan",
     "src": "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
       "_systemSettings-B21O7BDs.js",
-      "_pencil-ZK_M-L_K.js",
-      "_user-check-MNyZLzDG.js",
-      "_save-On_psYcx.js"
+      "_pencil-Cxt-eJwA.js",
+      "_user-check-CxGfyMAR.js",
+      "_save-7LSTGGGI.js"
     ]
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx": {
-    "file": "assets/ModalImporKaryawan-DnTntX3b.js",
+    "file": "assets/ModalImporKaryawan-BtOI0RlE.js",
     "name": "ModalImporKaryawan",
     "src": "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
       "_xlsx-DTAVMkyz.js",
-      "_modal-Dx2XlEfs.js",
-      "_download-CRnkIXim.js",
-      "_upload-Cwnx2rhm.js"
+      "_modal-Bds1vUiT.js",
+      "_download-DgQ4W1kW.js",
+      "_upload-BOoWBCoE.js"
     ]
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "file": "assets/CatatanKehadiran-CeTELttj.js",
+    "file": "assets/CatatanKehadiran-CkN03jqy.js",
     "name": "CatatanKehadiran",
     "src": "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx",
     "isDynamicEntry": true,
@@ -331,181 +331,213 @@
       "_systemSettings-B21O7BDs.js",
       "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx",
       "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx",
-      "_ModalImporFingerprint-DNGl84DZ.js",
-      "_plus-a6RKFiq2.js",
-      "_calendar-BCB5ec4v.js",
-      "_rotate-ccw-DC1yzbT4.js",
-      "_user-check-MNyZLzDG.js",
-      "_pencil-ZK_M-L_K.js",
-      "_trash-2-DesW8pz3.js",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
-      "_lock-DRsEnqLD.js",
-      "_save-On_psYcx.js",
-      "_upload-Cwnx2rhm.js"
+      "_ModalImporFingerprint-DF0RMsSQ.js",
+      "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceDateRibbon.jsx",
+      "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceKpiCards.jsx",
+      "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceToolbar.jsx",
+      "_plus-BlgcTZH2.js",
+      "_user-check-CxGfyMAR.js",
+      "_pencil-Cxt-eJwA.js",
+      "_trash-2-wxBbv_2b.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
+      "_lock-45k7BMOT.js",
+      "_save-7LSTGGGI.js",
+      "_upload-BOoWBCoE.js",
+      "_calendar-B2xxPWZb.js",
+      "_rotate-ccw-CcPqrH9Y.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceDateRibbon.jsx": {
+    "file": "assets/AttendanceDateRibbon-Bc1jJMqf.js",
+    "name": "AttendanceDateRibbon",
+    "src": "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceDateRibbon.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_calendar-B2xxPWZb.js"
+    ]
+  },
+  "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceKpiCards.jsx": {
+    "file": "assets/AttendanceKpiCards-CuhHU_cr.js",
+    "name": "AttendanceKpiCards",
+    "src": "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceKpiCards.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceToolbar.jsx": {
+    "file": "assets/AttendanceToolbar-BCih6_1s.js",
+    "name": "AttendanceToolbar",
+    "src": "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceToolbar.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_rotate-ccw-CcPqrH9Y.js"
     ]
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
-    "file": "assets/ModalFormPresensi-jckrmyzV.js",
+    "file": "assets/ModalFormPresensi-Djj7Wwxo.js",
     "name": "ModalFormPresensi",
     "src": "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
       "_systemSettings-B21O7BDs.js",
-      "_lock-DRsEnqLD.js",
-      "_save-On_psYcx.js"
+      "_lock-45k7BMOT.js",
+      "_save-7LSTGGGI.js"
     ]
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx": {
-    "file": "assets/ModalPresensiMassal-BnW56OKR.js",
+    "file": "assets/ModalPresensiMassal-DXbj0q9O.js",
     "name": "ModalPresensiMassal",
     "src": "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
       "_systemSettings-B21O7BDs.js"
     ]
   },
   "resources/js/Pages/Admin/Laporan/LaporanRekap.jsx": {
-    "file": "assets/LaporanRekap-C8DvcqUg.js",
+    "file": "assets/LaporanRekap-xr0-v4lE.js",
     "name": "LaporanRekap",
     "src": "resources/js/Pages/Admin/Laporan/LaporanRekap.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
       "_xlsx-DTAVMkyz.js",
-      "_RaporIndividu--aB3aNlQ.js",
-      "_calendar-BCB5ec4v.js",
-      "_building-Ds4_qH2t.js",
-      "_user-check-MNyZLzDG.js",
-      "_trending-up-DyhtmaJ0.js",
-      "_BarChart-Bo2IuNCM.js",
-      "_rotate-ccw-DC1yzbT4.js",
-      "_heart-pulse-Dix44pYJ.js",
-      "_plus-a6RKFiq2.js"
+      "_RaporIndividu-CW464VH7.js",
+      "_calendar-B2xxPWZb.js",
+      "_building-q9ig40bN.js",
+      "_user-check-CxGfyMAR.js",
+      "_trending-up-CQvgQfrf.js",
+      "_BarChart-6u8DQj5W.js",
+      "_rotate-ccw-CcPqrH9Y.js",
+      "_heart-pulse-CjhfAAzZ.js",
+      "_plus-BlgcTZH2.js"
     ]
   },
   "resources/js/Pages/Admin/Lembur/LemburOvertime.jsx": {
-    "file": "assets/LemburOvertime-bmH23lie.js",
+    "file": "assets/LemburOvertime-BfeO1itR.js",
     "name": "LemburOvertime",
     "src": "resources/js/Pages/Admin/Lembur/LemburOvertime.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_file-check-BpqW3A6W.js",
-      "_trending-up-DyhtmaJ0.js"
+      "_file-check-1XXs376O.js",
+      "_trending-up-CQvgQfrf.js"
     ]
   },
   "resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx": {
-    "file": "assets/OrganisasiJabatan-B8uPF3rI.js",
+    "file": "assets/OrganisasiJabatan-w02CkQ39.js",
     "name": "OrganisasiJabatan",
     "src": "resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_building-Ds4_qH2t.js"
+      "_building-q9ig40bN.js"
     ]
   },
   "resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx": {
-    "file": "assets/PenggajianPeriode-CQvlZEp7.js",
+    "file": "assets/PenggajianPeriode-cAzCaa2q.js",
     "name": "PenggajianPeriode",
     "src": "resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_trending-up-DyhtmaJ0.js"
+      "_trending-up-CQvgQfrf.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/ModalEditLokasi.jsx": {
-    "file": "assets/ModalEditLokasi-CLxE6VTp.js",
+    "file": "assets/ModalEditLokasi-C6Gx3D5V.js",
     "name": "ModalEditLokasi",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/ModalEditLokasi.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
-      "_save-On_psYcx.js"
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
+      "_save-7LSTGGGI.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/ModalHariLibur.jsx": {
-    "file": "assets/ModalHariLibur-FRjMY1yo.js",
+    "file": "assets/ModalHariLibur-4r8f3d9U.js",
     "name": "ModalHariLibur",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/ModalHariLibur.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_modal-Dx2XlEfs.js",
-      "_save-On_psYcx.js"
+      "_input-C58CBsXj.js",
+      "_modal-Bds1vUiT.js",
+      "_save-7LSTGGGI.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/TabGeofencingLokasi.jsx": {
-    "file": "assets/TabGeofencingLokasi-CuRvk0rK.js",
+    "file": "assets/TabGeofencingLokasi-iGbJs72O.js",
     "name": "TabGeofencingLokasi",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/TabGeofencingLokasi.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_pencil-ZK_M-L_K.js"
+      "_input-C58CBsXj.js",
+      "_pencil-Cxt-eJwA.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/TabJamKerjaShift.jsx": {
-    "file": "assets/TabJamKerjaShift-BhNWk71G.js",
+    "file": "assets/TabJamKerjaShift-DphGW0i0.js",
     "name": "TabJamKerjaShift",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/TabJamKerjaShift.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_arrow-left-right-CGtZje67.js"
+      "_input-C58CBsXj.js",
+      "_arrow-left-right-gJgKBrWH.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/TabKalenderLibur.jsx": {
-    "file": "assets/TabKalenderLibur-DqDV_c-N.js",
+    "file": "assets/TabKalenderLibur-Bw6dYkN6.js",
     "name": "TabKalenderLibur",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/TabKalenderLibur.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
+      "_input-C58CBsXj.js",
       "_systemSettings-B21O7BDs.js",
-      "_plus-a6RKFiq2.js",
-      "_pencil-ZK_M-L_K.js",
-      "_trash-2-DesW8pz3.js"
+      "_plus-BlgcTZH2.js",
+      "_pencil-Cxt-eJwA.js",
+      "_trash-2-wxBbv_2b.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/TabKebijakanPresensi.jsx": {
-    "file": "assets/TabKebijakanPresensi-CLNvoW3I.js",
+    "file": "assets/TabKebijakanPresensi-Bk1Tkrbw.js",
     "name": "TabKebijakanPresensi",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/TabKebijakanPresensi.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js"
+      "_input-C58CBsXj.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/Partials/TabProfilPemeliharaan.jsx": {
-    "file": "assets/TabProfilPemeliharaan-Dr69SHGb.js",
+    "file": "assets/TabProfilPemeliharaan-D-OsT6Ef.js",
     "name": "TabProfilPemeliharaan",
     "src": "resources/js/Pages/Admin/Pengaturan/Partials/TabProfilPemeliharaan.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_input-CCRjW-V3.js",
-      "_building-Ds4_qH2t.js",
-      "_database-UQI9veqf.js",
-      "_download-CRnkIXim.js"
+      "_input-C58CBsXj.js",
+      "_building-q9ig40bN.js",
+      "_database-BTAy5KhB.js",
+      "_download-DgQ4W1kW.js"
     ]
   },
   "resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx": {
-    "file": "assets/PengaturanSistem-BRdxOJ9o.js",
+    "file": "assets/PengaturanSistem-CAK6ODTC.js",
     "name": "PengaturanSistem",
     "src": "resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx",
     "isDynamicEntry": true,
@@ -519,21 +551,21 @@
       "resources/js/Pages/Admin/Pengaturan/Partials/TabProfilPemeliharaan.jsx",
       "resources/js/Pages/Admin/Pengaturan/Partials/ModalHariLibur.jsx",
       "resources/js/Pages/Admin/Pengaturan/Partials/ModalEditLokasi.jsx",
-      "_rotate-ccw-DC1yzbT4.js",
-      "_save-On_psYcx.js",
-      "_database-UQI9veqf.js",
-      "_arrow-left-right-CGtZje67.js",
-      "_input-CCRjW-V3.js",
-      "_plus-a6RKFiq2.js",
-      "_pencil-ZK_M-L_K.js",
-      "_trash-2-DesW8pz3.js",
-      "_building-Ds4_qH2t.js",
-      "_download-CRnkIXim.js",
-      "_modal-Dx2XlEfs.js"
+      "_rotate-ccw-CcPqrH9Y.js",
+      "_save-7LSTGGGI.js",
+      "_database-BTAy5KhB.js",
+      "_arrow-left-right-gJgKBrWH.js",
+      "_input-C58CBsXj.js",
+      "_plus-BlgcTZH2.js",
+      "_pencil-Cxt-eJwA.js",
+      "_trash-2-wxBbv_2b.js",
+      "_building-q9ig40bN.js",
+      "_download-DgQ4W1kW.js",
+      "_modal-Bds1vUiT.js"
     ]
   },
   "resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx": {
-    "file": "assets/SaldoKuotaCuti-Dw8k6-BR.js",
+    "file": "assets/SaldoKuotaCuti-Qhl-R0Wc.js",
     "name": "SaldoKuotaCuti",
     "src": "resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx",
     "isDynamicEntry": true,
@@ -542,38 +574,38 @@
     ]
   },
   "resources/js/Pages/Admin/SlipGaji/SlipGaji.jsx": {
-    "file": "assets/SlipGaji-VaZ3mBkU.js",
+    "file": "assets/SlipGaji-C5WMhTSR.js",
     "name": "SlipGaji",
     "src": "resources/js/Pages/Admin/SlipGaji/SlipGaji.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_download-CRnkIXim.js"
+      "_download-DgQ4W1kW.js"
     ]
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "file": "assets/Login-Ogfm9zhm.js",
+    "file": "assets/Login-B0Zdv2bN.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_layers-1ULPWwvs.js",
-      "_lock-DRsEnqLD.js"
+      "_layers-kdmJITh_.js",
+      "_lock-45k7BMOT.js"
     ]
   },
   "resources/js/Pages/User/RingkasanPublik.jsx": {
-    "file": "assets/RingkasanPublik-lx1T5Tb1.js",
+    "file": "assets/RingkasanPublik-jUtRDjpw.js",
     "name": "RingkasanPublik",
     "src": "resources/js/Pages/User/RingkasanPublik.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_layers-1ULPWwvs.js"
+      "_layers-kdmJITh_.js"
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-DhhSxkac.js",
+    "file": "assets/app-BJcw7ecU.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -588,11 +620,14 @@
       "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx",
       "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx",
       "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx",
+      "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceDateRibbon.jsx",
+      "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceKpiCards.jsx",
+      "resources/js/Pages/Admin/Kehadiran/Partials/AttendanceToolbar.jsx",
       "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx",
-      "_ModalImporFingerprint-DNGl84DZ.js",
+      "_ModalImporFingerprint-DF0RMsSQ.js",
       "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx",
       "resources/js/Pages/Admin/Laporan/LaporanRekap.jsx",
-      "_RaporIndividu--aB3aNlQ.js",
+      "_RaporIndividu-CW464VH7.js",
       "resources/js/Pages/Admin/Lembur/LemburOvertime.jsx",
       "resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx",
       "resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx",

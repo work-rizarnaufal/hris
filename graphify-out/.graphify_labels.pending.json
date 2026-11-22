@@ -1,6 +1,7 @@
 {
   "0": "@inertiajs/react",
   "3": "HCGA HRIS Enterprise Design System (DESIGN.md)",
+  "4": "App\\Models\\Employee",
   "5": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
   "6": "Employee",
   "7": "Illuminate\\Database\\Schema\\Blueprint",
@@ -10,7 +11,8 @@
   "41": "PengaturanSistem.jsx",
   "42": "App\\Models\\Employee",
   "43": "Illuminate\\Database\\Seeder",
-  "45": "App\\Models\\Employee",
+  "44": "FingerprintAndManualAttendanceTest",
+  "45": "KehadiranController",
   "46": "web.php",
   "47": "sidebar.jsx",
   "48": "Location",
