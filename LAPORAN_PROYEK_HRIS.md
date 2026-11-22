@@ -356,6 +356,18 @@ Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/A
 ### G. Tab 3: Log Pengecualian & Tukar Shift (`exceptions`) & Modal Atomik (`ModalFormTukarShift.jsx`)
 - Rekam pertukaran shift resmi antar-rekan kerja atau penugasan khusus yang disetujui HCGA dengan preset shift operasional 9 jam.
 
+### H. Dekomposisi Modular & Sanitasi Total Dead Code
+- **Perampingan Kode**: Memecah file utama [JadwalShift.jsx](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx) dari 1.202 baris menjadi 631 baris dengan mengekstrak 3 sub-komponen modular di `Partials/`:
+  - [`JadwalKpiCards.jsx`](resources/js/Pages/Admin/Jadwal/Partials/JadwalKpiCards.jsx) (~85 baris): 4 scorecard KPI roster operasional.
+  - [`JadwalRosterTab.jsx`](resources/js/Pages/Admin/Jadwal/Partials/JadwalRosterTab.jsx) (~320 baris): Matriks kalender roster 7 hari, selektor minggu, controller lokasi Mariuk & Cimalaka, filter dinamis, dan paginasi atomik.
+  - [`JadwalExceptionsTab.jsx`](resources/js/Pages/Admin/Jadwal/Partials/JadwalExceptionsTab.jsx) (~115 baris): Tabel log permohonan tukar shift dan penugasan khusus.
+- **Pembersihan Import & State Redundan**:
+  - Menghapus 1 import usang (`Text`) di file utama.
+  - Menghapus 7 import usang di [ModalFormTukarShift.jsx](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx) (`Calendar`, `User`, `FileText`, `MapPin`, `AlertCircle`, `Building`, `RotateCw`).
+  - Menghilangkan *state mirroring* `const [employees, setEmployees] = useState(initialEmployees)` dengan `useMemo` normalisasi langsung.
+  - Mengganti opsi divisi hardcoded dengan `availableDivisions` dinamis dari master karyawan.
+- **Dampak Performa**: Ukuran *JS chunk bundle* berkurang dari **29.22 kB menjadi 13.45 kB** (>53% lebih ringan).
+
 ---
 
 ## 9. Modul Pengaturan Sistem & Kebijakan HR (`PengaturanSistem.jsx`)
