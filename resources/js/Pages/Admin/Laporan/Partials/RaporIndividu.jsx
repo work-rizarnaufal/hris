@@ -85,66 +85,48 @@ function generateCalendarDays(employee, selectedPeriod) {
         ? '20:00 - 05:00 WIB (Shift Malam 9 Jam)'
         : '08:00 - 17:00 WIB (Shift Pagi 9 Jam)'
       : 'Libur Pasca-Dinas (Rotasi 24/7)';
-    let typeClass = isWorkingRoster ? 'status-hadir' : 'status-libur';
 
     if (realAtt) {
       status = realAtt.status;
       if (realAtt.status === 'Hadir') {
         detail = `Masuk: ${realAtt.check_in_time || '-'} • Pulang: ${realAtt.check_out_time || '-'} (Tepat Waktu)`;
-        typeClass = 'status-hadir';
       } else if (realAtt.status === 'Terlambat') {
         detail = `Masuk: ${realAtt.check_in_time || '-'} (Terlambat ${realAtt.late_minutes} mnt) • Pulang: ${realAtt.check_out_time || '-'}`;
-        typeClass = 'status-terlambat';
       } else if (realAtt.status === 'Alpha' || realAtt.status === 'Alpa') {
         detail = realAtt.notes || 'Tidak hadir tanpa keterangan (Alpha)';
-        typeClass = 'status-alpha';
       } else if (realAtt.status === 'Izin') {
         detail = realAtt.notes || 'Izin dinas/pribadi resmi disetujui';
-        typeClass = 'status-izin';
       } else if (realAtt.status === 'Sakit') {
         detail = realAtt.notes || 'Sakit dengan surat keterangan dokter';
-        typeClass = 'status-sakit';
       } else if (realAtt.status === 'Cuti') {
         detail = realAtt.notes || 'Cuti tahunan resmi disetujui';
-        typeClass = 'status-cuti';
       }
     } else if (incident) {
       if (incident.type.includes('Terlambat')) {
         status = 'Terlambat';
         detail = `${isMalam ? 'Shift Malam 20:00' : 'Shift Pagi 08:00'} - ${incident.detail}`;
-        typeClass = 'status-terlambat';
       } else if (incident.type.includes('Alpa') || incident.type.includes('Alpha')) {
         status = 'Alpha';
         detail = incident.detail;
-        typeClass = 'status-alpha';
       } else if (incident.type.includes('Cuti')) {
         status = 'Cuti';
         detail = incident.detail;
-        typeClass = 'status-cuti';
       } else if (incident.type.includes('Sakit')) {
         status = 'Sakit';
         detail = incident.detail;
-        typeClass = 'status-sakit';
       } else if (incident.type.includes('Izin')) {
         status = 'Izin';
         detail = incident.detail;
-        typeClass = 'status-izin';
-      } else if (incident.type.includes('Tepat Waktu')) {
-        status = 'Hadir';
-        detail = incident.detail;
-        typeClass = 'status-hadir';
       }
     } else if (isWorkingRoster) {
       if (employee.presentDays > 0) {
         status = 'Hadir';
         detail = isMalam ? '20:00 - 05:00 WIB (Shift Malam 9 Jam)' : '08:00 - 17:00 WIB (Shift Pagi 9 Jam)';
-        typeClass = 'status-hadir';
       } else {
         status = dateObj > today ? 'Terjadwal' : 'Libur';
         detail = dateObj > today
           ? (isMalam ? 'Jadwal Shift Malam (20:00 - 05:00 WIB)' : 'Jadwal Shift Pagi (08:00 - 17:00 WIB)')
           : 'Libur Pasca-Dinas / Belum Ada Log';
-        typeClass = dateObj > today ? 'status-terjadwal' : 'status-libur';
       }
     }
 
@@ -155,7 +137,6 @@ function generateCalendarDays(employee, selectedPeriod) {
       dayName: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][dayOfWeek],
       status,
       detail,
-      typeClass,
     });
   }
 
@@ -228,18 +209,10 @@ export default function RaporIndividu({
 
   // Riwayat skor 6 bulan terhubung database backend
   const historyData = useMemo(() => {
-    if (employee.monthlyHistory && employee.monthlyHistory.length > 0) {
-      return employee.monthlyHistory;
-    }
-    return [
-      { month: 'Jun', score: Math.min(100, employee.score) },
-      { month: 'Jul', score: Math.min(100, employee.score) },
-      { month: 'Agt', score: Math.max(60, employee.score) },
-      { month: 'Sep', score: Math.min(100, employee.score) },
-      { month: 'Okt', score: Math.max(60, employee.score) },
-      { month: 'Nov', score: employee.score },
-    ];
-  }, [employee.monthlyHistory, employee.score]);
+    return employee.monthlyHistory && employee.monthlyHistory.length > 0
+      ? employee.monthlyHistory
+      : [];
+  }, [employee.monthlyHistory]);
 
   // Tambah Catatan Pembinaan Baru
   const handleAddCoachingLog = (e) => {
@@ -856,7 +829,7 @@ export default function RaporIndividu({
               </ResponsiveContainer>
             </div>
             <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-[11px] text-slate-600 mt-2">
-              Rata-rata semester: <strong>{(historyData.reduce((a, b) => a + b.score, 0) / 6).toFixed(1)}%</strong>
+              Rata-rata semester: <strong>{historyData.length > 0 ? (historyData.reduce((a, b) => a + b.score, 0) / historyData.length).toFixed(1) : 0}%</strong>
             </div>
           </CardContent>
         </Card>
