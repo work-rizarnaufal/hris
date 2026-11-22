@@ -29,6 +29,8 @@ class LaporanBackendTest extends TestCase
             ->where('evaluations.0.name', fn ($name) => ! empty($name))
             ->where('evaluations.0.workDays', 22)
             ->where('evaluations.0.score', fn ($score) => $score >= 0 && $score <= 100)
+            ->has('evaluations.0.dailyAttendances')
+            ->has('evaluations.0.monthlyHistory', 6)
         );
     }
 
@@ -71,6 +73,8 @@ class LaporanBackendTest extends TestCase
                     $this->assertEquals(2, $target['presentDays']);
                     $this->assertEquals(1, $target['lateCount']);
                     $this->assertEquals(30, $target['totalLateMinutes']);
+                    $this->assertCount(2, $target['dailyAttendances']);
+                    $this->assertCount(6, $target['monthlyHistory']);
 
                     return true;
                 });

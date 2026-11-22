@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import {
   UserCheck,
@@ -41,11 +41,18 @@ import {
   Toast,
 } from '@/components/ui';
 
-// Helper membuat 30 hari kalender November 2026 berdasarkan data insiden karyawan dan pola roster operasional
-function generateCalendarDays(employee) {
+// Helper membuat kalender harian dinamis berdasarkan periode, data presensi riil database, dan pola roster operasional
+function generateCalendarDays(employee, selectedPeriod) {
   const days = [];
-  const daysInMonth = 30; // November 2026
+  const [yearStr, monthStr] = (selectedPeriod || '2026-11').split('-');
+  const year = parseInt(yearStr, 10) || 2026;
+  const month = parseInt(monthStr, 10) || 11; // 1-indexed
+
+  // Hitung jumlah hari aktual dalam bulan terpilih
+  const daysInMonth = new Date(year, month, 0).getDate();
   const incidents = employee.incidents || [];
+  const dailyAttendances = employee.dailyAttendances || [];
+
   const isMalam =
     employee.shiftCode === 'MALAM' ||
     employee.baseShift?.toLowerCase().includes('malam') ||
@@ -53,16 +60,24 @@ function generateCalendarDays(employee) {
   const isGroupA = employee.group === 'Grup A';
   const isGroupB = employee.group === 'Grup B';
 
+  const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const monthShort = monthNamesShort[month - 1] || 'Nov';
+  const today = new Date();
+
   for (let d = 1; d <= daysInMonth; d++) {
     const dayStr = d < 10 ? `0${d}` : `${d}`;
-    const dateFormatted = `${dayStr} Nov 2026`;
-    const dateObj = new Date(2026, 10, d);
+    const dateFormatted = `${dayStr} ${monthShort} ${year}`;
+    const dateIso = `${year}-${String(month).padStart(2, '0')}-${dayStr}`;
+    const dateObj = new Date(year, month - 1, d);
     const dayOfWeek = dateObj.getDay(); // 0 = Minggu, 6 = Sabtu
 
     // Pola 24/7 Rolling: Grup A berdinas tanggal ganjil (1, 3, 5, ...), Grup B tanggal genap (2, 4, 6, ...)
     const isWorkingRoster = isGroupA ? d % 2 === 1 : isGroupB ? d % 2 === 0 : dayOfWeek !== 0 && dayOfWeek !== 6;
 
-    const incident = incidents.find((inc) => inc.date && inc.date.includes(`${dayStr} Nov`));
+    // 1. Cek data presensi riil dari tabel database
+    const realAtt = dailyAttendances.find((a) => a.date === dateIso);
+    // 2. Cek riwayat insiden
+    const incident = incidents.find((inc) => inc.date && inc.date.includes(`${dayStr} ${monthShort}`));
 
     let status = isWorkingRoster ? 'Hadir' : 'Libur';
     let detail = isWorkingRoster
@@ -72,7 +87,28 @@ function generateCalendarDays(employee) {
       : 'Libur Pasca-Dinas (Rotasi 24/7)';
     let typeClass = isWorkingRoster ? 'status-hadir' : 'status-libur';
 
-    if (incident) {
+    if (realAtt) {
+      status = realAtt.status;
+      if (realAtt.status === 'Hadir') {
+        detail = `Masuk: ${realAtt.check_in_time || '-'} • Pulang: ${realAtt.check_out_time || '-'} (Tepat Waktu)`;
+        typeClass = 'status-hadir';
+      } else if (realAtt.status === 'Terlambat') {
+        detail = `Masuk: ${realAtt.check_in_time || '-'} (Terlambat ${realAtt.late_minutes} mnt) • Pulang: ${realAtt.check_out_time || '-'}`;
+        typeClass = 'status-terlambat';
+      } else if (realAtt.status === 'Alpha' || realAtt.status === 'Alpa') {
+        detail = realAtt.notes || 'Tidak hadir tanpa keterangan (Alpha)';
+        typeClass = 'status-alpha';
+      } else if (realAtt.status === 'Izin') {
+        detail = realAtt.notes || 'Izin dinas/pribadi resmi disetujui';
+        typeClass = 'status-izin';
+      } else if (realAtt.status === 'Sakit') {
+        detail = realAtt.notes || 'Sakit dengan surat keterangan dokter';
+        typeClass = 'status-sakit';
+      } else if (realAtt.status === 'Cuti') {
+        detail = realAtt.notes || 'Cuti tahunan resmi disetujui';
+        typeClass = 'status-cuti';
+      }
+    } else if (incident) {
       if (incident.type.includes('Terlambat')) {
         status = 'Terlambat';
         detail = `${isMalam ? 'Shift Malam 20:00' : 'Shift Pagi 08:00'} - ${incident.detail}`;
@@ -98,10 +134,23 @@ function generateCalendarDays(employee) {
         detail = incident.detail;
         typeClass = 'status-hadir';
       }
+    } else if (isWorkingRoster) {
+      if (employee.presentDays > 0) {
+        status = 'Hadir';
+        detail = isMalam ? '20:00 - 05:00 WIB (Shift Malam 9 Jam)' : '08:00 - 17:00 WIB (Shift Pagi 9 Jam)';
+        typeClass = 'status-hadir';
+      } else {
+        status = dateObj > today ? 'Terjadwal' : 'Libur';
+        detail = dateObj > today
+          ? (isMalam ? 'Jadwal Shift Malam (20:00 - 05:00 WIB)' : 'Jadwal Shift Pagi (08:00 - 17:00 WIB)')
+          : 'Libur Pasca-Dinas / Belum Ada Log';
+        typeClass = dateObj > today ? 'status-terjadwal' : 'status-libur';
+      }
     }
 
     days.push({
       day: d,
+      dateIso,
       dateFormatted,
       dayName: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][dayOfWeek],
       status,
@@ -125,40 +174,72 @@ export default function RaporIndividu({
   const [newNoteType, setNewNoteType] = useState('Konseling Rutin');
   const [alertInfo, setAlertInfo] = useState(null);
 
-  // State lokal untuk catatan pembinaan agar interaktif
-  const [coachingLogs, setCoachingLogs] = useState(() => [
-    {
-      id: 1,
-      date: '02 Nov 2026',
-      type: employee.status === 'Peringatan / SP' ? 'Surat Peringatan (SP-1)' : 'Konseling Supervisor',
-      officer: 'Tim Human Capital & GA',
-      note: employee.actionRecommendation,
-      status: employee.status === 'Peringatan / SP' ? 'Aktif (Masa Berlaku 6 Bulan)' : 'Selesai',
-    },
-    {
-      id: 2,
-      date: '24 Okt 2026',
-      type: 'Teguran Lisan',
-      officer: 'Supervisor Divisi',
-      note: 'Evaluasi kesiapan shift dan pemenuhan APD di area kerja.',
-      status: 'Selesai',
-    },
-  ]);
+  // Parsing periode dinamis
+  const [yearStr, monthStr] = (selectedPeriod || '2026-11').split('-');
+  const year = parseInt(yearStr, 10) || 2026;
+  const month = parseInt(monthStr, 10) || 11;
+  const monthNamesLong = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+  ];
+  const currentMonthLong = monthNamesLong[month - 1] || 'November';
+
+  // State lokal catatan pembinaan tersinkronisasi per karyawan aktif
+  const [coachingLogs, setCoachingLogs] = useState([]);
+
+  useEffect(() => {
+    setSelectedDay(null);
+    const initialLogs = [];
+
+    if (employee.status === 'Peringatan / SP') {
+      initialLogs.push({
+        id: 1,
+        date: `02 ${currentMonthLong.slice(0, 3)} ${year}`,
+        type: 'Surat Peringatan (SP-1)',
+        officer: 'Tim Human Capital & GA',
+        note: employee.actionRecommendation || 'Penerbitan SP-1 terkait ketidakhadiran berulang.',
+        status: 'Aktif (Masa Berlaku 6 Bulan)',
+      });
+    } else if (employee.status === 'Perlu Pembinaan') {
+      initialLogs.push({
+        id: 1,
+        date: `05 ${currentMonthLong.slice(0, 3)} ${year}`,
+        type: 'Konseling Supervisor',
+        officer: 'Tim Human Capital & GA',
+        note: employee.actionRecommendation || 'Bimbingan kedisiplinan dan evaluasi kesiapan shift kerja.',
+        status: 'Dalam Pengawasan',
+      });
+    } else {
+      initialLogs.push({
+        id: 1,
+        date: `01 ${currentMonthLong.slice(0, 3)} ${year}`,
+        type: 'Apresiasi Kedisiplinan',
+        officer: 'Tim Human Capital & GA',
+        note: employee.actionRecommendation || 'Rekam jejak kehadiran sangat baik, pertahankan konsistensi.',
+        status: 'Selesai',
+      });
+    }
+
+    setCoachingLogs(initialLogs);
+  }, [employee.id, employee.status, employee.actionRecommendation, currentMonthLong, year]);
 
   // Generate kalender kehadiran untuk karyawan aktif
-  const calendarDays = useMemo(() => generateCalendarDays(employee), [employee]);
+  const calendarDays = useMemo(() => generateCalendarDays(employee, selectedPeriod), [employee, selectedPeriod]);
 
-  // Hitung riwayat 6 bulan
+  // Riwayat skor 6 bulan terhubung database backend
   const historyData = useMemo(() => {
-    return employee.monthlyHistory || [
-      { month: 'Jun', score: Math.min(100, employee.score + 4) },
-      { month: 'Jul', score: Math.min(100, employee.score + 2) },
-      { month: 'Agt', score: Math.max(60, employee.score - 3) },
-      { month: 'Sep', score: Math.min(100, employee.score + 1) },
-      { month: 'Okt', score: Math.max(60, employee.score - 2) },
+    if (employee.monthlyHistory && employee.monthlyHistory.length > 0) {
+      return employee.monthlyHistory;
+    }
+    return [
+      { month: 'Jun', score: Math.min(100, employee.score) },
+      { month: 'Jul', score: Math.min(100, employee.score) },
+      { month: 'Agt', score: Math.max(60, employee.score) },
+      { month: 'Sep', score: Math.min(100, employee.score) },
+      { month: 'Okt', score: Math.max(60, employee.score) },
       { month: 'Nov', score: employee.score },
     ];
-  }, [employee]);
+  }, [employee.monthlyHistory, employee.score]);
 
   // Tambah Catatan Pembinaan Baru
   const handleAddCoachingLog = (e) => {
@@ -231,7 +312,7 @@ export default function RaporIndividu({
     wsCalendar['!cols'] = [{ wch: 15 }, { wch: 8 }, { wch: 16 }, { wch: 40 }];
 
     XLSX.utils.book_append_sheet(workbook, wsProfile, 'Ringkasan Rapor');
-    XLSX.utils.book_append_sheet(workbook, wsCalendar, 'Log Presensi 30 Hari');
+    XLSX.utils.book_append_sheet(workbook, wsCalendar, 'Log Presensi Harian');
 
     XLSX.writeFile(workbook, `Rapor_Disiplin_${employee.nip}_${selectedPeriod}.xlsx`);
   };
@@ -602,7 +683,7 @@ export default function RaporIndividu({
               <div>
                 <CardTitle className="text-sm font-bold text-navy flex items-center gap-2">
                   <CalendarCheck className="w-4 h-4 text-[#c4a266]" />
-                  Matriks Presensi 30 Hari (November 2026)
+                  Matriks Presensi {calendarDays.length} Hari ({currentMonthLong} {year})
                 </CardTitle>
                 <CardDescription className="text-xs">
                   Klik tanggal untuk melihat catatan absensi spesifik pada hari tersebut
@@ -637,7 +718,7 @@ export default function RaporIndividu({
           </CardHeader>
 
           <CardContent className="p-4 sm:p-5">
-            {/* Grid 30 Hari */}
+            {/* Grid Hari */}
             <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2">
               {calendarDays.map((dayItem) => {
                 const isSelected = selectedDay?.day === dayItem.day;
@@ -659,6 +740,9 @@ export default function RaporIndividu({
                 } else if (dayItem.status === 'Cuti') {
                   bgStyle = 'bg-teal-50 border-teal-300 text-teal-900';
                   dotStyle = 'bg-teal-500';
+                } else if (dayItem.status === 'Terjadwal') {
+                  bgStyle = 'bg-sky-50/70 border-sky-200 text-sky-800';
+                  dotStyle = 'bg-sky-400';
                 } else if (dayItem.status === 'Libur') {
                   bgStyle = 'bg-slate-50 border-slate-200 text-slate-400';
                   dotStyle = 'bg-slate-300';
@@ -729,7 +813,7 @@ export default function RaporIndividu({
               </Badge>
             </CardTitle>
             <CardDescription className="text-xs">
-              Histori skor kepatuhan kehadiran (Jun - Nov 2026)
+              Histori skor kepatuhan kehadiran ({historyData[0]?.month || 'Jun'} - {historyData[historyData.length - 1]?.month || 'Nov'} {year})
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-2">

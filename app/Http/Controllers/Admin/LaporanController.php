@@ -28,14 +28,19 @@ class LaporanController extends Controller
         $locations = Location::where('status', 'Aktif')->get();
 
         // Rentang tanggal bulan pada periode yang dipilih
-        $startOfMonth = Carbon::parse($period.'-01')->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::parse($period.'-01')->endOfMonth()->toDateString();
+        $periodDate = Carbon::parse($period.'-01');
+        $startOfMonth = $periodDate->copy()->startOfMonth()->toDateString();
+        $endOfMonth = $periodDate->copy()->endOfMonth()->toDateString();
 
-        $attendances = Attendance::with(['employee', 'location'])
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
+        // Rentang 6 bulan untuk tren histori performa individu
+        $sixMonthsAgo = $periodDate->copy()->subMonths(5)->startOfMonth()->toDateString();
+        $sixMonthsAttendances = Attendance::with(['employee', 'location'])
+            ->whereBetween('date', [$sixMonthsAgo, $endOfMonth])
             ->get();
 
-        $evaluations = $employees->map(function ($emp) use ($attendances) {
+        $attendances = $sixMonthsAttendances->filter(fn ($a) => $a->date >= $startOfMonth && $a->date <= $endOfMonth);
+
+        $evaluations = $employees->map(function ($emp) use ($attendances, $sixMonthsAttendances, $periodDate) {
             $empAttendances = $attendances->where('employee_id', $emp->id);
 
             $workDays = 22; // Standar 22 hari kerja efektif per bulan
@@ -81,6 +86,43 @@ class LaporanController extends Controller
                 ->values()
                 ->toArray();
 
+            // Catatan presensi harian di bulan berjalan
+            $dailyAttendances = $empAttendances->map(fn ($a) => [
+                'date' => $a->date,
+                'status' => $a->status,
+                'check_in_time' => $a->check_in_time ? substr($a->check_in_time, 0, 5) : null,
+                'check_out_time' => $a->check_out_time ? substr($a->check_out_time, 0, 5) : null,
+                'late_minutes' => (int) $a->late_minutes,
+                'notes' => $a->notes,
+            ])->values()->toArray();
+
+            // Hitung tren riwayat 6 bulan riil
+            $monthlyHistory = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $m = $periodDate->copy()->subMonths($i);
+                $mKey = $m->format('Y-m');
+                $mLabel = $m->locale('id')->isoFormat('MMM');
+                $mStart = $m->copy()->startOfMonth()->toDateString();
+                $mEnd = $m->copy()->endOfMonth()->toDateString();
+
+                $mEmpAtt = $sixMonthsAttendances
+                    ->where('employee_id', $emp->id)
+                    ->whereBetween('date', [$mStart, $mEnd]);
+
+                $mLate = $mEmpAtt->where('status', 'Terlambat')->count();
+                $mLateMinutes = (int) $mEmpAtt->where('status', 'Terlambat')->sum('late_minutes');
+                $mAlpa = $mEmpAtt->where('status', 'Alpha')->count();
+
+                $mScoreDeduction = ($mLate * 2) + ($mAlpa * 15) + (int) floor($mLateMinutes / 15);
+                $mScore = max(50, 100 - $mScoreDeduction);
+
+                $monthlyHistory[] = [
+                    'month' => $mLabel,
+                    'period' => $mKey,
+                    'score' => $mScore,
+                ];
+            }
+
             $locationName = $emp->location?->name
                 ?? ($emp->location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka');
 
@@ -108,6 +150,8 @@ class LaporanController extends Controller
                 'status' => $status,
                 'actionRecommendation' => $actionRecommendation,
                 'incidents' => $incidents,
+                'dailyAttendances' => $dailyAttendances,
+                'monthlyHistory' => $monthlyHistory,
             ];
         });
 

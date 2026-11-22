@@ -312,11 +312,12 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
   - Profil korporat lengkap dengan avatar inisial, NIP font-mono, badge lokasi kerja (Mariuk/Cimalaka), badge kelompok regu (Grup A/B), dan badge shift operasional (Pagi/Malam).
   - Skor kedisiplinan (0–100%) dan kotak rekomendasi resmi tindakan manajemen HCGA.
 - **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha.
-- **Kalender Visual Presensi 30 Hari (Heatmap Grid 24/7)**:
-  - Kotak visual per tanggal (1 s/d 30) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu).
+- **Kalender Visual Presensi Harian Dinamis (Heatmap Grid 24/7)**:
+  - Kotak visual per tanggal (1 s/d 28/30/31 hari sesuai bulan aktif) berkode warna interaktif: Hadir (Hijau), Terlambat (Kuning), Izin (Biru), Sakit (Ungu), Cuti (Teal), Alpha (Merah), Libur (Abu-abu), Terjadwal (Biru Muda).
+  - Terkoneksi ke `dailyAttendances` riil database SQLite, menampilkan waktu tap masuk/pulang serta toleransi keterlambatan.
   - Selaras dengan pola dinas operasional (Shift Pagi `08:00–17:00` / Shift Malam `20:00–05:00`) dan rotasi selang-seling Grup A & B.
-- **Grafik Tren Kedisiplinan 6 Bulan**: `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang.
-- **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**: Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi, dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
+- **Grafik Tren Kedisiplinan 6 Bulan Terhubung Database**: `BarChart` Recharts menampilkan histori riil skor kedisiplinan 6 bulan ke belakang yang dihitung dinamis dari log presensi database via `LaporanController.php`.
+- **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log) Reaktif**: Daftar riwayat pembinaan tersinkronisasi otomatis dengan profil karyawan aktif (apresiasi bagi karyawan teladan, bimbingan bagi yang perlu pembinaan, dan SP-1 bagi pelanggaran berulang), dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
 
 ### D. Dekomposisi Modular, Sinkronisasi Riil, & Sanitasi Total Dead Code
 - **Perampingan Kode & Eliminasi Dummy**:
