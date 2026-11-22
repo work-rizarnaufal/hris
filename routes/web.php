@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BerandaController;
 use App\Http\Controllers\Admin\JadwalController;
 use App\Http\Controllers\Admin\KaryawanController;
 use App\Http\Controllers\Admin\KehadiranController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -69,9 +70,7 @@ Route::get('/slip-gaji', function () {
     return Inertia::render('Admin/SlipGaji/SlipGaji');
 })->name('admin.slip-gaji');
 
-Route::get('/laporan', function () {
-    return Inertia::render('Admin/Laporan/LaporanRekap');
-})->name('admin.laporan');
+Route::get('/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
 
 Route::get('/audit', function () {
     return Inertia::render('Admin/Audit/LogAudit');

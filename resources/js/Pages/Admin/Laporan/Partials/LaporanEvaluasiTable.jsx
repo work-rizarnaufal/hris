@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { UserCheck, RotateCcw, Eye } from 'lucide-react';
 import {
   Card,
@@ -19,6 +19,7 @@ import {
   TableSearch,
   TableFilterGroup,
   TableSelect,
+  TablePagination,
 } from '@/components/ui';
 import { renderStatusBadge } from './LaporanAnalyticsGrid.jsx';
 
@@ -38,7 +39,18 @@ export default function LaporanEvaluasiTable({
   hasActiveFilters = false,
   selectedPeriod = '',
   onOpenRapor,
+  currentPage = 1,
+  perPage = 25,
+  totalPages = 1,
+  onPageChange,
+  onPerPageChange,
 }) {
+  const paginatedData = useMemo(() => {
+    if (!onPageChange) return filteredData;
+    const start = (currentPage - 1) * perPage;
+    return filteredData.slice(start, start + perPage);
+  }, [filteredData, currentPage, perPage, onPageChange]);
+
   return (
     <Card className="border-slate-200 shadow-2xs">
       <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -138,12 +150,13 @@ export default function LaporanEvaluasiTable({
             {filteredData.length === 0 ? (
               <TableEmpty colSpan={10} message="Tidak ada data evaluasi karyawan yang cocok dengan kriteria filter." />
             ) : (
-              filteredData.map((emp, index) => {
-                const attendancePct = ((emp.presentDays / emp.workDays) * 100).toFixed(0);
+              paginatedData.map((emp, index) => {
+                const globalIndex = onPageChange ? (currentPage - 1) * perPage + index + 1 : index + 1;
+                const attendancePct = emp.workDays > 0 ? ((emp.presentDays / emp.workDays) * 100).toFixed(0) : 0;
                 return (
                   <TableRow key={emp.id} className="hover:bg-slate-50/70 transition-colors">
                     <TableCell className="text-center font-medium text-slate-500 text-xs">
-                      {index + 1}
+                      {globalIndex}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2.5">
@@ -280,10 +293,22 @@ export default function LaporanEvaluasiTable({
           </TableBody>
         </Table>
 
+        {/* Atomic Table Pagination */}
+        {onPageChange && (
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredData.length}
+            itemsPerPage={perPage}
+            onPageChange={onPageChange}
+            onItemsPerPageChange={onPerPageChange}
+          />
+        )}
+
         {/* Footer Table Info */}
         <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
           <div>
-            Menampilkan <strong>{filteredData.length}</strong> dari total <strong>{totalEmployees}</strong> karyawan pada periode {selectedPeriod}
+            Menampilkan <strong>{paginatedData.length}</strong> dari total <strong>{filteredData.length}</strong> karyawan tersaring ({totalEmployees} personil total)
           </div>
           <div className="text-[11px] text-slate-400">
             Pembaruan terakhir: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}

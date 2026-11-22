@@ -48,8 +48,8 @@ function generateCalendarDays(employee) {
   const incidents = employee.incidents || [];
   const isMalam =
     employee.shiftCode === 'MALAM' ||
-    employee.role?.toLowerCase().includes('malam') ||
-    ['HC-0105', 'HC-0109', 'HC-0110', 'HC-0112'].includes(employee.nip);
+    employee.baseShift?.toLowerCase().includes('malam') ||
+    employee.role?.toLowerCase().includes('malam');
   const isGroupA = employee.group === 'Grup A';
   const isGroupB = employee.group === 'Grup B';
 
@@ -131,7 +131,7 @@ export default function RaporIndividu({
       id: 1,
       date: '02 Nov 2026',
       type: employee.status === 'Peringatan / SP' ? 'Surat Peringatan (SP-1)' : 'Konseling Supervisor',
-      officer: 'Siti Rahmawati (HCGA)',
+      officer: 'Tim Human Capital & GA',
       note: employee.actionRecommendation,
       status: employee.status === 'Peringatan / SP' ? 'Aktif (Masa Berlaku 6 Bulan)' : 'Selesai',
     },

@@ -272,35 +272,44 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
 
 ## 7. Modul Laporan & Rapor Evaluasi Kehadiran (`LaporanRekap.jsx`)
 
-Lokasi: [`resources/js/Pages/Admin/Laporan/LaporanRekap.jsx`](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) dan [`resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx)
+Lokasi: [`resources/js/Pages/Admin/Laporan/LaporanRekap.jsx`](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) dan subkomponen di [`Partials/`](resources/js/Pages/Admin/Laporan/Partials/)
 
 Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah makro (organisasi) dan mikro (individu) dalam satu halaman tanpa reload rute:
 
-### A. Tab 1: Rekap Organisasi & Divisi (Makro)
-- **Segmented Location Controller (Mariuk & Cimalaka)**:
-  - Tab pengontrol segmen instan: **Semua Lokasi (12)**, **Mariuk (6)** (amber), dan **Cimalaka (6)** (indigo).
+### A. Sinkronisasi Penuh Database SQLite & Backend Controller (`LaporanController.php`)
+- **100% Data Riil**: Menghapus seluruh dataset dummy fiktif (12 orang pada `evaluationDataset.js`) dan mengoneksikan halaman langsung ke model `Employee`, `Attendance`, dan `Location` melalui `LaporanController.php`.
+- **Cakupan 86 Karyawan Riil**: Data evaluasi otomatis dihitung secara live untuk seluruh 86 karyawan operasional (35 Site Mariuk, 51 Site Cimalaka).
+- **Kalkulasi Metrik & Skor Kedisiplinan Otomatis**:
+  - Menghitung hari kerja aktif (default 22 hari), hari hadir, jumlah keterlambatan & akumulasi menit keterlambatan, cuti, sakit, izin, dan alpa berdasarkan log presensi riil di bulan/periode terpilih.
+  - Skor Kedisiplinan terhitung otomatis (0–100%) dengan klasifikasi status: *Sangat Baik*, *Disiplin Baik*, *Perlu Pembinaan*, dan *Peringatan / SP*.
+  - Rekomendasi tindakan dinamis dan pencatatan insiden indisipliner otomatis.
+
+### B. Tab 1: Rekap Organisasi & Divisi (Makro)
+- **Segmented Location Controller Dinamis (Mariuk & Cimalaka)**:
+  - Tab pengontrol segmen instan yang menghitung counter riil karyawan: **Semua Lokasi (86)**, **Mariuk (35)** (amber), dan **Cimalaka (51)** (indigo).
   - Dilengkapi indikator detak operasional live: *Monitoring Disiplin & Evaluasi 24/7 Non-Stop*.
-- **Filter Periode Dinamis**: Pemilihan bulan berjalan (November 2026) dan arsip periode sebelumnya.
+- **Filter Periode Dinamis**: Pemilihan bulan berjalan dan arsip periode sebelumnya yang memicu kueri Inertia reaktif ke controller backend.
 - **4 Kartu Metrik KPI Evaluasi Reaktif**:
   - Dihitung dinamis mengikuti pilihan lokasi kerja aktif:
     1. *Rata-rata Kehadiran Organisasi* (Target $\ge 95\%$).
     2. *Karyawan Hadir 100%* (Kedisiplinan penuh tanpa telat).
     3. *Total Keterlambatan* (Akumulasi frekuensi dan durasi menit).
     4. *Perhatian Disiplin / SP* (Early warning deteksi indisipliner).
-- **Visual Analytics (Recharts)**: Grafik batang rata-rata skor kedisiplinan per divisi menggunakan palet warna resmi Deep Navy & Gold.
+- **Visual Analytics (Recharts)**: Grafik batang rata-rata skor kedisiplinan per divisi aktual karyawan menggunakan palet warna resmi Deep Navy & Gold.
 - **Panel Sorotan (Top Stars & Early Warning)**:
-  - *Duta Keteladanan*: Karyawan dengan skor 100% tepat waktu tanpa telat untuk nominasi reward (klik langsung membuka rapor individu).
-  - *Panggilan / Pembinaan Khusus*: Karyawan yang melewati batas toleransi keterlambatan atau memiliki alpa (klik langsung membuka dossier pembinaan).
-- **Matriks Evaluasi Kedisiplinan Karyawan**:
-  - **Identitas Lengkap & Interaktif**: Avatar inisial visual, nama karyawan interaktif (dapat diklik langsung untuk membuka rapor), NIP font-mono, jabatan, serta pill badge lokasi penempatan (`Mariuk` / `Cimalaka`) dan kelompok regu (`Grup A` / `Grup B`).
-  - Kolom metrik: Kehadiran (Hadir/Hari & %), Keterlambatan, Cuti/Sakit, Alpa, Indikator Progress Skor Disiplin (0–100%), Status Evaluasi (*Sangat Baik*, *Disiplin Baik*, *Perlu Pembinaan*, *Peringatan / SP*).
+  - *Duta Keteladanan*: Karyawan dengan skor tertinggi untuk nominasi reward (klik langsung membuka rapor individu).
+  - *Panggilan / Pembinaan Khusus*: Karyawan dengan akumulasi keterlambatan atau catatan alpa (klik langsung membuka dossier pembinaan).
+- **Matriks Evaluasi Kedisiplinan Karyawan & `<TablePagination>`**:
+  - **Identitas Lengkap & Interaktif**: Avatar inisial visual, nama karyawan interaktif, NIP font-mono, jabatan, serta pill badge lokasi penempatan (`Mariuk` / `Cimalaka`) dan kelompok regu (`Grup A` / `Grup B`).
+  - Kolom metrik: Kehadiran (Hadir/Hari & %), Keterlambatan, Cuti/Sakit, Alpa, Indikator Progress Skor Disiplin (0–100%), Status Evaluasi.
+  - **Navigasi Pagination Atomik**: Menggunakan `<TablePagination>` dengan pemilih baris per halaman (10, 25, 50, 100 baris, default 25 baris), penomoran kontinu, tombol navigasi Previous/Next, dan ellipsis halaman.
   - Tombol **"Buka Rapor"**: 1-klik beralih mulus ke Tab 2 dengan karyawan terkait langsung terpilih.
 - **Ekspor Dokumen Excel (`.xlsx`)**: 1-klik unduh rekapitulasi evaluasi kehadiran seluruh karyawan via SheetJS lengkap dengan NIP, Divisi, Jabatan, Lokasi, dan Rekomendasi Tindakan.
 
-### B. Tab 2: Rapor Evaluasi Individu / Dossier Personel (Mikro)
-- **Toolbar Navigasi Cepat**: Tombol kembali ke rekap organisasi, dropdown pemilih karyawan aktif (12 personil), cetak rapor (`window.print()`), dan ekspor XLSX personal (profil lengkap + log 30 hari).
+### C. Tab 2: Rapor Evaluasi Individu / Dossier Personel (Mikro)
+- **Toolbar Navigasi Cepat**: Tombol kembali ke rekap organisasi, dropdown pemilih karyawan aktif (seluruh 86 personil riil), cetak rapor (`window.print()`), dan ekspor XLSX personal (profil lengkap + log dinamis).
 - **Dossier Header Card**:
-  - Profil korporat lengkap dengan avatar inisial, NIP font-mono, badge lokasi kerja (Mariuk/Cimalaka), badge kelompok regu (Grup A/B), dan badge shift 12 jam (Pagi/Malam).
+  - Profil korporat lengkap dengan avatar inisial, NIP font-mono, badge lokasi kerja (Mariuk/Cimalaka), badge kelompok regu (Grup A/B), dan badge shift operasional (Pagi/Malam).
   - Skor kedisiplinan (0–100%) dan kotak rekomendasi resmi tindakan manajemen HCGA.
 - **8 Scorecard KPI Terperinci**: Total Kehadiran, Tepat Waktu, Terlambat, Menit Terlambat, Izin, Sakit, Cuti, dan Alpha.
 - **Kalender Visual Presensi 30 Hari (Heatmap Grid 24/7)**:
@@ -309,15 +318,17 @@ Modul ini mengusung arsitektur **Tab Switcher Terpadu** yang memisahkan ranah ma
 - **Grafik Tren Kedisiplinan 6 Bulan**: `BarChart` Recharts menampilkan histori skor kedisiplinan 6 bulan ke belakang.
 - **Buku Pembinaan & Sanksi Disiplin (Disciplinary Log)**: Daftar riwayat teguran lisan, bimbingan supervisor, atau SP-1 resmi, dilengkapi form interaktif penambahan catatan pembinaan baru dengan notifikasi atomik `<Toast />`.
 
-### C. Dekomposisi Modular & Sanitasi Total Dead Code
-- **Perampingan Kode**: Memecah file utama [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) dari 1.245 baris menjadi 342 baris (>72% reduksi baris kode) dengan memisahkan dataset dan 3 sub-komponen modular di `Partials/`:
-  - [`evaluationDataset.js`](resources/js/Pages/Admin/Laporan/data/evaluationDataset.js) (~340 baris): Data agregasi evaluasi karyawan dan daftar periode.
-  - [`LaporanKpiCards.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanKpiCards.jsx) (~100 baris): 4 kartu metrik evaluasi kehadiran reaktif.
-  - [`LaporanAnalyticsGrid.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanAnalyticsGrid.jsx) (~170 baris): Visual analytics Recharts per divisi dan panel sorotan Duta Keteladanan / Early Warning.
-  - [`LaporanEvaluasiTable.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanEvaluasiTable.jsx) (~260 baris): Toolbar pencarian/filter dan matriks evaluasi 10 kolom.
+### D. Dekomposisi Modular, Sinkronisasi Riil, & Sanitasi Total Dead Code
+- **Perampingan Kode & Eliminasi Dummy**:
+  - Memecah file utama [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) dari 1.245 baris menjadi ~350 baris (>70% reduksi baris kode) dengan arsitektur modular di `Partials/`:
+    - [`LaporanController.php`](app/Http/Controllers/Admin/LaporanController.php): Mengambil 86 karyawan riil dari database SQLite, menghitung agregasi presensi, dan mempassing data ke Inertia.
+    - Menghapus total file dummy fiktif `evaluationDataset.js`.
+    - [`LaporanKpiCards.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanKpiCards.jsx): 4 kartu metrik evaluasi kehadiran reaktif.
+    - [`LaporanAnalyticsGrid.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanAnalyticsGrid.jsx): Visual analytics Recharts per divisi dan panel sorotan Duta Keteladanan / Early Warning.
+    - [`LaporanEvaluasiTable.jsx`](resources/js/Pages/Admin/Laporan/Partials/LaporanEvaluasiTable.jsx): Toolbar pencarian/filter, matriks evaluasi 10 kolom, dan dilengkapi komponen atomik `<TablePagination>` untuk menavigasi 86 baris data.
 - **Pembersihan Import Usang**:
   - Menghapus 6 import usang di [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) (`Download`, `Search`, `Filter`, `X`, `Info`, `colors`).
-  - Menghapus 2 import usang di [RaporIndividu.jsx](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx) (`TrendingDown`, `Sparkles`).
+  - Menghapus 2 import usang di [RaporIndividu.jsx](resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx) (`TrendingDown`, `Sparkles`), serta mengganti hardcoded NIP malam dan supervisor mock dengan resolusi dinamis.
 - **Dampak Performa**: Ukuran *JS chunk bundle* [LaporanRekap.jsx](resources/js/Pages/Admin/Laporan/LaporanRekap.jsx) menyusut drastis dari **31.05 kB menjadi 16.31 kB** (~48% lebih ringan).
 
 ---

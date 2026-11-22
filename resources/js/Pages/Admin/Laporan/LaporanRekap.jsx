@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Head } from '@inertiajs/react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Head, router } from '@inertiajs/react';
 import * as XLSX from 'xlsx';
 import {
   FileSpreadsheet,
@@ -13,64 +13,97 @@ import {
   Button,
   PageHeader,
 } from '@/components/ui';
-import { AVAILABLE_PERIODS, EVALUATION_DATASET } from './data/evaluationDataset.js';
 import RaporIndividu from './Partials/RaporIndividu.jsx';
 import LaporanKpiCards from './Partials/LaporanKpiCards.jsx';
 import LaporanAnalyticsGrid from './Partials/LaporanAnalyticsGrid.jsx';
 import LaporanEvaluasiTable from './Partials/LaporanEvaluasiTable.jsx';
 
-export default function LaporanRekap() {
+// Periode Evaluasi Operasional
+const AVAILABLE_PERIODS = [
+  { value: '2026-11', label: 'November 2026 (Berjalan)' },
+  { value: '2026-10', label: 'Oktober 2026' },
+  { value: '2026-09', label: 'September 2026' },
+];
+
+export default function LaporanRekap({
+  evaluations = [],
+  dbEmployees = [],
+  dbLocations = [],
+  activePeriod = '2026-11',
+}) {
   const [activeTab, setActiveTab] = useState('organisasi'); // 'organisasi' | 'individu'
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState(1);
-  const [selectedPeriod, setSelectedPeriod] = useState('2026-11');
+  const [selectedPeriod, setSelectedPeriod] = useState(activePeriod);
   const [selectedLocation, setSelectedLocation] = useState('ALL');
   const [selectedDivision, setSelectedDivision] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Sinkronisasi data evaluasi dari props backend (86 karyawan riil SQLite)
+  const dataset = useMemo(() => {
+    if (evaluations && evaluations.length > 0) return evaluations;
+    return [];
+  }, [evaluations]);
+
+  // ID Karyawan aktif untuk tab Rapor Individu
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(() => {
+    return dataset[0]?.id || 1;
+  });
+
+  useEffect(() => {
+    if (dataset.length > 0 && !dataset.some((e) => e.id === selectedEmployeeId)) {
+      setSelectedEmployeeId(dataset[0].id);
+    }
+  }, [dataset, selectedEmployeeId]);
+
   // Karyawan terpilih untuk tab Rapor Individu
   const selectedEmployee = useMemo(() => {
-    return EVALUATION_DATASET.find((e) => e.id === selectedEmployeeId) || EVALUATION_DATASET[0];
-  }, [selectedEmployeeId]);
+    return dataset.find((e) => e.id === selectedEmployeeId) || dataset[0] || null;
+  }, [dataset, selectedEmployeeId]);
 
-  // Daftar Divisi Unik
+  // Daftar Divisi Unik Dinamis langsung dari database
   const divisions = useMemo(() => {
-    const list = Array.from(new Set(EVALUATION_DATASET.map((item) => item.division)));
-    return ['ALL', ...list];
-  }, []);
+    const set = new Set();
+    dataset.forEach((item) => {
+      if (item.division && item.division !== '-' && item.division !== 'Belum Ditetapkan') {
+        set.add(item.division);
+      }
+    });
+    return ['ALL', ...Array.from(set).sort()];
+  }, [dataset]);
 
   // Filter Data Evaluasi
   const filteredData = useMemo(() => {
-    return EVALUATION_DATASET.filter((emp) => {
+    return dataset.filter((emp) => {
       const matchLocation = selectedLocation === 'ALL' || emp.location === selectedLocation;
       const matchDivision = selectedDivision === 'ALL' || emp.division === selectedDivision;
       const matchStatus = selectedStatus === 'ALL' || emp.status === selectedStatus;
+      const q = searchQuery.toLowerCase().trim();
       const matchSearch =
-        searchQuery === '' ||
-        emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.nip.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        emp.role.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        emp.name.toLowerCase().includes(q) ||
+        emp.nip.toLowerCase().includes(q) ||
+        emp.role.toLowerCase().includes(q);
       return matchLocation && matchDivision && matchStatus && matchSearch;
     });
-  }, [selectedLocation, selectedDivision, selectedStatus, searchQuery]);
+  }, [dataset, selectedLocation, selectedDivision, selectedStatus, searchQuery]);
 
   // Dataset sesuai filter lokasi aktif (Semua / Mariuk / Cimalaka)
   const locationDataset = useMemo(() => {
-    if (selectedLocation === 'ALL') return EVALUATION_DATASET;
-    return EVALUATION_DATASET.filter((e) => e.location === selectedLocation);
-  }, [selectedLocation]);
+    if (selectedLocation === 'ALL') return dataset;
+    return dataset.filter((e) => e.location === selectedLocation);
+  }, [dataset, selectedLocation]);
 
   // Statistik Ringkasan Evaluasi (Reaktif terhadap Lokasi Terpilih)
   const summaryStats = useMemo(() => {
     const totalEmployees = locationDataset.length;
     const totalPossibleDays = totalEmployees * 22;
-    const totalPresentDays = locationDataset.reduce((acc, curr) => acc + curr.presentDays, 0);
-    const totalLateIncidents = locationDataset.reduce((acc, curr) => acc + curr.lateCount, 0);
-    const totalLateMinutes = locationDataset.reduce((acc, curr) => acc + curr.totalLateMinutes, 0);
-    const totalAlpa = locationDataset.reduce((acc, curr) => acc + curr.alpaDays, 0);
+    const totalPresentDays = locationDataset.reduce((acc, curr) => acc + (curr.presentDays || 0), 0);
+    const totalLateIncidents = locationDataset.reduce((acc, curr) => acc + (curr.lateCount || 0), 0);
+    const totalLateMinutes = locationDataset.reduce((acc, curr) => acc + (curr.totalLateMinutes || 0), 0);
+    const totalAlpa = locationDataset.reduce((acc, curr) => acc + (curr.alpaDays || 0), 0);
 
     const attendanceRate = totalPossibleDays > 0 ? ((totalPresentDays / totalPossibleDays) * 100).toFixed(1) : '0.0';
-    const perfectCount = locationDataset.filter((e) => e.score === 100).length;
+    const perfectCount = locationDataset.filter((e) => e.score >= 98).length;
     const warningCount = locationDataset.filter((e) => e.status === 'Peringatan / SP').length;
     const coachingCount = locationDataset.filter((e) => e.status === 'Perlu Pembinaan').length;
 
@@ -93,28 +126,39 @@ export default function LaporanRekap() {
       if (!divMap[emp.division]) {
         divMap[emp.division] = { division: emp.division, totalScore: 0, count: 0, totalLate: 0 };
       }
-      divMap[emp.division].totalScore += emp.score;
-      divMap[emp.division].totalLate += emp.lateCount;
+      divMap[emp.division].totalScore += (emp.score || 100);
+      divMap[emp.division].totalLate += (emp.lateCount || 0);
       divMap[emp.division].count += 1;
     });
 
     return Object.values(divMap).map((d) => ({
       name: d.division.replace('& Lapangan', '').replace('& Safety', '').trim(),
       fullName: d.division,
-      avgScore: Math.round(d.totalScore / d.count),
+      avgScore: Math.round(d.totalScore / (d.count || 1)),
       totalLate: d.totalLate,
       karyawan: d.count,
     }));
   }, [locationDataset]);
 
-  // Top Performers (100% On-Time) & Perhatian Khusus
+  // Top Performers (Disiplin Tinggi) & Perhatian Khusus
   const topPerformers = useMemo(() => {
-    return locationDataset.filter((e) => e.score === 100);
+    return locationDataset.filter((e) => e.score >= 95);
   }, [locationDataset]);
 
   const warningList = useMemo(() => {
     return locationDataset.filter((e) => e.status === 'Peringatan / SP' || e.status === 'Perlu Pembinaan');
   }, [locationDataset]);
+
+  // Pagination States untuk Tabel Evaluasi
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedLocation, selectedDivision, selectedStatus, searchQuery, selectedPeriod]);
+
+  const totalFiltered = filteredData.length;
+  const totalPages = Math.ceil(totalFiltered / perPage) || 1;
 
   const hasActiveFilters =
     searchQuery.trim() !== '' ||
@@ -129,6 +173,11 @@ export default function LaporanRekap() {
     setSearchQuery('');
   };
 
+  const handlePeriodChange = (newPeriod) => {
+    setSelectedPeriod(newPeriod);
+    router.get('/laporan', { period: newPeriod }, { preserveState: true, preserveScroll: true });
+  };
+
   // Fungsi Ekspor Excel
   const handleExportExcel = () => {
     const exportRows = filteredData.map((emp, index) => ({
@@ -140,7 +189,7 @@ export default function LaporanRekap() {
       Lokasi: emp.location,
       'Hari Kerja': emp.workDays,
       'Total Hadir': emp.presentDays,
-      '% Kehadiran': `${((emp.presentDays / emp.workDays) * 100).toFixed(1)}%`,
+      '% Kehadiran': emp.workDays > 0 ? `${((emp.presentDays / emp.workDays) * 100).toFixed(1)}%` : '0%',
       'Frekuensi Terlambat': emp.lateCount,
       'Total Menit Terlambat': emp.totalLateMinutes,
       'Cuti/Izin': emp.leaveDays,
@@ -191,14 +240,14 @@ export default function LaporanRekap() {
       <PageHeader
         eyebrow="MODUL HCGA ANALYTICS & DISCIPLINE"
         title="Laporan & Evaluasi Kehadiran"
-        subtitle="Analisis kepatuhan kerja, scoring kedisiplinan berkala, peringatan dini indisipliner, dan rekap evaluasi bulanan."
+        subtitle="Analisis kepatuhan kerja, scoring kedisiplinan berkala, peringatan dini indisipliner, dan rekap evaluasi bulanan seluruh site."
         actions={
           <div className="flex items-center gap-2.5">
             <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-2xs">
               <Calendar className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
               <select
                 value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
+                onChange={(e) => handlePeriodChange(e.target.value)}
                 className="text-xs font-semibold text-navy bg-transparent border-0 focus:ring-0 cursor-pointer p-0 pr-4"
               >
                 {AVAILABLE_PERIODS.map((period) => (
@@ -236,7 +285,7 @@ export default function LaporanRekap() {
           <Building className="w-4 h-4" />
           <span>Rekap & Analitik Organisasi</span>
           <Badge className={activeTab === 'organisasi' ? 'bg-white/20 text-white font-mono text-[10px]' : 'bg-slate-200 text-slate-700 text-[10px]'}>
-            {EVALUATION_DATASET.length}
+            {dataset.length}
           </Badge>
         </button>
 
@@ -293,7 +342,7 @@ export default function LaporanRekap() {
                     : 'text-slate-600 hover:text-navy hover:bg-slate-50'
                 }`}
               >
-                Semua Lokasi ({EVALUATION_DATASET.length})
+                Semua Lokasi ({dataset.length})
               </button>
               <button
                 type="button"
@@ -305,7 +354,7 @@ export default function LaporanRekap() {
                 }`}
               >
                 <MapPin className="w-3.5 h-3.5 text-amber-600" />
-                Mariuk ({EVALUATION_DATASET.filter((e) => e.location === 'Lokasi Mariuk').length})
+                Mariuk ({dataset.filter((e) => e.location?.includes('Mariuk')).length})
               </button>
               <button
                 type="button"
@@ -317,7 +366,7 @@ export default function LaporanRekap() {
                 }`}
               >
                 <MapPin className="w-3.5 h-3.5 text-indigo-600" />
-                Cimalaka ({EVALUATION_DATASET.filter((e) => e.location === 'Lokasi Cimalaka').length})
+                Cimalaka ({dataset.filter((e) => e.location?.includes('Cimalaka')).length})
               </button>
             </div>
 
@@ -342,7 +391,7 @@ export default function LaporanRekap() {
           {/* Tabel Master Evaluasi Kehadiran */}
           <LaporanEvaluasiTable
             filteredData={filteredData}
-            totalEmployees={EVALUATION_DATASET.length}
+            totalEmployees={dataset.length}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             selectedLocation={selectedLocation}
@@ -356,12 +405,17 @@ export default function LaporanRekap() {
             hasActiveFilters={hasActiveFilters}
             selectedPeriod={selectedPeriod}
             onOpenRapor={handleOpenRapor}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setCurrentPage}
+            onPerPageChange={setPerPage}
           />
         </div>
       ) : (
         <RaporIndividu
           employee={selectedEmployee}
-          allEmployees={EVALUATION_DATASET}
+          allEmployees={dataset}
           onSelectEmployee={setSelectedEmployeeId}
           selectedPeriod={selectedPeriod}
           onBackToOrganization={() => setActiveTab('organisasi')}
