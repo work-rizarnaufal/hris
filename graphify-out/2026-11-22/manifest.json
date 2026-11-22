@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Beranda/Beranda.jsx": {
-    "mtime": 1795324342.4420607,
-    "seen": 1795324534.4023254,
-    "ast_hash": "67ae07adbe8e700874b163b059cdd0ce",
+    "mtime": 1795324872.4743495,
+    "seen": 1795324920.7402818,
+    "ast_hash": "692b69084723d89ee2e5f9e72a2eefa8",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795324509.0314448,
-    "seen": 1795324534.4023254,
-    "ast_hash": "8316bafb8fc2ec27bba44616aa0e8280",
+    "mtime": 1795324902.538315,
+    "seen": 1795324920.7402818,
+    "ast_hash": "2d0563645362b76da596848ceccc5168",
     "semantic_hash": ""
   },
   "README.md": {
@@ -540,9 +540,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/BerandaController.php": {
-    "mtime": 1795270166.152252,
-    "seen": 1795270339.955239,
-    "ast_hash": "a02885d738c146c8cdbed062991be940",
+    "mtime": 1795324803.5673506,
+    "seen": 1795324920.7402818,
+    "ast_hash": "1fe75279b28e7d6c4119ced9c99bf2ba",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/KaryawanController.php": {
@@ -837,6 +837,12 @@
     "mtime": 1795293994.010786,
     "seen": 1795294048.9736493,
     "ast_hash": "da1b2b2dd1163547955f182f97686175",
+    "semantic_hash": ""
+  },
+  "tests/Feature/BerandaBackendTest.php": {
+    "mtime": 1795324882.6717668,
+    "seen": 1795324920.7402818,
+    "ast_hash": "ec9387835bcef0ae1a484c75615e1245",
     "semantic_hash": ""
   },
   "package-lock.json": {

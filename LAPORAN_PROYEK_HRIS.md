@@ -264,6 +264,7 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
   - **Presensi Massal Cepat (`ModalPresensiMassal.jsx`)**: 1-klik tandai seluruh atau per-shift karyawan terjadwal sebagai *Hadir Tepat Waktu*.
   - **Ekspor Excel**: 1-klik unduh `.xlsx` seluruh data terfilter per tanggal aktif via SheetJS.
   - **Live Filter**: Pencarian teks nama/NIP + filter Status, Divisi, dan Shift.
+  - **Navigasi Pagination Tunggal & Atomik**: Menggunakan satu komponen `<TablePagination />` terpadu dengan pemilih baris per halaman (10, 25, 50, 100 baris) dan nomor halaman berelipsis, mengeliminasi duplikasi footer baris ganda.
   - **Notifikasi**: Menggunakan notifikasi atomik `<Toast />`.
 
 ---

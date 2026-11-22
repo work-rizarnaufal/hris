@@ -999,36 +999,16 @@ export default function CatatanKehadiran({
           <TablePagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalRows={totalFiltered}
-            perPage={perPage}
+            totalItems={currentDayAttendances.length}
+            filteredCount={totalFiltered}
+            itemsPerPage={perPage}
             onPageChange={setCurrentPage}
-            onPerPageChange={(newPerPage) => {
+            onItemsPerPageChange={(newPerPage) => {
               setPerPage(newPerPage);
               setCurrentPage(1);
             }}
           />
         </CardContent>
-
-        {/* Footer Info Card */}
-        <div className="p-4 bg-slate-50/60 border-t border-slate-100 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <span>
-            Menampilkan <strong>{totalFiltered > 0 ? (currentPage - 1) * perPage + 1 : 0}</strong>–
-            <strong>{Math.min(currentPage * perPage, totalFiltered)}</strong> dari{' '}
-            <strong>{totalFiltered}</strong> hasil filter (
-            <strong>{currentDayAttendances.length}</strong> total presensi hari ini).
-          </span>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#428a73]" /> Hadir ({stats.presentOnTime})
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#ac8848]" /> Terlambat ({stats.lateCount})
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#b36a74]" /> Alpha ({stats.alphaCount})
-            </span>
-          </div>
-        </div>
       </Card>
 
       {/* Modal Form Catat / Ubah Presensi */}

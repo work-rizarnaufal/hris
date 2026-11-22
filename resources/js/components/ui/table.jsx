@@ -165,17 +165,25 @@ const TablePagination = React.forwardRef(({
   className,
   currentPage = 1,
   totalPages = 1,
-  totalItems = 0,
-  itemsPerPage = 10,
+  totalItems,
+  itemsPerPage,
   onPageChange,
   onItemsPerPageChange,
   perPageOptions = [10, 25, 50, 100],
   filteredCount,
+  totalRows,
+  perPage,
+  onPerPageChange,
+  children,
   ...props
 }, ref) => {
-  const effectiveTotal = filteredCount !== undefined ? filteredCount : totalItems;
-  const from = effectiveTotal === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
-  const to = Math.min(currentPage * itemsPerPage, effectiveTotal);
+  const actualTotalItems = totalItems ?? totalRows ?? 0;
+  const actualItemsPerPage = itemsPerPage ?? perPage ?? 10;
+  const handleItemsPerPageChange = onItemsPerPageChange ?? onPerPageChange;
+
+  const effectiveTotal = filteredCount !== undefined ? filteredCount : actualTotalItems;
+  const from = effectiveTotal === 0 ? 0 : (currentPage - 1) * actualItemsPerPage + 1;
+  const to = Math.min(currentPage * actualItemsPerPage, effectiveTotal);
 
   const getPageNumbers = () => {
     const pages = [];
@@ -207,17 +215,17 @@ const TablePagination = React.forwardRef(({
         <div>
           Menampilkan <strong className="text-slate-900 font-semibold">{from} - {to}</strong> dari{' '}
           <strong className="text-slate-900 font-semibold">
-            {filteredCount !== undefined && filteredCount !== totalItems ? `${filteredCount} (terfilter)` : totalItems}
+            {filteredCount !== undefined && filteredCount !== actualTotalItems ? `${filteredCount} (terfilter)` : actualTotalItems}
           </strong> data
         </div>
 
         {/* Pilihan Baris per Halaman */}
-        {onItemsPerPageChange && (
+        {handleItemsPerPageChange && (
           <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
             <span className="text-xs sm:text-sm text-slate-500 font-medium">Tampilkan:</span>
             <select
-              value={itemsPerPage}
-              onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+              value={actualItemsPerPage}
+              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
               className="h-8 text-xs sm:text-sm bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-slate-700 font-medium focus:border-navy focus:ring-1 focus:ring-navy cursor-pointer transition-all shadow-2xs"
             >
               {perPageOptions.map((opt) => (
@@ -228,6 +236,8 @@ const TablePagination = React.forwardRef(({
             </select>
           </div>
         )}
+
+        {children}
       </div>
 
       {/* Navigasi Nomor Halaman */}
