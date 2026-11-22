@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
-import * as XLSX from 'xlsx';
 import { getHolidays, getShiftSettings, formatDateDMY } from '@/services/systemSettings.js';
 import {
   CalendarDays,
@@ -20,69 +19,18 @@ import PanelRotasiGrup from './Partials/PanelRotasiGrup.jsx';
 import JadwalKpiCards from './Partials/JadwalKpiCards.jsx';
 import JadwalRosterTab from './Partials/JadwalRosterTab.jsx';
 import JadwalExceptionsTab from './Partials/JadwalExceptionsTab.jsx';
-
-// Opsi Minggu Tersedia (Format DD/MM/YYYY)
-const WEEKS = [
-  {
-    id: 1,
-    label: 'Minggu 1: 02/11/2026 - 08/11/2026',
-    days: [
-      { key: 'd1', label: 'Sen', date: '02/11/2026', isWeekend: false },
-      { key: 'd2', label: 'Sel', date: '03/11/2026', isWeekend: false },
-      { key: 'd3', label: 'Rab', date: '04/11/2026', isWeekend: false },
-      { key: 'd4', label: 'Kam', date: '05/11/2026', isWeekend: false },
-      { key: 'd5', label: 'Jum', date: '06/11/2026', isWeekend: false },
-      { key: 'd6', label: 'Sab', date: '07/11/2026', isWeekend: true },
-      { key: 'd7', label: 'Min', date: '08/11/2026', isWeekend: true },
-    ],
-  },
-  {
-    id: 2,
-    label: 'Minggu 2: 09/11/2026 - 15/11/2026',
-    days: [
-      { key: 'd1', label: 'Sen', date: '09/11/2026', isWeekend: false },
-      { key: 'd2', label: 'Sel', date: '10/11/2026', isWeekend: false },
-      { key: 'd3', label: 'Rab', date: '11/11/2026', isWeekend: false },
-      { key: 'd4', label: 'Kam', date: '12/11/2026', isWeekend: false },
-      { key: 'd5', label: 'Jum', date: '13/11/2026', isWeekend: false },
-      { key: 'd6', label: 'Sab', date: '14/11/2026', isWeekend: true },
-      { key: 'd7', label: 'Min', date: '15/11/2026', isWeekend: true },
-    ],
-  },
-  {
-    id: 3,
-    label: 'Minggu 3: 16/11/2026 - 22/11/2026',
-    days: [
-      { key: 'd1', label: 'Sen', date: '16/11/2026', isWeekend: false },
-      { key: 'd2', label: 'Sel', date: '17/11/2026', isWeekend: false },
-      { key: 'd3', label: 'Rab', date: '18/11/2026', isWeekend: false },
-      { key: 'd4', label: 'Kam', date: '19/11/2026', isWeekend: false },
-      { key: 'd5', label: 'Jum', date: '20/11/2026', isWeekend: false },
-      { key: 'd6', label: 'Sab', date: '21/11/2026', isWeekend: true },
-      { key: 'd7', label: 'Min', date: '22/11/2026', isWeekend: true },
-    ],
-  },
-  {
-    id: 4,
-    label: 'Minggu 4: 23/11/2026 - 29/11/2026',
-    days: [
-      { key: 'd1', label: 'Sen', date: '23/11/2026', isWeekend: false },
-      { key: 'd2', label: 'Sel', date: '24/11/2026', isWeekend: false },
-      { key: 'd3', label: 'Rab', date: '25/11/2026', isWeekend: false },
-      { key: 'd4', label: 'Kam', date: '26/11/2026', isWeekend: false },
-      { key: 'd5', label: 'Jum', date: '27/11/2026', isWeekend: false },
-      { key: 'd6', label: 'Sab', date: '28/11/2026', isWeekend: true },
-      { key: 'd7', label: 'Min', date: '29/11/2026', isWeekend: true },
-    ],
-  },
-];
+import {
+  WEEKS,
+  getEmployeeShiftForDay,
+  calculateWeeklyHours,
+  exportRosterToExcel,
+} from './services/rosterUtils.js';
 
 export default function JadwalShift({
   dbEmployees = [],
   dbLocations = [],
   dbShifts = [],
 }) {
-  // Normalisasi data karyawan langsung via useMemo tanpa mirroring state
   const employees = useMemo(() => {
     if (!dbEmployees || dbEmployees.length === 0) return [];
     return dbEmployees.map((emp) => {
@@ -113,7 +61,6 @@ export default function JadwalShift({
     });
   }, [dbEmployees]);
 
-  // Ekstraksi divisi dinamis langsung dari master data karyawan
   const availableDivisions = useMemo(() => {
     const set = new Set();
     employees.forEach((e) => {
@@ -134,7 +81,6 @@ export default function JadwalShift({
   const [editingException, setEditingException] = useState(null);
   const [alertInfo, setAlertInfo] = useState(null);
 
-  // Pagination States untuk Roster Karyawan
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
@@ -153,7 +99,6 @@ export default function JadwalShift({
     EXCEPTIONS: 'hris_shift_exceptions',
   };
 
-  // Daftar Pengecualian & Tukar Shift Aktif (Persisten)
   const [exceptions, setExceptions] = useState(() => {
     if (typeof window === 'undefined') return [];
     try {
@@ -164,7 +109,6 @@ export default function JadwalShift({
     }
   });
 
-  // Daftar Perubahan Jadwal Operasional Manual (Persisten)
   const [manualSchedules, setManualSchedules] = useState(() => {
     if (typeof window === 'undefined') return [];
     try {
@@ -187,11 +131,9 @@ export default function JadwalShift({
     }
   }, [manualSchedules]);
 
-  // Kalender Hari Libur & Konfigurasi Shift yang Disinkronkan dari Modul Pengaturan Sistem
   const [holidays, setHolidays] = useState(() => getHolidays());
   const [shiftSettings, setShiftSettings] = useState(() => getShiftSettings());
 
-  // Listener Sinkronisasi Otomatis jika Pengaturan Hari Libur / Shift Diubah di Tab Lain
   useEffect(() => {
     const handleSync = () => {
       setHolidays(getHolidays());
@@ -203,7 +145,6 @@ export default function JadwalShift({
 
   const currentWeek = WEEKS[selectedWeekIndex];
 
-  // Filter Karyawan
   const filteredEmployees = useMemo(() => {
     return employees.filter((emp) => {
       const matchLocation = filterLocation === 'ALL' || emp.location === filterLocation;
@@ -218,7 +159,6 @@ export default function JadwalShift({
     });
   }, [employees, filterLocation, filterDivision, filterGroup, searchQuery]);
 
-  // Reset page on filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [filterLocation, filterDivision, filterGroup, searchQuery, selectedWeekIndex]);
@@ -230,27 +170,40 @@ export default function JadwalShift({
     return filteredEmployees.slice(start, start + perPage);
   }, [filteredEmployees, currentPage, perPage]);
 
-  // Statistik Ringkasan Jadwal (Reaktif terhadap Filter Lokasi)
+  // Statistik Ringkasan Jadwal (Single Pass)
   const stats = useMemo(() => {
-    const list =
-      filterLocation === 'ALL'
-        ? employees
-        : employees.filter((e) => e.location === filterLocation);
+    let total = 0;
+    let groupA = 0;
+    let groupB = 0;
+    let unassigned = 0;
+    let nonShift = 0;
 
-    const total = list.length;
-    const groupA = list.filter((e) => e.group === 'Grup A').length;
-    const groupB = list.filter((e) => e.group === 'Grup B').length;
-    const unassigned = list.filter((e) => e.group === 'Belum Ditetapkan').length;
-    const nonShift = list.filter((e) => e.group === 'Non-Shift').length;
+    employees.forEach((e) => {
+      if (filterLocation === 'ALL' || e.location === filterLocation) {
+        total++;
+        if (e.group === 'Grup A') groupA++;
+        else if (e.group === 'Grup B') groupB++;
+        else if (e.group === 'Non-Shift') nonShift++;
+        else unassigned++;
+      }
+    });
+
     const totalExceptions = exceptions.filter((ex) => {
       const emp = employees.find((e) => e.id === ex.employeeId);
       return filterLocation === 'ALL' || emp?.location === filterLocation;
     }).length;
-    const totalManualSchedules = manualSchedules.length;
-    return { total, groupA, groupB, unassigned, nonShift, totalExceptions, totalManualSchedules };
+
+    return {
+      total,
+      groupA,
+      groupB,
+      unassigned,
+      nonShift,
+      totalExceptions,
+      totalManualSchedules: manualSchedules.length,
+    };
   }, [employees, exceptions, manualSchedules, filterLocation]);
 
-  // Handle Update Grup Karyawan per Individu
   const handleUpdateEmployeeGroup = (empId, newGroup) => {
     const targetEmp = employees.find((e) => e.id === empId);
     router.put(`/jadwal/employee/${empId}/group`, { group: newGroup }, {
@@ -268,7 +221,6 @@ export default function JadwalShift({
     });
   };
 
-  // Handle Pemindahan Massal (Bulk Update Group)
   const handleBulkUpdateGroup = (selectedIds, targetGroup) => {
     router.post('/jadwal/bulk-update-group', { employee_ids: selectedIds, group: targetGroup }, {
       preserveScroll: true,
@@ -285,17 +237,13 @@ export default function JadwalShift({
     });
   };
 
-  // Handle Tukar Semua Personil Grup A dan Grup B
   const handleSwapAllGroups = () => {
     router.post('/jadwal/swap-group', {}, {
       preserveScroll: true,
       onSuccess: (page) => {
         const flash = page.props?.flash;
         if (flash?.warning) {
-          setAlertInfo({
-            type: 'warning',
-            message: flash.warning,
-          });
+          setAlertInfo({ type: 'warning', message: flash.warning });
         } else {
           setAlertInfo({
             type: 'success',
@@ -309,7 +257,6 @@ export default function JadwalShift({
     });
   };
 
-  // Handle Simpan Pengecualian / Tukar Shift (Tambah & Ubah)
   const handleSaveException = (itemData) => {
     setExceptions((prev) => {
       const idx = prev.findIndex((e) => e.id === itemData.id);
@@ -332,7 +279,6 @@ export default function JadwalShift({
     });
   };
 
-  // Handle Hapus Pengecualian
   const handleDeleteException = (id) => {
     setExceptions(exceptions.filter((ex) => ex.id !== id));
     setAlertInfo({
@@ -341,7 +287,6 @@ export default function JadwalShift({
     });
   };
 
-  // Handle Simpan Perubahan Jadwal Operasional Manual
   const handleSaveManualSchedule = (item) => {
     const newItem = {
       id: Date.now(),
@@ -356,7 +301,6 @@ export default function JadwalShift({
     });
   };
 
-  // Handle Hapus Perubahan Jadwal Operasional Manual
   const handleDeleteManualSchedule = (id) => {
     setManualSchedules((prev) => prev.filter((m) => m.id !== id));
     setAlertInfo({
@@ -365,7 +309,6 @@ export default function JadwalShift({
     });
   };
 
-  // Reset Filters
   const hasActiveFilters =
     searchQuery.trim() !== '' ||
     filterLocation !== 'ALL' ||
@@ -379,209 +322,29 @@ export default function JadwalShift({
     setSearchQuery('');
   };
 
-  // Helper penentuan shift dinamis per hari (Aturan Permanen: 1 Hari 2 Shift, Bergantian Antar-Grup)
-  const getEmployeeShiftForDay = (emp, day) => {
-    const parts = day.date.split('/');
-    const dayDateStr = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : day.date;
-    const activeException = exceptions.find(
-      (ex) =>
-        ex.date === dayDateStr &&
-        (ex.employeeId === emp.id || (ex.type === 'swap' && ex.targetEmployeeId === emp.id))
-    );
+  const resolverOptions = useMemo(
+    () => ({
+      exceptions,
+      holidays,
+      manualSchedules,
+      shiftSettings,
+      selectedWeekIndex,
+    }),
+    [exceptions, holidays, manualSchedules, shiftSettings, selectedWeekIndex]
+  );
 
-    if (activeException) {
-      const isTarget = activeException.type === 'swap' && activeException.targetEmployeeId === emp.id;
-      return {
-        code: isTarget ? 'S1 (SWAP)' : 'S2 (SWAP)',
-        label: `Tukar Shift: ${activeException.reason}`,
-        badgeClass: 'bg-purple-100 text-purple-900 border-purple-300 font-bold',
-      };
-    }
+  const calculateHours = (emp, days) => calculateWeeklyHours(emp, days, resolverOptions);
 
-    if (emp.group === 'Belum Ditetapkan') {
-      return {
-        code: 'UNSET',
-        label: 'Grup Kerja Belum Ditetapkan',
-        badgeClass: 'bg-slate-100 text-slate-400 border-slate-200 font-medium',
-      };
-    }
-
-    if (emp.group === 'Non-Shift') {
-      if (day.isWeekend) {
-        return {
-          code: 'OFF',
-          label: 'Libur Akhir Pekan',
-          badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-        };
-      }
-      return {
-        code: 'NON',
-        label: 'Office (08:00 - 17:00)',
-        badgeClass: 'bg-sky-50 text-sky-800 border-sky-200 font-semibold',
-      };
-    }
-
-    const activeHoliday = holidays.find((h) => h.date === dayDateStr);
-    const activeManual = manualSchedules.find((m) => m.startDate === dayDateStr);
-
-    if (activeHoliday) {
-      const isTargetGroup =
-        activeManual &&
-        (activeManual.targetGroup === emp.group || activeManual.targetGroup === 'Semua Grup (A & B)');
-
-      if (isTargetGroup) {
-        const isShift2 = emp.shiftCode === 'S2' || (emp.baseShift && emp.baseShift.includes('Shift 2'));
-        const timeStr = isShift2
-          ? `${activeManual.shift2In}-${activeManual.shift2Out}`
-          : `${activeManual.shift1In}-${activeManual.shift1Out}`;
-        const shiftCodeStr = isShift2 ? `S2 (${timeStr})` : `S1 (${timeStr})`;
-        return {
-          code: shiftCodeStr,
-          label: `Penugasan Lembur Libur [${activeHoliday.name}]: ${activeManual.reason}`,
-          badgeClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-        };
-      }
-
-      return {
-        code: 'LIBUR',
-        label: `${activeHoliday.category}: ${activeHoliday.name} - ${activeHoliday.operationalNote}`,
-        badgeClass: 'bg-rose-50 text-rose-800 border-rose-200 font-bold',
-      };
-    }
-
-    if (activeManual) {
-      const isTargetGroup =
-        activeManual.targetGroup === emp.group || activeManual.targetGroup === 'Semua Grup (A & B)';
-
-      if (isTargetGroup) {
-        const isShift2 = emp.shiftCode === 'S2' || (emp.baseShift && emp.baseShift.includes('Shift 2'));
-        const timeStr = isShift2
-          ? `${activeManual.shift2In}-${activeManual.shift2Out}`
-          : `${activeManual.shift1In}-${activeManual.shift1Out}`;
-        const shiftCodeStr = isShift2 ? `S2 (${timeStr})` : `S1 (${timeStr})`;
-        const shiftName = isShift2 ? 'Shift 2' : 'Shift 1';
-        return {
-          code: shiftCodeStr,
-          label: `Jadwal Manual [${activeManual.targetGroup}]: ${shiftName} (${timeStr}) - ${activeManual.reason}`,
-          badgeClass: 'bg-amber-100 text-amber-900 border-amber-300 font-bold',
-        };
-      } else {
-        return {
-          code: 'OFF',
-          label: `Libur Operasional (Jadwal Manual Khusus ${activeManual.targetGroup})`,
-          badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-        };
-      }
-    }
-
-    const isGroupA = emp.group === 'Grup A';
-    const isGroupB = emp.group === 'Grup B';
-    const dayNum = parseInt(day.key.replace('d', ''), 10);
-
-    const isWeekEven = selectedWeekIndex % 2 === 1;
-    const isGroupAWorking = !isWeekEven ? dayNum % 2 === 1 : dayNum % 2 === 0;
-    const isWorkingDay = isGroupA ? isGroupAWorking : isGroupB ? !isGroupAWorking : false;
-
-    if (!isWorkingDay) {
-      return {
-        code: 'OFF',
-        label: 'Libur Roster Bergantian (OFF)',
-        badgeClass: 'bg-slate-100 text-slate-500 border-slate-200 font-semibold',
-      };
-    }
-
-    const isMalam =
-      emp.shiftCode === 'MALAM' || (emp.baseShift && emp.baseShift.toLowerCase().includes('malam'));
-    if (isMalam) {
-      return {
-        code: 'MALAM (20-05)',
-        label: `${shiftSettings.shiftMalamName} (${shiftSettings.shiftMalamIn} - ${shiftSettings.shiftMalamOut})`,
-        badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200 font-bold',
-      };
-    }
-
-    return {
-      code: 'PAGI (08-17)',
-      label: `${shiftSettings.shiftPagiName} (${shiftSettings.shiftPagiIn} - ${shiftSettings.shiftPagiOut})`,
-      badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200 font-bold',
-    };
-  };
-
-  // Kalkulasi total jam kerja mingguan aktual berdasarkan jadwal aktif (8 jam efektif per dinas)
-  const calculateWeeklyHours = (emp, days) => {
-    let totalHours = 0;
-    days.forEach((day) => {
-      const shiftInfo = getEmployeeShiftForDay(emp, day);
-      if (
-        shiftInfo.code.includes('PAGI') ||
-        shiftInfo.code.includes('MALAM') ||
-        shiftInfo.code.includes('SWAP') ||
-        shiftInfo.code.includes('S1') ||
-        shiftInfo.code.includes('S2')
-      ) {
-        totalHours += 8;
-      } else if (shiftInfo.code === 'NON') {
-        totalHours += 8;
-      }
-    });
-    return totalHours;
-  };
-
-  // Ekspor Excel Roster Mingguan
   const handleExportRoster = () => {
-    const rows = filteredEmployees.map((emp, index) => {
-      const row = {
-        No: index + 1,
-        NIP: emp.nip,
-        'Nama Karyawan': emp.name,
-        Lokasi: emp.location || '-',
-        Divisi: emp.division,
-        Grup: emp.group,
-        'Shift Dasar': emp.baseShift,
-      };
-
-      currentWeek.days.forEach((day) => {
-        const shiftInfo = getEmployeeShiftForDay(emp, day);
-        row[`${day.label} (${day.date})`] = shiftInfo.code;
-      });
-
-      const weeklyHours = calculateWeeklyHours(emp, currentWeek.days);
-      row['Total Jam Kerja'] = `${weeklyHours} Jam`;
-      return row;
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Roster Shift');
-
-    worksheet['!cols'] = [
-      { wch: 4 },
-      { wch: 12 },
-      { wch: 22 },
-      { wch: 18 },
-      { wch: 24 },
-      { wch: 12 },
-      { wch: 28 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 12 },
-      { wch: 16 },
-    ];
-
-    XLSX.writeFile(workbook, `Roster_Shift_HCGA_Minggu_${selectedWeekIndex + 1}_Nov_2026.xlsx`);
+    exportRosterToExcel(filteredEmployees, currentWeek, selectedWeekIndex, resolverOptions);
     setAlertInfo({
       type: 'success',
       message: `Roster Shift ${currentWeek.label} berhasil diekspor ke Excel.`,
     });
   };
 
-  // Helper Badge Shift Sel
   const renderShiftCellBadge = (emp, day) => {
-    const shiftInfo = getEmployeeShiftForDay(emp, day);
+    const shiftInfo = getEmployeeShiftForDay(emp, day, resolverOptions);
     return (
       <span
         title={shiftInfo.label}
@@ -710,7 +473,7 @@ export default function JadwalShift({
             perPage={perPage}
             onPageChange={setCurrentPage}
             onPerPageChange={setPerPage}
-            calculateWeeklyHours={calculateWeeklyHours}
+            calculateWeeklyHours={calculateHours}
             renderShiftCellBadge={renderShiftCellBadge}
           />
         )}

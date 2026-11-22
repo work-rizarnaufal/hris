@@ -783,7 +783,34 @@ Menindaklanjuti audit berkala modul **Jadwal & Shift Kerja** (`JadwalShift.jsx`)
 
 ---
 
-## 23. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 23. Audit, Refaktor & Eliminasi Dead Code Halaman Utama Roster (`JadwalShift.jsx`)
+
+Lokasi: [`resources/js/Pages/Admin/Jadwal/JadwalShift.jsx`](resources/js/Pages/Admin/Jadwal/JadwalShift.jsx), [`resources/js/Pages/Admin/Jadwal/services/rosterUtils.js`](resources/js/Pages/Admin/Jadwal/services/rosterUtils.js), dan [`resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx`](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx)
+
+Menindaklanjuti audit perampingan kode anti-slop & ponytail pada modul Jadwal & Shift, dilakukan pembersihan menyeluruh terhadap `JadwalShift.jsx` yang sebelumnya membengkak hingga 754 baris:
+
+1. **Ekstraksi Utility Shift & Generator Roster ([`rosterUtils.js`](resources/js/Pages/Admin/Jadwal/services/rosterUtils.js))**:
+   - **Generator 4 Minggu Kompak**: Menggantikan 54 baris deklarasi array `WEEKS` hardcoded statis dengan generator dinamis fungsional (15 baris) yang menghasilkan struktur data minggu dan hari (Senin–Minggu) dengan 100% kompatibilitas.
+   - **Enkapsulasi Engine Resolusi Shift (`getEmployeeShiftForDay`)**: Memindahkan ~125 baris logika penentuan giliran dinas per karyawan (pengecualian, tukar shift, libur nasional, lembur libur, jadwal manual grup, dan siklus rotasi ganjil/genap) ke dalam modul utility terisolasi dan testable.
+   - **Kalkulasi Jam Kerja & Ekspor Excel**: Memindahkan fungsi `calculateWeeklyHours` dan `exportRosterToExcel` ke dalam modul utility.
+   - **Eliminasi Ketergantungan Langsung XLSX di Halaman Utama**: Mengurangi beban bundle parsing komponen utama `JadwalShift.jsx`.
+
+2. **Perbaikan Sinkronisasi Logika (Bug Fix: Pengecualian Mandiri / Override)**:
+   - Ditemukan inkonsistensi pada `getEmployeeShiftForDay` lama di mana setiap pengecualian non-swap (`type === 'override'`, misal request libur atau shift khusus) salah dipetakan secara sepihak menjadi `'S2 (SWAP)'`.
+   - Diperbaiki agar membaca atribut `targetShift` secara presisi: jika mengandung `'Off'`, shift dirender menjadi `'OFF*'`, dan jika mengandung `'Malam'` atau `'Pagi'` dirender sesuai penugasan mandirinya dengan badge khusus.
+
+3. **Eliminasi Dead Code & Optimasi Loop**:
+   - **Penghapusan Dead Code `SHIFT_12H_OPTIONS`**: Menghapus 27 baris konstanta statis tak terpakai di [`ModalFormTukarShift.jsx`](resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx) yang sebelumnya menduplikasi `getDynamicShift12HOptions()`.
+   - **Optimasi `stats` Scorecard (Single-Pass Loop)**: Menggantikan 5 kali pemanggilan array `.filter()` terpisah menjadi 1 kali iterasi terpadu (`forEach`), mengurangi *computational overhead* secara signifikan saat menyaring puluhan personil.
+
+4. **Hasil Pengurangan Baris & Performa Bundle**:
+   - **Penurunan Baris Kode**: `JadwalShift.jsx` berkurang drastis dari **754 baris menjadi 348 baris** (pengurangan **54% / 406 baris**).
+   - **Ukuran JS Bundle**: Chunk `JadwalShift` tetap sangat ringan di **13.85 kB** (5.11 kB gzip).
+   - **Integritas Sistem**: 22 backend PHPUnit Feature Tests (164 assertions) dan build Vite lulus 100%.
+
+---
+
+## 24. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 

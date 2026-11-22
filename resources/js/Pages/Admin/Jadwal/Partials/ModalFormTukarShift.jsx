@@ -45,33 +45,6 @@ export function getDynamicShift12HOptions() {
   ];
 }
 
-export const SHIFT_12H_OPTIONS = [
-  {
-    value: 'Shift Pagi (08:00 - 17:00)',
-    label: 'Shift Pagi: 9 Jam (08:00 - 17:00 WIB)',
-    time: '08:00 - 17:00',
-    type: 'Pagi',
-  },
-  {
-    value: 'Shift Malam (20:00 - 05:00)',
-    label: 'Shift Malam: 9 Jam (20:00 - 05:00 WIB)',
-    time: '20:00 - 05:00',
-    type: 'Malam',
-  },
-  {
-    value: 'Off Pasca-Dinas',
-    label: 'Off Pasca-Dinas (Libur Rotasi)',
-    time: 'Off',
-    type: 'Off',
-  },
-  {
-    value: 'Penugasan Khusus Operasional',
-    label: 'Penugasan Khusus / Lembur Operasional',
-    time: 'Fleksibel',
-    type: 'Khusus',
-  },
-];
-
 export default function ModalFormTukarShift({
   isOpen,
   onClose,
