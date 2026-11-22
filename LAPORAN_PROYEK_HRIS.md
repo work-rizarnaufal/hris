@@ -265,7 +265,7 @@ Lokasi: [`resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx`](resources/js
   - **Ekspor Excel**: 1-klik unduh `.xlsx` seluruh data terfilter per tanggal aktif via SheetJS.
   - **Live Filter**: Pencarian teks nama/NIP + filter Status, Divisi, dan Shift.
   - **Navigasi Pagination Tunggal & Atomik**: Menggunakan satu komponen `<TablePagination />` terpadu dengan pemilih baris per halaman (10, 25, 50, 100 baris) dan nomor halaman berelipsis, mengeliminasi duplikasi footer baris ganda.
-  - **Modularisasi & Pembersihan Kode Usang**: Memecah file 1.045 baris menjadi orchestrator ringkas ~510 baris dan 3 sub-komponen terisolasi di `Partials/` (`AttendanceDateRibbon.jsx`, `AttendanceKpiCards.jsx`, `AttendanceToolbar.jsx`). Menghapus 8 import mati, 2 konstanta usang, menghilangkan duplikasi state React, dan mendinamisasi opsi filter divisi dari master karyawan.
+  - **Modularisasi & Pembersihan Kode Usang**: Memecah file 1.045 baris menjadi orchestrator ringkas 507 baris dan 4 sub-komponen terisolasi di `Partials/` (`AttendanceDateRibbon.jsx`, `AttendanceKpiCards.jsx`, `AttendanceToolbar.jsx`, `AttendanceTable.jsx`). Sanitasi total 100% dead code: menghapus 8 import mati di file utama, 5 import mati di modal fingerprint, 2 import mati di modal form presensi, 1 import mati di tabel, 3 konstanta usang (`MASTER_EMPLOYEES`, `INITIAL_ATTENDANCES`, `SHIFT_OPTIONS`), menghilangkan duplikasi state React, mendinamisasi filter divisi dari master karyawan, serta mengoneksikan props `locations` dan `existingAttendances` antar komponen.
   - **Notifikasi**: Menggunakan notifikasi atomik `<Toast />`.
 
 ---
