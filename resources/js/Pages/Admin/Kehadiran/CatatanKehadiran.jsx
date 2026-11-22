@@ -549,6 +549,7 @@ export default function CatatanKehadiran({
         onExecute={handleExecuteMass}
         employees={employees}
         currentDate={selectedDate}
+        existingAttendances={attendances}
       />
 
       {/* Modal Impor Fingerprint */}
@@ -557,7 +558,7 @@ export default function CatatanKehadiran({
         onClose={() => setIsFingerprintOpen(false)}
         onSuccess={handleFingerprintImportSuccess}
         employees={employees}
-        currentDate={selectedDate}
+        locations={dbLocations}
       />
     </>
   );

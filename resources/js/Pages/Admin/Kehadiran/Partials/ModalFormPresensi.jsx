@@ -6,9 +6,7 @@ import {
   AlertCircle,
   MapPin,
   Lock,
-  Building,
   CheckCircle2,
-  Calendar,
 } from 'lucide-react';
 import {
   Modal,
@@ -48,23 +46,6 @@ export function getDynamicShiftOptions() {
     },
   ];
 }
-
-export const SHIFT_OPTIONS = [
-  {
-    value: 'Shift Pagi (08:00 - 17:00)',
-    label: 'Shift Pagi (08:00 - 17:00)',
-    startTime: '08:00',
-    endTime: '17:00',
-    type: 'Pagi',
-  },
-  {
-    value: 'Shift Malam (20:00 - 05:00)',
-    label: 'Shift Malam (20:00 - 05:00)',
-    startTime: '20:00',
-    endTime: '05:00',
-    type: 'Malam',
-  },
-];
 
 export function resolveShiftConfig(shiftStr) {
   const options = getDynamicShiftOptions();
