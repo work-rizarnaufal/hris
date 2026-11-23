@@ -31,12 +31,15 @@ export function generateCalendarDays(employee, selectedPeriod) {
   const incidents = employee.incidents || [];
   const dailyAttendances = employee.dailyAttendances || [];
 
+  const isUnset = employee.group === 'Belum Ditetapkan' || !employee.group;
+  const isNonShift = employee.group === 'Non-Shift';
+  const isGroupA = employee.group === 'Grup A';
+  const isGroupB = employee.group === 'Grup B';
+
   const isMalam =
     employee.shiftCode === 'MALAM' ||
     employee.baseShift?.toLowerCase().includes('malam') ||
     employee.role?.toLowerCase().includes('malam');
-  const isGroupA = employee.group === 'Grup A';
-  const isGroupB = employee.group === 'Grup B';
 
   const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const monthShort = monthNamesShort[month - 1] || 'Nov';
@@ -103,6 +106,25 @@ export function generateCalendarDays(employee, selectedPeriod) {
         status = 'Izin';
         detail = incident.detail;
       }
+    } else if (isUnset) {
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        status = 'Libur';
+        detail = 'Libur Akhir Pekan (Grup Kerja Belum Ditetapkan)';
+      } else {
+        status = 'Belum Ditetapkan';
+        detail = 'Grup kerja dan jadwal shift belum ditetapkan oleh Administrator';
+      }
+    } else if (isNonShift) {
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        status = 'Libur';
+        detail = 'Libur Akhir Pekan (Sabtu/Minggu)';
+      } else if (dateObj > todayStart) {
+        status = 'Terjadwal';
+        detail = 'Jadwal Staf Kantor (08:00 - 17:00 WIB)';
+      } else {
+        status = 'Belum Ada Log';
+        detail = 'Staf Kantor (Belum ada rekaman log presensi)';
+      }
     } else if (isWorkingRoster) {
       if (dateObj > todayStart) {
         status = 'Terjadwal';
@@ -113,6 +135,9 @@ export function generateCalendarDays(employee, selectedPeriod) {
           ? 'Jadwal Shift Malam (Belum ada rekaman log presensi)'
           : 'Jadwal Shift Pagi (Belum ada rekaman log presensi)';
       }
+    } else {
+      status = 'Libur';
+      detail = 'Libur Pasca-Dinas (Rotasi 24/7)';
     }
 
     days.push({
@@ -176,7 +201,7 @@ export default function RaporCalendarGrid({
                 <span className="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block" /> Terjadwal
               </span>
               <span className="flex items-center gap-1 text-slate-600">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" /> Libur / Belum Ada Log
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block" /> Libur / Belum Ditetapkan
               </span>
             </div>
           </div>
@@ -214,6 +239,9 @@ export default function RaporCalendarGrid({
               } else if (dayItem.status === 'Belum Ada Log') {
                 bgStyle = 'bg-slate-50 border-dashed border-slate-300 text-slate-500';
                 dotStyle = 'bg-slate-400';
+              } else if (dayItem.status === 'Belum Ditetapkan') {
+                bgStyle = 'bg-slate-50/70 border-dashed border-slate-200 text-slate-400';
+                dotStyle = 'bg-slate-300';
               } else if (dayItem.status === 'Libur') {
                 bgStyle = 'bg-slate-50 border-slate-200 text-slate-400';
                 dotStyle = 'bg-slate-300';
@@ -299,7 +327,7 @@ export default function RaporCalendarGrid({
                   tick={{ fill: '#64748b', fontSize: 11 }}
                 />
                 <YAxis
-                  domain={[50, 100]}
+                  domain={[0, 100]}
                   tickLine={false}
                   axisLine={{ stroke: '#e2e8f0' }}
                   tick={{ fill: '#64748b', fontSize: 10 }}
@@ -319,7 +347,7 @@ export default function RaporCalendarGrid({
                   {historyData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={entry.score >= 95 ? '#10273f' : entry.score >= 85 ? '#39609e' : '#c4a266'}
+                      fill={entry.score > 0 ? (entry.score >= 95 ? '#10273f' : entry.score >= 85 ? '#39609e' : '#c4a266') : '#cbd5e1'}
                     />
                   ))}
                 </Bar>
@@ -327,7 +355,12 @@ export default function RaporCalendarGrid({
             </ResponsiveContainer>
           </div>
           <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 text-[11px] text-slate-600 mt-2">
-            Rata-rata semester: <strong>{historyData.length > 0 ? (historyData.reduce((a, b) => a + b.score, 0) / historyData.length).toFixed(1) : 0}%</strong>
+            Rata-rata semester:{' '}
+            <strong>
+              {historyData.length > 0 && historyData.some((h) => h.score > 0)
+                ? `${(historyData.reduce((a, b) => a + b.score, 0) / historyData.length).toFixed(1)}%`
+                : '0% (Belum Ada Data)'}
+            </strong>
           </div>
         </CardContent>
       </Card>

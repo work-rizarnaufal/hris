@@ -42,8 +42,8 @@ export default function RaporKpiCards({ employee, calendarDays = [] }) {
     : (employee.alpaDays || 0);
 
   const workDays = calendarDays.length > 0
-    ? calendarDays.filter((d) => d.status !== 'Libur').length
-    : (employee.workDays || 22);
+    ? calendarDays.filter((d) => d.status !== 'Libur' && d.status !== 'Belum Ditetapkan').length
+    : (employee.workDays || 0);
 
   const totalLateMinutes = employee.totalLateMinutes || 0;
 

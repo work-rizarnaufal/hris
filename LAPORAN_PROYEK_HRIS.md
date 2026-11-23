@@ -810,7 +810,28 @@ Menindaklanjuti audit perampingan kode anti-slop & ponytail pada modul Jadwal & 
 
 ---
 
-## 24. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 24. Audit & Eliminasi Data Dummy / Fallback Semu Matriks Presensi 30 Hari (`RaporIndividu.jsx`)
+
+Lokasi: [`resources/js/Pages/Admin/Laporan/Partials/RaporCalendarGrid.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporCalendarGrid.jsx), [`resources/js/Pages/Admin/Laporan/Partials/RaporKpiCards.jsx`](resources/js/Pages/Admin/Laporan/Partials/RaporKpiCards.jsx), dan [`app/Http/Controllers/Admin/LaporanController.php`](app/Http/Controllers/Admin/LaporanController.php)
+
+Menindaklanjuti audit pengecekan data dummy pada tabel **Matriks Presensi 30 Hari (November 2026)** di tab Rapor Individu:
+
+1. **Hasil Verifikasi Database SQLite**:
+   - Tabel `attendances`: **0 baris** (Bersih total, tidak ada catatan kehadiran palsu di database).
+   - Tabel `employees`: **86 personil riil** (seluruhnya berstatus awal `shift_group: 'Belum Ditetapkan'`, `shift_id: null`).
+
+2. **Eliminasi Jadwal Semu (*Ghost Schedule*) pada Sel Kalender**:
+   - Sebelumnya, jika karyawan berstatus `Belum Ditetapkan`, sistem mengevaluasi fallback hari kerja Senin–Jumat dan melabeli tanggal yang belum lewat sebagai `Terjadwal` dengan detail *"Jadwal Shift Pagi (08:00 - 17:00 WIB)"*, serta akhir pekan sebagai *"Libur Pasca-Dinas (Rotasi 24/7)"*.
+   - Telah diperbaiki secara komprehensif: jika personil berstatus `Belum Ditetapkan`, seluruh sel kalender secara jujur menampilkan status **`Belum Ditetapkan`** dengan detail *"Grup kerja dan shift operasional belum ditetapkan oleh Administrator"*, serta akhir pekan sebagai *"Libur Akhir Pekan (Grup Kerja Belum Ditetapkan)"*.
+
+3. **Penyelarasan Backend `LaporanController.php`**:
+   - Menghapus fallback string hardcoded `'Shift Pagi (08:00 - 17:00)'` dan `'PAGI'` saat karyawan belum memiliki shift. Kini secara presisi mengembalikan `'Belum Ditentukan'` dan `'-'`.
+   - Mengeliminasi skor dummy 100% pada grafik **Tren Disiplin 6 Bulan**. Ketika histori absensi karyawan kosong (0 log), nilai skor dikembalikan 0% dengan keterangan informatif *"0% (Belum Ada Data)"*.
+   - Menyesuaikan kalkulasi `workDays` di kartu KPI rapor: jika personil berstatus `Belum Ditetapkan`, total hari kerja tidak lagi dipaksakan 22 hari melainkan 0 hari hingga jadwal ditetapkan.
+
+---
+
+## 25. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
@@ -824,4 +845,4 @@ Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
    - Menyediakan scheduled command (`php artisan attendance:pull-fingerprint`) atau webhook listener jika mesin absensi site mendukung direct push via ADMS/Cloud.
 
 ---
-*Laporan handover ini diperbarui secara komprehensif pada 22 November 2026 sebagai dokumentasi resmi arsitektur sistem HRIS.*
+*Laporan handover ini diperbarui secara komprehensif pada 23 November 2026 sebagai dokumentasi resmi arsitektur sistem HRIS.*

@@ -149,7 +149,7 @@ class LaporanController extends Controller
                 $mAlpa = $mEmpAtt->filter(fn ($a) => in_array(strtolower($a->status), ['alpha', 'alpa']))->count();
 
                 if ($mPresent === 0 && $mAlpa === 0) {
-                    $mScore = 100;
+                    $mScore = 0;
                 } else {
                     $mScoreDeduction = ($mLate * 2) + ($mAlpa * 15) + (int) floor($mLateMinutes / 15);
                     $mScore = max(50, min(100, 100 - $mScoreDeduction));
@@ -165,6 +165,17 @@ class LaporanController extends Controller
             $locationName = $emp->location?->name
                 ?? ($emp->location_id === 1 ? 'Lokasi Mariuk' : 'Lokasi Cimalaka');
 
+            $group = $emp->shift_group ?? ($emp->group ?? 'Belum Ditetapkan');
+            $isUnset = ($group === 'Belum Ditetapkan');
+            $isNonShift = ($group === 'Non-Shift');
+
+            $baseShift = $isNonShift
+                ? 'Non-Shift Kantor (08:00 - 17:00)'
+                : ($isUnset ? ($emp->shift?->name ?? 'Belum Ditentukan') : ($emp->shift?->name ?? 'Shift Pagi (08:00 - 17:00)'));
+            $shiftCode = $isNonShift
+                ? 'OFFICE'
+                : ($isUnset ? ($emp->shift?->code ?? '-') : ($emp->shift?->code ?? 'PAGI'));
+
             return [
                 'id' => $emp->id,
                 'name' => $emp->name,
@@ -173,9 +184,9 @@ class LaporanController extends Controller
                 'division' => $emp->division ?? '-',
                 'location' => $locationName,
                 'location_id' => $emp->location_id,
-                'group' => $emp->shift_group ?? ($emp->group ?? 'Grup A'),
-                'baseShift' => $emp->shift?->name ?? 'Shift Pagi (08:00 - 17:00)',
-                'shiftCode' => $emp->shift?->code ?? 'PAGI',
+                'group' => $group,
+                'baseShift' => $baseShift,
+                'shiftCode' => $shiftCode,
                 'workDays' => $workDays,
                 'presentDays' => $presentDays,
                 'lateCount' => $lateCount,
