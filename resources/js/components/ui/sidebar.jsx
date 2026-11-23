@@ -21,8 +21,23 @@ export function Sidebar({
   companyName = siteConfig.defaultCompany,
   actorName = siteConfig.defaultActor,
   currentUrl = '',
+  user,
 }) {
   const [roleProfile, setRoleProfile] = useState(() => getActiveRoleProfile());
+
+  useEffect(() => {
+    if (user?.role) {
+      const roleKeyMap = {
+        super_admin: 'SUPER_ADMIN',
+        supervisor: 'SUPERVISOR',
+        karyawan: 'KARYAWAN',
+      };
+      const mappedKey = roleKeyMap[user.role] || 'SUPER_ADMIN';
+      if (ROLE_PROFILES[mappedKey]) {
+        setRoleProfile(ROLE_PROFILES[mappedKey]);
+      }
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleRoleChange = (e) => {
@@ -33,6 +48,8 @@ export function Sidebar({
     window.addEventListener('hris:role-changed', handleRoleChange);
     return () => window.removeEventListener('hris:role-changed', handleRoleChange);
   }, []);
+
+  const displayName = user?.name || roleProfile.name;
 
   const isItemActive = (href) => {
     const cleanUrl = (typeof currentUrl === 'string' ? currentUrl : '').split('?')[0];
@@ -133,11 +150,11 @@ export function Sidebar({
           <div className="sidebar-user flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="avatar small text-slate-800 font-bold bg-amber-200 shrink-0">
-                {roleProfile.name.slice(0, 2).toUpperCase()}
+                {displayName.slice(0, 2).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <strong className="truncate block" title={roleProfile.name}>
-                  {roleProfile.name}
+                <strong className="truncate block" title={displayName}>
+                  {displayName}
                 </strong>
                 <small className="truncate block text-[#c4a266] font-medium" title={roleProfile.roleLabel}>
                   {roleProfile.shortTitle}

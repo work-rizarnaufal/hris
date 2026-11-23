@@ -192,9 +192,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "mtime": 1795250064.3235102,
-    "seen": 1795250261.1956322,
-    "ast_hash": "2537274d721cf80c22b37a6aabe537b3",
+    "mtime": 1795440851.7370994,
+    "seen": 1795440947.508421,
+    "ast_hash": "da06a7a0815b153c7c4e6aa37af7d75f",
     "semantic_hash": ""
   },
   "resources/js/Pages/User/RingkasanPublik.jsx": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795440496.9726074,
-    "seen": 1795440513.1339576,
-    "ast_hash": "f55bd671fce768f9e4a7764e0069a519",
+    "mtime": 1795440936.996583,
+    "seen": 1795440947.508421,
+    "ast_hash": "4a5c139096ac9d7e4650c92ad8691616",
     "semantic_hash": ""
   },
   "README.md": {
@@ -534,9 +534,9 @@
     "semantic_hash": ""
   },
   "resources/js/services/authRole.js": {
-    "mtime": 1795272673.665149,
-    "seen": 1795273395.922694,
-    "ast_hash": "542bd859527d3385514df750a32fbb55",
+    "mtime": 1795440852.1108215,
+    "seen": 1795440947.508421,
+    "ast_hash": "014aa953c898743d438f3a8db346c6ff",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/BerandaController.php": {
@@ -684,9 +684,9 @@
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795324372.1451168,
-    "seen": 1795324534.4023254,
-    "ast_hash": "6ea2394cea194694096193f9b371bc93",
+    "mtime": 1795440850.9313953,
+    "seen": 1795440947.508421,
+    "ast_hash": "4ad6640eaa424e506b218c24ad3cd57a",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {

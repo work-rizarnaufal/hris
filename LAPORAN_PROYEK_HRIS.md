@@ -856,7 +856,32 @@ Sesuai permintaan instruksi operasional, akun pengguna pada sistem disederhanaka
 
 ---
 
-## 26. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 26. Penyelarasan & Sinkronisasi Penuh Autentikasi Laravel (Auth Middleware & Frontend State)
+
+Lokasi: [`bootstrap/app.php`](bootstrap/app.php), [`routes/web.php`](routes/web.php), [`app/Http/Controllers/Auth/AuthController.php`](app/Http/Controllers/Auth/AuthController.php), [`resources/js/Layouts/LayoutUtama.jsx`](resources/js/Layouts/LayoutUtama.jsx), [`resources/js/components/ui/topbar.jsx`](resources/js/components/ui/topbar.jsx), dan [`tests/Feature/AuthTest.php`](tests/Feature/AuthTest.php)
+
+Untuk menjamin keamanan penuh pada level rute dan memastikan status masuk tersinkronisasi secara otomatis antara backend dan frontend:
+
+1. **Perlindungan Rute Administrator (`auth` & `guest` middleware)**:
+   - Seluruh rute administratif (`/beranda`, `/karyawan`, `/kehadiran`, `/jadwal`, `/laporan`, `/pengaturan`, dll) kini diproteksi dengan grup `Route::middleware('auth')`. Permintaan tanpa sesi login langsung dialihkan ke `/login`.
+   - Halaman `/login` dilindungi dengan `Route::middleware('guest')`. Pengguna yang telah memiliki sesi aktif otomatis dialihkan ke `/beranda`.
+   - Konfigurasi `redirectGuestsTo('/login')` dan `redirectUsersTo('/beranda')` didaftarkan secara native pada [`bootstrap/app.php`](bootstrap/app.php).
+   - Rute pangkal `/` kini secara cerdas mengarahkan pengunjung: langsung ke `/beranda` jika terautentikasi, atau ke `/login` jika belum.
+
+2. **Dukungan Login Fleksibel (Dual Login: Email atau NIP)**:
+   - [`AuthController.php`](app/Http/Controllers/Auth/AuthController.php) disempurnakan sehingga pengguna dapat masuk menggunakan **Email** (`nabiel@hrd.com`) maupun **NIP** (`HC-0001`) dengan kata sandi yang sama.
+
+3. **Sinkronisasi Otomatis Antarmuka Pengguna (App Shell)**:
+   - [`LayoutUtama.jsx`](resources/js/Layouts/LayoutUtama.jsx), [`topbar.jsx`](resources/js/components/ui/topbar.jsx), dan [`sidebar.jsx`](resources/js/components/ui/sidebar.jsx) disinkronkan secara reaktif dengan `props.auth.user`.
+   - Nama pengguna, inisial avatar, email, NIP, serta profil peran operasional pada Topbar dan Sidebar langsung mencerminkan data pengguna terautentikasi yang dikirimkan oleh middleware Inertia.
+
+4. **Pengujian Komprehensif (29 Tests Passing)**:
+   - Dibuat rangkaian pengujian fitur baru [`AuthTest.php`](tests/Feature/AuthTest.php) yang memverifikasi proteksi tamu, autentikasi email, autentikasi NIP, penolakan password salah, proteksi rute tamu, dan proses logout.
+   - Seluruh 29 pengujian backend PHPUnit (185 assertions) lulus 100%.
+
+---
+
+## 27. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 

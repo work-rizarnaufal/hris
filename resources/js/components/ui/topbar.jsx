@@ -24,6 +24,7 @@ export function Topbar({
   title = 'Beranda',
   sidebarOpen = false,
   onToggleSidebar,
+  user,
 }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
@@ -37,6 +38,21 @@ export function Topbar({
     timeZone: 'Asia/Jakarta',
   }).format(new Date());
 
+  // Sinkronkan profil peran saat data user autentikasi tersedia
+  useEffect(() => {
+    if (user?.role) {
+      const roleKeyMap = {
+        super_admin: 'SUPER_ADMIN',
+        supervisor: 'SUPERVISOR',
+        karyawan: 'KARYAWAN',
+      };
+      const mappedKey = roleKeyMap[user.role] || 'SUPER_ADMIN';
+      if (ROLE_PROFILES[mappedKey]) {
+        setCurrentRole(ROLE_PROFILES[mappedKey]);
+      }
+    }
+  }, [user]);
+
   // Dengarkan perubahan role real-time dari komponen lain
   useEffect(() => {
     const handleRoleChange = (e) => {
@@ -48,8 +64,9 @@ export function Topbar({
     return () => window.removeEventListener('hris:role-changed', handleRoleChange);
   }, []);
 
-  const displayName = currentRole.name;
-  const displayEmail = currentRole.email;
+  const displayName = user?.name || currentRole.name;
+  const displayEmail = user?.email || currentRole.email;
+  const displayNip = user?.nip || currentRole.nip;
 
   // Inisial 2 karakter
   const userInitials = displayName
@@ -196,7 +213,7 @@ export function Topbar({
                       Sesi {currentRole.shortTitle} Aktif
                     </span>
                     <span className="text-slate-300 font-mono text-[10px] bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
-                      NIP: {currentRole.nip}
+                      NIP: {displayNip}
                     </span>
                   </div>
                 </div>

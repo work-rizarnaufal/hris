@@ -18,10 +18,17 @@ class AuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
+
+        $loginInput = $request->input('email');
+        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'nip';
+        $credentials = [
+            $field => $loginInput,
+            'password' => $request->input('password'),
+        ];
 
         $remember = (bool) $request->boolean('remember');
 
@@ -32,7 +39,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Kombinasi email dan kata sandi tidak cocok dengan data terdaftar.',
+            'email' => 'Kombinasi kredensial dan kata sandi tidak cocok dengan data terdaftar.',
         ])->onlyInput('email');
     }
 

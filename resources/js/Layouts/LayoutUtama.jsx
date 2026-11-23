@@ -39,6 +39,21 @@ export default function LayoutUtama({
   const actorName = props.auth?.user?.name || props.appData?.actor || siteConfig.defaultActor;
   const companyName = props.appData?.config?.company || siteConfig.defaultCompany;
 
+  // Sinkronkan peran dengan user terautentikasi jika ada
+  useEffect(() => {
+    if (props.auth?.user?.role) {
+      const roleKeyMap = {
+        super_admin: 'SUPER_ADMIN',
+        supervisor: 'SUPERVISOR',
+        karyawan: 'KARYAWAN',
+      };
+      const mappedKey = roleKeyMap[props.auth.user.role] || 'SUPER_ADMIN';
+      if (ROLE_PROFILES[mappedKey]) {
+        setRoleProfile(ROLE_PROFILES[mappedKey]);
+      }
+    }
+  }, [props.auth?.user]);
+
   // Dengarkan perubahan role simulasi secara real-time
   useEffect(() => {
     const handleRoleChange = (e) => {
@@ -78,6 +93,7 @@ export default function LayoutUtama({
         onClose={() => setSidebarOpen(false)}
         companyName={companyName}
         actorName={actorName}
+        user={props.auth?.user}
         currentUrl={url}
       />
 
