@@ -18,7 +18,7 @@ import {
 } from '@/components/ui';
 import { getPageMetadata } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
-import { getActiveRoleProfile, isRouteAllowed } from '@/services/authRole.js';
+import { getActiveRoleProfile, isRouteAllowed, ROLE_PROFILES } from '@/services/authRole.js';
 
 export default function LayoutUtama({
   children,

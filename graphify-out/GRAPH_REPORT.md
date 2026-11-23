@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-23)
 
 ## Corpus Check
-- 159 files · ~101,926 words
+- 159 files · ~101,928 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
 ## Summary
-- 743 nodes · 1775 edges · 53 communities (21 shown, 32 thin omitted)
+- 743 nodes · 1777 edges · 53 communities (21 shown, 32 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1924eacf`
+- Built from commit: `2804c76e`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -56,6 +56,8 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `renderAdminLayout()` --calls--> `LayoutUtama()`  [EXTRACTED]
+  resources/js/app.jsx → resources/js/Layouts/LayoutUtama.jsx
 - `AuthTest` --inherits--> `TestCase`  [EXTRACTED]
   tests/Feature/AuthTest.php → tests/TestCase.php
 - `Card()` --calls--> `cn()`  [EXTRACTED]
@@ -63,8 +65,6 @@
 - `CardContent()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 - `CardDescription()` --calls--> `cn()`  [EXTRACTED]
-  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
-- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles

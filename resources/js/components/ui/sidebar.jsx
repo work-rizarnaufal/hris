@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import { Building2, LogOut } from 'lucide-react';
 import { navigationConfig } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
-import { getActiveRoleProfile, isRouteAllowed } from '@/services/authRole.js';
+import { getActiveRoleProfile, isRouteAllowed, ROLE_PROFILES } from '@/services/authRole.js';
 
 // Daftar rute modul yang sudah memiliki implementasi halaman penuh
 const IMPLEMENTED_ROUTES = new Set([
