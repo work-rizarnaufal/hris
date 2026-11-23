@@ -9,18 +9,15 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
-  CalendarDays,
   Layers,
-  Sparkles,
   ArrowLeft,
-  KeyRound,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.js';
 
 export default function Login() {
-  const [email, setEmail] = useState('nabiel@hrd.com');
-  const [password, setPassword] = useState('nabiel123');
-  const [remember, setRemember] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -31,7 +28,7 @@ export default function Login() {
     setErrorMessage('');
 
     if (!email || !password) {
-      setErrorMessage('Silakan lengkapi alamat email dan kata sandi.');
+      setErrorMessage('Silakan lengkapi alamat email atau NIP dan kata sandi Anda.');
       setLoading(false);
       return;
     }
@@ -49,12 +46,6 @@ export default function Login() {
         },
       }
     );
-  };
-
-  const handleQuickFill = (roleEmail, rolePass) => {
-    setEmail(roleEmail);
-    setPassword(rolePass);
-    setErrorMessage('');
   };
 
   return (
@@ -157,27 +148,6 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Quick Fill Pills untuk Pengujian Cepat */}
-            <div className="mb-6 p-3 rounded-xl bg-slate-50 border border-slate-200/80">
-              <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
-                <span className="font-semibold text-slate-700 flex items-center gap-1">
-                  <KeyRound className="w-3 h-3 text-[#c4a266]" />
-                  <span>Akun Super Admin:</span>
-                </span>
-                <span className="text-[10px] text-slate-400">Klik untuk mengisi</span>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('nabiel@hrd.com', 'nabiel123')}
-                  className="w-full py-1.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:border-[#c4a266] hover:text-navy transition-colors text-center shadow-2xs flex items-center justify-center gap-1.5"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#c4a266]" />
-                  <span>Super Admin (nabiel@hrd.com)</span>
-                </button>
-              </div>
-            </div>
-
             {/* Notifikasi Error */}
             {errorMessage && (
               <div className="mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
@@ -198,12 +168,14 @@ export default function Login() {
                   </div>
                   <input
                     id="email"
+                    name="email"
                     type="text"
+                    autoComplete="username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="nama@perusahaan.com atau HC-XXXX"
-                    className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900"
+                    placeholder="nama@perusahaan.com atau NIP (HC-XXXX)"
+                    className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -230,17 +202,19 @@ export default function Login() {
                   </div>
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="••••••••"
-                    className="w-full pl-9 pr-10 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900"
+                    placeholder="Masukkan kata sandi akun"
+                    className="w-full pl-9 pr-10 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
                     aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

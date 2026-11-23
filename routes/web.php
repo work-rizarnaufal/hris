@@ -19,7 +19,7 @@ Route::get('/', function () {
 // Rute Tamu (Guest-Only): Pengguna yang sudah login diarahkan ke /beranda
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
 
 // Rute Keluar (Logout)
@@ -102,3 +102,7 @@ Route::prefix('user')->name('user.')->group(function () {
         return Inertia::render('User/RingkasanPublik');
     })->name('dashboard');
 });
+
+Route::get('/ringkasan-publik', function () {
+    return redirect()->route('user.dashboard');
+})->name('ringkasan-publik');

@@ -472,18 +472,18 @@ Lokasi: [`resources/js/Pages/Auth/Login.jsx`](resources/js/Pages/Auth/Login.jsx)
   3. *Rapor Disiplin & Rekapitulasi*: Evaluasi kehadiran real-time dan dossier pembinaan.
 - **Sisi Kanan (Formulir Masuk)**: Tata letak bersih, fokus form terpusat, dan responsif di perangkat bergerak.
 
-### B. Fitur & Keamanan Antarmuka
-- **Quick-Fill Akun Demo**: Tombol 1-klik untuk memasukkan kredensial pengujian tanpa repot mengetik:
-  - *Admin HCGA*: `admin@hcga-manufaktur.co.id`
-  - *SPV Operasional*: `spv.ops@hcga-manufaktur.co.id`
-- **Toggle Intip Kata Sandi**: Ikon mata (`Eye` / `EyeOff`) untuk melihat kata sandi.
-- **Opsi Remember Me & Lupa Sandi**: Penanganan sesi masuk pengguna.
-- **Navigasi Balik**: Tautan langsung ke portal terbuka *Ringkasan Publik*.
+### B. Fitur & Keamanan Antarmuka (Production-Grade)
+- **Form Bersih & Aman**: Input email/NIP dan password diinisialisasi kosong (`useState('')`), tanpa menyimpan kredensial atau password hardcoded di client bundle.
+- **Eliminasi Quick-Fill Demo**: Komponen tombol pengisi otomatis demo telah dihapus total untuk mencegah kebocoran kredensial pada server staging/produksi.
+- **Proteksi Anti-Brute Force (Rate Limiting)**: Rute `POST /login` dilindungi dengan `middleware('throttle:5,1')` (maksimal 5 percobaan gagal per menit).
+- **Atribut Autocomplete Standar**: Dilengkapi `autoComplete="username"` dan `autoComplete="current-password"` yang ramah browser password manager.
+- **Toggle Intip Kata Sandi**: Ikon mata (`Eye` / `EyeOff`) untuk melihat kata sandi saat pengetikan manual.
+- **Opsi Remember Me & Lupa Sandi**: Penanganan opsi `remember` dan arahan kontak helpdesk IT.
+- **Navigasi Balik**: Tautan aman ke portal terbuka *Ringkasan Publik* (`/ringkasan-publik` $\to$ `/user`).
 - **Rute Autentikasi**:
-  - `GET /login`: Menampilkan halaman login (bebas dari wrapper LayoutUtama via `Login.layout = (page) => page`).
-  - `POST /login`: Validasi kredensial dan pengalihan ke `/beranda`.
+  - `GET /login`: Menampilkan halaman login (dilindungi `guest` middleware, dialihkan jika sudah login).
+  - `POST /login`: Validasi kredensial Email/NIP dan pengalihan ke `/beranda`.
   - `MATCH /logout`: Aksi keluar sesi dan pengalihan kembali ke `/login`.
-- **Tombol Keluar Resmi**: Disediakan tombol **Keluar** berwarna merah/danger pada [`topbar.jsx`](resources/js/components/ui/topbar.jsx) dan [`sidebar.jsx`](resources/js/components/ui/sidebar.jsx).
 
 ---
 
