@@ -1,7 +1,7 @@
-# Graph Report - hris  (2026-11-22)
+# Graph Report - hris  (2026-11-23)
 
 ## Corpus Check
-- 158 files · ~100,775 words
+- 158 files · ~101,613 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `de0b219a`
+- Built from commit: `acfb1152`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -54,15 +54,15 @@
 10. `CardTitle()` - 18 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `JadwalShift()` --calls--> `JadwalExceptionsTab()`  [EXTRACTED]
-  resources/js/Pages/Admin/Jadwal/JadwalShift.jsx → resources/js/Pages/Admin/Jadwal/Partials/JadwalExceptionsTab.jsx
-- `JadwalShift()` --calls--> `JadwalKpiCards()`  [EXTRACTED]
-  resources/js/Pages/Admin/Jadwal/JadwalShift.jsx → resources/js/Pages/Admin/Jadwal/Partials/JadwalKpiCards.jsx
-- `JadwalShift()` --calls--> `JadwalRosterTab()`  [EXTRACTED]
-  resources/js/Pages/Admin/Jadwal/JadwalShift.jsx → resources/js/Pages/Admin/Jadwal/Partials/JadwalRosterTab.jsx
-- `JadwalShift()` --calls--> `PanelRotasiGrup()`  [EXTRACTED]
-  resources/js/Pages/Admin/Jadwal/JadwalShift.jsx → resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx
 - `Card()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardContent()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardDescription()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardHeader()` --calls--> `cn()`  [EXTRACTED]
+  resources/js/components/ui/card.jsx → resources/js/lib/utils.js
+- `CardTitle()` --calls--> `cn()`  [EXTRACTED]
   resources/js/components/ui/card.jsx → resources/js/lib/utils.js
 
 ## Import Cycles

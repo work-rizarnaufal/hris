@@ -72,134 +72,134 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Audit/LogAudit.jsx": {
-    "mtime": 1795193378.4256809,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.656579,
+    "seen": 1795440513.1339576,
     "ast_hash": "f80511cc8f154698ddaff9d8da83b513",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Beranda/Beranda.jsx": {
-    "mtime": 1795324872.4743495,
-    "seen": 1795324920.7402818,
+    "mtime": 1795381610.657734,
+    "seen": 1795440513.1339576,
     "ast_hash": "692b69084723d89ee2e5f9e72a2eefa8",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Cuti/PengajuanCutiIzin.jsx": {
-    "mtime": 1795193201.5208461,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.657734,
+    "seen": 1795440513.1339576,
     "ast_hash": "a629129a83a519437f63c956004785f0",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/JadwalShift.jsx": {
-    "mtime": 1795336411.554838,
-    "seen": 1795336454.6772752,
+    "mtime": 1795381610.6592715,
+    "seen": 1795440513.1339576,
     "ast_hash": "a2b13b8e9844e60c1a953aa062876a82",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/Partials/ModalFormTukarShift.jsx": {
-    "mtime": 1795336357.4867969,
-    "seen": 1795336454.6772752,
+    "mtime": 1795381610.6618335,
+    "seen": 1795440513.1339576,
     "ast_hash": "51ce6ede5be8779ca100d2c1a42fe9eb",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Jadwal/Partials/PanelRotasiGrup.jsx": {
-    "mtime": 1795335028.3389878,
-    "seen": 1795335058.4297924,
+    "mtime": 1795381610.6618335,
+    "seen": 1795440513.1339576,
     "ast_hash": "65b485413bba88bb13dc03d0e8d05745",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/DataKaryawan.jsx": {
-    "mtime": 1795291487.35836,
-    "seen": 1795291543.9079523,
+    "mtime": 1795381610.663277,
+    "seen": 1795440513.1339576,
     "ast_hash": "c62399313570dbad7110c15dd669bde4",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalFormKaryawan.jsx": {
-    "mtime": 1795293373.5434916,
-    "seen": 1795293390.2878656,
+    "mtime": 1795381610.663277,
+    "seen": 1795440513.1339576,
     "ast_hash": "f688776b1e771d560d68e438301690c3",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Karyawan/Partials/ModalImporKaryawan.jsx": {
-    "mtime": 1795283061.4153779,
-    "seen": 1795283155.4847665,
+    "mtime": 1795381610.6647813,
+    "seen": 1795440513.1339576,
     "ast_hash": "55335d7e0d870941595977ee544636b9",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/CatatanKehadiran.jsx": {
-    "mtime": 1795326321.3122203,
-    "seen": 1795326791.4189086,
+    "mtime": 1795381610.6661065,
+    "seen": 1795440513.1339576,
     "ast_hash": "f294a5f33b5e3a3e3f7d19c974a74010",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalFormPresensi.jsx": {
-    "mtime": 1795326139.2063067,
-    "seen": 1795326176.1539183,
+    "mtime": 1795381610.6671076,
+    "seen": 1795440513.1339576,
     "ast_hash": "9e7673e40806b2419d45a2d05000efa2",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Kehadiran/Partials/ModalPresensiMassal.jsx": {
-    "mtime": 1795281414.2681627,
-    "seen": 1795281866.7142336,
+    "mtime": 1795381610.6671076,
+    "seen": 1795440513.1339576,
     "ast_hash": "e42e290585e835dfe92bc92f57ad85c1",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/LaporanRekap.jsx": {
-    "mtime": 1795327991.416433,
-    "seen": 1795328097.2668958,
+    "mtime": 1795381610.6681712,
+    "seen": 1795440513.1339576,
     "ast_hash": "ad20d5858da34c23de9dfab2f6f5a972",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporIndividu.jsx": {
-    "mtime": 1795332677.3187125,
-    "seen": 1795333785.9561012,
+    "mtime": 1795381610.669358,
+    "seen": 1795440513.1339576,
     "ast_hash": "a0c84111aa070b5c022c4166bbc269cb",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Lembur/LemburOvertime.jsx": {
-    "mtime": 1795193158.4885604,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.669358,
+    "seen": 1795440513.1339576,
     "ast_hash": "5d8fb15dd9528171e9341c23b172acd7",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Organisasi/OrganisasiJabatan.jsx": {
-    "mtime": 1795250064.4659252,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.670658,
+    "seen": 1795440513.1339576,
     "ast_hash": "48a204d0023e560f920564055af03d18",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Payroll/PenggajianPeriode.jsx": {
-    "mtime": 1795193278.8470592,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.671168,
+    "seen": 1795440513.1339576,
     "ast_hash": "fc9ed0dcab9a2e7a3f872d4f0e5bc44c",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx": {
-    "mtime": 1795294031.1558938,
-    "seen": 1795294048.9736493,
+    "mtime": 1795381610.6721847,
+    "seen": 1795440513.1339576,
     "ast_hash": "e344623fc48488fb71f92be570b46e08",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/SaldoCuti/SaldoKuotaCuti.jsx": {
-    "mtime": 1795193248.1002786,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.6731794,
+    "seen": 1795440513.1339576,
     "ast_hash": "411e0a66d64c05ec02041c5f037f260c",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/SlipGaji/SlipGaji.jsx": {
-    "mtime": 1795193318.4158275,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.6731794,
+    "seen": 1795440513.1339576,
     "ast_hash": "8ed8f7139a71eac1a9a317d8c3b32e36",
     "semantic_hash": ""
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "mtime": 1795250064.3235102,
-    "seen": 1795250261.1956322,
-    "ast_hash": "2537274d721cf80c22b37a6aabe537b3",
+    "mtime": 1795440851.7370994,
+    "seen": 1795440947.508421,
+    "ast_hash": "da06a7a0815b153c7c4e6aa37af7d75f",
     "semantic_hash": ""
   },
   "resources/js/Pages/User/RingkasanPublik.jsx": {
-    "mtime": 1795250064.3844678,
-    "seen": 1795250261.1956322,
+    "mtime": 1795381610.6731794,
+    "seen": 1795440513.1339576,
     "ast_hash": "56b9a0577ffe01211b5733ca2f72c413",
     "semantic_hash": ""
   },
@@ -240,8 +240,8 @@
     "semantic_hash": ""
   },
   "resources/js/components/ui/index.js": {
-    "mtime": 1793726137.708645,
-    "seen": 1795250261.196631,
+    "mtime": 1795381610.67469,
+    "seen": 1795440513.1339576,
     "ast_hash": "f4e9c570c7d4764d5c4e36c12306c494",
     "semantic_hash": ""
   },
@@ -252,8 +252,8 @@
     "semantic_hash": ""
   },
   "resources/js/components/ui/modal.jsx": {
-    "mtime": 1795251889.1310036,
-    "seen": 1795251976.2501287,
+    "mtime": 1795381610.67469,
+    "seen": 1795440513.1339576,
     "ast_hash": "ec3cdf5a1d3b9c6bc2095263aebadc31",
     "semantic_hash": ""
   },
@@ -270,8 +270,8 @@
     "semantic_hash": ""
   },
   "resources/js/components/ui/sidebar.jsx": {
-    "mtime": 1795267712.488871,
-    "seen": 1795267946.7592618,
+    "mtime": 1795381610.676032,
+    "seen": 1795440513.1339576,
     "ast_hash": "2d046ae9aa9c37e62ede957177cde4c3",
     "semantic_hash": ""
   },
@@ -288,20 +288,20 @@
     "semantic_hash": ""
   },
   "resources/js/components/ui/toast.jsx": {
-    "mtime": 1793805487.415606,
-    "seen": 1795250261.196631,
+    "mtime": 1795381610.676032,
+    "seen": 1795440513.1339576,
     "ast_hash": "ce0f5e2a19da12db04cd7657bff652f1",
     "semantic_hash": ""
   },
   "resources/js/components/ui/topbar.jsx": {
-    "mtime": 1795267819.7861426,
-    "seen": 1795267946.7592618,
+    "mtime": 1795381610.6774144,
+    "seen": 1795440513.1339576,
     "ast_hash": "b9fd878aae4d1eca1bcd76df5bc66e32",
     "semantic_hash": ""
   },
   "resources/js/config/navigation.js": {
-    "mtime": 1793807160.3230903,
-    "seen": 1795250261.196631,
+    "mtime": 1795381610.6784165,
+    "seen": 1795440513.1339576,
     "ast_hash": "7342e8eede8f5accb4eabf73b0f58d5a",
     "semantic_hash": ""
   },
@@ -324,8 +324,8 @@
     "semantic_hash": ""
   },
   "resources/js/services/systemSettings.js": {
-    "mtime": 1795333758.976019,
-    "seen": 1795333785.9561012,
+    "mtime": 1795381610.6784165,
+    "seen": 1795440513.1339576,
     "ast_hash": "449ebf4005b35f3a7a794d0585d728e9",
     "semantic_hash": ""
   },
@@ -504,15 +504,15 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1793805487.3805828,
-    "seen": 1795250261.196631,
+    "mtime": 1795381610.6414783,
+    "seen": 1795440513.1339576,
     "ast_hash": "24385908a95d9f0336a74a65fb09298a",
     "semantic_hash": ""
   },
   "LAPORAN_PROYEK_HRIS.md": {
-    "mtime": 1795335075.026281,
-    "seen": 1795336454.6772752,
-    "ast_hash": "3ed6a7d024c4879b5af2417839ec824a",
+    "mtime": 1795440936.996583,
+    "seen": 1795440947.508421,
+    "ast_hash": "4a5c139096ac9d7e4650c92ad8691616",
     "semantic_hash": ""
   },
   "README.md": {
@@ -534,9 +534,9 @@
     "semantic_hash": ""
   },
   "resources/js/services/authRole.js": {
-    "mtime": 1795272673.665149,
-    "seen": 1795273395.922694,
-    "ast_hash": "542bd859527d3385514df750a32fbb55",
+    "mtime": 1795440852.1108215,
+    "seen": 1795440947.508421,
+    "ast_hash": "014aa953c898743d438f3a8db346c6ff",
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/BerandaController.php": {
@@ -684,9 +684,9 @@
     "semantic_hash": ""
   },
   "database/seeders/EmployeeSeeder.php": {
-    "mtime": 1795324372.1451168,
-    "seen": 1795324534.4023254,
-    "ast_hash": "6ea2394cea194694096193f9b371bc93",
+    "mtime": 1795440850.9313953,
+    "seen": 1795440947.508421,
+    "ast_hash": "4ad6640eaa424e506b218c24ad3cd57a",
     "semantic_hash": ""
   },
   "database/seeders/HolidaySeeder.php": {
@@ -906,9 +906,9 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/LaporanController.php": {
-    "mtime": 1795332478.5733502,
-    "seen": 1795332492.1657653,
-    "ast_hash": "175863f451dc96aa9c713f4e0635165c",
+    "mtime": 1795440324.7238405,
+    "seen": 1795440513.1339576,
+    "ast_hash": "56106a56602a090329f39b1e99db5750",
     "semantic_hash": ""
   },
   "tests/Feature/LaporanBackendTest.php": {
@@ -918,9 +918,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporCalendarGrid.jsx": {
-    "mtime": 1795332413.9573803,
-    "seen": 1795332492.1657653,
-    "ast_hash": "51379f74d485fb68f0ca0e19c1aa08e5",
+    "mtime": 1795440401.718889,
+    "seen": 1795440513.1339576,
+    "ast_hash": "2079e7c2ebf0c3c6c1c40d580dcf6193",
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporCoachingLogs.jsx": {
@@ -930,9 +930,9 @@
     "semantic_hash": ""
   },
   "resources/js/Pages/Admin/Laporan/Partials/RaporKpiCards.jsx": {
-    "mtime": 1795332425.93573,
-    "seen": 1795332492.1657653,
-    "ast_hash": "8bc12a9bd64da166151f74bb7d1bc05a",
+    "mtime": 1795440414.1762526,
+    "seen": 1795440513.1339576,
+    "ast_hash": "a721178f2fcc7f775973868155641f24",
     "semantic_hash": ""
   },
   "tests/Feature/JadwalBackendTest.php": {

@@ -1,0 +1,607 @@
+{
+  "communities": {
+    "0": [
+      "ref_inertiajs_react",
+      "ref_lucide_react",
+      "ref_react",
+      "resources_js_components_ui_card",
+      "resources_js_components_ui_card_card",
+      "resources_js_components_ui_card_cardcontent",
+      "resources_js_components_ui_card_carddescription",
+      "resources_js_components_ui_card_cardheader",
+      "resources_js_components_ui_card_cardtitle",
+      "resources_js_components_ui_footer",
+      "resources_js_components_ui_footer_footer",
+      "resources_js_components_ui_index",
+      "resources_js_components_ui_page_container",
+      "resources_js_components_ui_page_container_pagecontainer",
+      "resources_js_components_ui_page_header",
+      "resources_js_components_ui_page_header_pageheader",
+      "resources_js_components_ui_sidebar",
+      "resources_js_components_ui_sidebar_implemented_routes",
+      "resources_js_components_ui_sidebar_sidebar",
+      "resources_js_components_ui_toast",
+      "resources_js_components_ui_topbar",
+      "resources_js_components_ui_topbar_topbar",
+      "resources_js_config_navigation",
+      "resources_js_config_navigation_getpagemetadata",
+      "resources_js_config_navigation_navigationconfig",
+      "resources_js_config_site",
+      "resources_js_config_site_siteconfig",
+      "resources_js_layouts_layoututama",
+      "resources_js_layouts_layoututama_layoututama",
+      "resources_js_pages_admin_audit_logaudit",
+      "resources_js_pages_admin_audit_logaudit_logaudit",
+      "resources_js_pages_admin_beranda_beranda",
+      "resources_js_pages_admin_beranda_beranda_beranda",
+      "resources_js_pages_admin_beranda_beranda_divisionsummary",
+      "resources_js_pages_admin_beranda_beranda_recentattendance",
+      "resources_js_pages_admin_beranda_beranda_weeklytrenddata",
+      "resources_js_pages_admin_cuti_pengajuancutiizin",
+      "resources_js_pages_admin_cuti_pengajuancutiizin_pengajuancutiizin",
+      "resources_js_pages_admin_laporan_partials_raporindividu",
+      "resources_js_pages_admin_laporan_partials_raporindividu_generatecalendardays",
+      "resources_js_pages_admin_laporan_partials_raporindividu_raporindividu",
+      "resources_js_pages_admin_lembur_lemburovertime",
+      "resources_js_pages_admin_lembur_lemburovertime_lemburovertime",
+      "resources_js_pages_admin_organisasi_organisasijabatan",
+      "resources_js_pages_admin_organisasi_organisasijabatan_organisasijabatan",
+      "resources_js_pages_admin_payroll_penggajianperiode",
+      "resources_js_pages_admin_payroll_penggajianperiode_penggajianperiode",
+      "resources_js_pages_admin_saldocuti_saldokuotacuti",
+      "resources_js_pages_admin_saldocuti_saldokuotacuti_saldokuotacuti",
+      "resources_js_pages_admin_slipgaji_slipgaji",
+      "resources_js_pages_admin_slipgaji_slipgaji_slipgaji",
+      "resources_js_pages_auth_login",
+      "resources_js_pages_auth_login_login",
+      "resources_js_pages_user_ringkasanpublik",
+      "resources_js_pages_user_ringkasanpublik_publicdivisionsummary",
+      "resources_js_pages_user_ringkasanpublik_ringkasanpublik"
+    ],
+    "1": [
+      "package",
+      "package_dependencies",
+      "package_dependencies_class_variance_authority",
+      "package_dependencies_clsx",
+      "package_dependencies_inertiajs_react",
+      "package_dependencies_lucide_react",
+      "package_dependencies_react",
+      "package_dependencies_react_dom",
+      "package_dependencies_recharts",
+      "package_dependencies_tailwind_merge",
+      "package_dependencies_xlsx",
+      "package_devdependencies",
+      "package_devdependencies_autoprefixer",
+      "package_devdependencies_laravel_vite_plugin",
+      "package_devdependencies_postcss",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_vite",
+      "package_devdependencies_vitejs_plugin_react",
+      "package_name",
+      "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_type",
+      "package_version",
+      "ref_autoprefixer",
+      "ref_clsx",
+      "ref_laravel_vite_plugin",
+      "ref_path",
+      "ref_postcss",
+      "ref_react_dom",
+      "ref_recharts",
+      "ref_tailwind_merge",
+      "ref_tailwindcss",
+      "ref_vite",
+      "ref_vitejs_plugin_react",
+      "resources_css_app",
+      "resources_js_app",
+      "resources_js_app_renderadminlayout",
+      "resources_js_app_renderuserlayout",
+      "resources_js_app_setup",
+      "resources_js_bootstrap",
+      "resources_js_layouts_layoutpublik",
+      "resources_js_layouts_layoutpublik_layoutpublik",
+      "vite_config"
+    ],
+    "2": [
+      "composer",
+      "composer_advisories_block",
+      "composer_allow_plugins_pestphp_pest_plugin",
+      "composer_allow_plugins_php_http_discovery",
+      "composer_autoload",
+      "composer_autoload_dev",
+      "composer_autoload_dev_psr_4",
+      "composer_autoload_psr_4",
+      "composer_config",
+      "composer_config_allow_plugins",
+      "composer_config_optimize_autoloader",
+      "composer_config_policy",
+      "composer_config_preferred_install",
+      "composer_config_sort_packages",
+      "composer_description",
+      "composer_extra",
+      "composer_extra_laravel",
+      "composer_keywords",
+      "composer_laravel_dont_discover",
+      "composer_license",
+      "composer_minimum_stability",
+      "composer_name",
+      "composer_policy_advisories",
+      "composer_prefer_stable",
+      "composer_psr_4_app",
+      "composer_psr_4_database_factories",
+      "composer_psr_4_database_seeders",
+      "composer_psr_4_tests",
+      "composer_require",
+      "composer_require_dev",
+      "composer_require_dev_fakerphp_faker",
+      "composer_require_dev_laravel_pint",
+      "composer_require_dev_mockery_mockery",
+      "composer_require_dev_nunomaduro_collision",
+      "composer_require_dev_phpunit_phpunit",
+      "composer_require_inertiajs_inertia_laravel",
+      "composer_require_laravel_framework",
+      "composer_require_laravel_tinker",
+      "composer_require_php",
+      "composer_scripts",
+      "composer_scripts_post_autoload_dump",
+      "composer_type"
+    ],
+    "3": [
+      "ref_xlsx",
+      "resources_js_components_ui_badge_badge",
+      "resources_js_components_ui_table",
+      "resources_js_components_ui_table_table",
+      "resources_js_components_ui_table_tablebody",
+      "resources_js_components_ui_table_tablecell",
+      "resources_js_components_ui_table_tableempty",
+      "resources_js_components_ui_table_tablefiltergroup",
+      "resources_js_components_ui_table_tablehead",
+      "resources_js_components_ui_table_tableheader",
+      "resources_js_components_ui_table_tablerow",
+      "resources_js_components_ui_table_tablesearch",
+      "resources_js_components_ui_table_tableselect",
+      "resources_js_components_ui_table_tabletoolbar",
+      "resources_js_components_ui_toast_toast",
+      "resources_js_pages_admin_jadwal_jadwalshift",
+      "resources_js_pages_admin_jadwal_jadwalshift_employees_schedule",
+      "resources_js_pages_admin_jadwal_jadwalshift_jadwalshift",
+      "resources_js_pages_admin_jadwal_jadwalshift_weeks",
+      "resources_js_pages_admin_jadwal_partials_panelrotasigrup",
+      "resources_js_pages_admin_jadwal_partials_panelrotasigrup_panelrotasigrup",
+      "resources_js_pages_admin_karyawan_datakaryawan",
+      "resources_js_pages_admin_karyawan_datakaryawan_datakaryawan",
+      "resources_js_pages_admin_karyawan_datakaryawan_initial_employees",
+      "resources_js_pages_admin_karyawan_partials_modalimporkaryawan",
+      "resources_js_pages_admin_karyawan_partials_modalimporkaryawan_modalimporkaryawan",
+      "resources_js_pages_admin_kehadiran_catatankehadiran",
+      "resources_js_pages_admin_kehadiran_catatankehadiran_catatankehadiran",
+      "resources_js_pages_admin_kehadiran_catatankehadiran_default_date",
+      "resources_js_pages_admin_kehadiran_catatankehadiran_gettodaydatestring",
+      "resources_js_pages_admin_kehadiran_catatankehadiran_initial_attendances",
+      "resources_js_pages_admin_kehadiran_catatankehadiran_master_employees",
+      "resources_js_pages_admin_laporan_laporanrekap",
+      "resources_js_pages_admin_laporan_laporanrekap_available_periods",
+      "resources_js_pages_admin_laporan_laporanrekap_evaluation_dataset",
+      "resources_js_pages_admin_laporan_laporanrekap_laporanrekap"
+    ],
+    "4": [
+      "app_http_middleware_handleinertiarequests",
+      "app_http_middleware_handleinertiarequests_closure_1",
+      "app_http_middleware_handleinertiarequests_closure_2",
+      "app_http_middleware_handleinertiarequests_handleinertiarequests",
+      "app_http_middleware_handleinertiarequests_handleinertiarequests_share",
+      "app_http_middleware_handleinertiarequests_handleinertiarequests_version",
+      "illuminate_http_request",
+      "illuminate_support_facades_route",
+      "inertia_inertia",
+      "inertia_middleware",
+      "public_index",
+      "routes_web",
+      "routes_web_closure_1",
+      "routes_web_closure_2",
+      "routes_web_get",
+      "routes_web_get_admin",
+      "routes_web_get_admin_beranda",
+      "routes_web_get_audit",
+      "routes_web_get_beranda",
+      "routes_web_get_cuti",
+      "routes_web_get_jadwal",
+      "routes_web_get_karyawan",
+      "routes_web_get_kehadiran",
+      "routes_web_get_laporan",
+      "routes_web_get_lembur",
+      "routes_web_get_login",
+      "routes_web_get_organisasi",
+      "routes_web_get_payroll",
+      "routes_web_get_pengaturan",
+      "routes_web_get_ringkasan_publik",
+      "routes_web_get_saldo_cuti",
+      "routes_web_get_slip_gaji",
+      "routes_web_get_user",
+      "routes_web_match_logout",
+      "routes_web_post_login"
+    ],
+    "5": [
+      "resources_js_components_ui_button_button",
+      "resources_js_components_ui_input_input",
+      "resources_js_components_ui_modal",
+      "resources_js_components_ui_modal_modal",
+      "resources_js_components_ui_modal_modalbody",
+      "resources_js_components_ui_modal_modalfooter",
+      "resources_js_components_ui_modal_modalheader",
+      "resources_js_components_ui_modal_sizemap",
+      "resources_js_pages_admin_jadwal_partials_modalformtukarshift",
+      "resources_js_pages_admin_jadwal_partials_modalformtukarshift_modalformtukarshift",
+      "resources_js_pages_admin_jadwal_partials_modalformtukarshift_shift_options",
+      "resources_js_pages_admin_karyawan_partials_modalformkaryawan",
+      "resources_js_pages_admin_karyawan_partials_modalformkaryawan_divisions",
+      "resources_js_pages_admin_karyawan_partials_modalformkaryawan_groups",
+      "resources_js_pages_admin_karyawan_partials_modalformkaryawan_locations",
+      "resources_js_pages_admin_karyawan_partials_modalformkaryawan_modalformkaryawan",
+      "resources_js_pages_admin_karyawan_partials_modalformkaryawan_schedule_categories",
+      "resources_js_pages_admin_kehadiran_partials_modalformpresensi",
+      "resources_js_pages_admin_kehadiran_partials_modalformpresensi_getstartminute",
+      "resources_js_pages_admin_kehadiran_partials_modalformpresensi_modalformpresensi",
+      "resources_js_pages_admin_kehadiran_partials_modalformpresensi_shift_options",
+      "resources_js_pages_admin_kehadiran_partials_modalformpresensi_status_options",
+      "resources_js_pages_admin_kehadiran_partials_modalpresensimassal",
+      "resources_js_pages_admin_kehadiran_partials_modalpresensimassal_modalpresensimassal",
+      "resources_js_pages_admin_kehadiran_partials_modalpresensimassal_target_options"
+    ],
+    "6": [
+      "resources_js_pages_admin_pengaturan_pengaturansistem",
+      "resources_js_pages_admin_pengaturan_pengaturansistem_pengaturansistem",
+      "resources_js_services_systemsettings",
+      "resources_js_services_systemsettings_default_attendance_settings",
+      "resources_js_services_systemsettings_default_company_profile",
+      "resources_js_services_systemsettings_dispatchsyncevent",
+      "resources_js_services_systemsettings_formatdatedmy",
+      "resources_js_services_systemsettings_getattendancesettings",
+      "resources_js_services_systemsettings_getcompanyprofile",
+      "resources_js_services_systemsettings_getholidays",
+      "resources_js_services_systemsettings_getlocations",
+      "resources_js_services_systemsettings_initial_holidays",
+      "resources_js_services_systemsettings_initial_locations",
+      "resources_js_services_systemsettings_resetallsettings",
+      "resources_js_services_systemsettings_saveattendancesettings",
+      "resources_js_services_systemsettings_savecompanyprofile",
+      "resources_js_services_systemsettings_saveholidays",
+      "resources_js_services_systemsettings_savelocations",
+      "resources_js_services_systemsettings_storage_keys"
+    ],
+    "7": [
+      "ref_class_variance_authority",
+      "resources_js_components_ui_badge",
+      "resources_js_components_ui_badge_badgevariants",
+      "resources_js_components_ui_button",
+      "resources_js_components_ui_button_buttonvariants",
+      "resources_js_components_ui_card_cardfooter",
+      "resources_js_components_ui_input",
+      "resources_js_components_ui_table_tablecaption",
+      "resources_js_components_ui_table_tablefooter",
+      "resources_js_components_ui_text",
+      "resources_js_components_ui_text_defaultelementmap",
+      "resources_js_components_ui_text_eyebrow",
+      "resources_js_components_ui_text_heading",
+      "resources_js_components_ui_text_text",
+      "resources_js_components_ui_text_textvariants",
+      "resources_js_lib_utils",
+      "resources_js_lib_utils_cn"
+    ],
+    "8": [
+      "illuminate_foundation_exceptions_renderer_renderer",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_d",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_f",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_g",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_n",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_p",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_u",
+      "storage_framework_views_623610ec788320afafb2ace2c5f352df_v"
+    ],
+    "9": [
+      "bootstrap_app",
+      "bootstrap_app_closure_1",
+      "bootstrap_app_closure_2",
+      "illuminate_foundation_application",
+      "illuminate_foundation_configuration_exceptions",
+      "illuminate_foundation_configuration_middleware"
+    ],
+    "10": [
+      "jsconfig",
+      "jsconfig_compileroptions",
+      "jsconfig_compileroptions_baseurl",
+      "jsconfig_compileroptions_jsx",
+      "jsconfig_compileroptions_paths",
+      "jsconfig_include"
+    ],
+    "11": [
+      "AGENTS_MD",
+      "LAPORAN_PROYEK_HRIS",
+      "README_PROJECT",
+      "RULE_ANTISLOP_PONYTAIL"
+    ],
+    "12": [
+      "illuminate_foundation_inspiring",
+      "illuminate_support_facades_artisan",
+      "routes_console",
+      "routes_console_closure_1"
+    ],
+    "13": [
+      "resources_js_config_theme",
+      "resources_js_config_theme_colors",
+      "tailwind_config",
+      "tailwindcss"
+    ],
+    "14": [
+      "application",
+      "argvinput",
+      "artisan"
+    ],
+    "15": [
+      "storage_framework_views_e7c818ce646a546ad10b7c4dd6bcd204",
+      "storage_framework_views_e7c818ce646a546ad10b7c4dd6bcd204_closure_1",
+      "storage_framework_views_e7c818ce646a546ad10b7c4dd6bcd204_closure_2"
+    ],
+    "16": [
+      "illuminate_support_str",
+      "storage_framework_views_8761e8500ccc2364bd45a7a3d23948d1"
+    ],
+    "17": [
+      "bootstrap_cache_packages"
+    ],
+    "18": [
+      "bootstrap_cache_services"
+    ],
+    "19": [
+      "postcss_config"
+    ],
+    "20": [
+      "resources_views_app_blade"
+    ],
+    "21": [
+      "storage_framework_views_33035f1adbd8fc13ef8a3b77d50480bf"
+    ],
+    "22": [
+      "storage_framework_views_3cc302e1a330bb356b7cac41c6833e9f"
+    ],
+    "23": [
+      "storage_framework_views_4ab924cf0b3b5ad92f04694527ca30a6"
+    ],
+    "24": [
+      "storage_framework_views_5ab361a29a8918d2bf7ccf4521b488a4"
+    ],
+    "25": [
+      "storage_framework_views_5c7b9e11276da2e48bff86ef23b1f6c6"
+    ],
+    "26": [
+      "storage_framework_views_785b49b563000719fab3463415a289bb"
+    ],
+    "27": [
+      "storage_framework_views_7b3f095ae14646c2e9713cc1fcb61f25"
+    ],
+    "28": [
+      "storage_framework_views_823300ed17a5c87e4ec26fb3be523cc7"
+    ],
+    "29": [
+      "storage_framework_views_82fc311e5a272e26a4e74c4a80edee42"
+    ],
+    "30": [
+      "storage_framework_views_940c537221ea99c21f2e5407939805c7"
+    ],
+    "31": [
+      "storage_framework_views_a00211578754c1ea2542d52f881e691e"
+    ],
+    "32": [
+      "storage_framework_views_a31f45fc553bdc60fdd970f1083473e8"
+    ],
+    "33": [
+      "storage_framework_views_b35d9852356e82e5654e6ecac1ddd3d1"
+    ],
+    "34": [
+      "storage_framework_views_cab19c66b47ec928bf5a9e8b7150d205"
+    ],
+    "35": [
+      "storage_framework_views_cbe5e52adb8b7406d8cc8ffc5611e5fb"
+    ],
+    "36": [
+      "storage_framework_views_e632417a86d23b29cff3b573211669ae"
+    ],
+    "37": [
+      "storage_framework_views_ecc5f3d631b23bc8fb6f28366ebf7001"
+    ],
+    "38": [
+      "storage_framework_views_f42a844b1e7f6f4b896eddb76e051def"
+    ]
+  },
+  "cohesion": {
+    "0": 0.15584415584415584,
+    "1": 0.0595959595959596,
+    "2": 0.047619047619047616,
+    "3": 0.2650793650793651,
+    "4": 0.06554621848739496,
+    "5": 0.21666666666666667,
+    "6": 0.2631578947368421,
+    "7": 0.19852941176470587,
+    "8": 0.4444444444444444,
+    "9": 0.4666666666666667,
+    "10": 0.3333333333333333,
+    "11": 0.5,
+    "12": 0.5,
+    "13": 0.6666666666666666,
+    "14": 0.6666666666666666,
+    "15": 0.6666666666666666,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0
+  },
+  "gods": [
+    {
+      "id": "ref_react",
+      "label": "react",
+      "degree": 40
+    },
+    {
+      "id": "resources_js_lib_utils_cn",
+      "label": "cn()",
+      "degree": 36
+    },
+    {
+      "id": "resources_js_components_ui_card_card",
+      "label": "Card()",
+      "degree": 34
+    },
+    {
+      "id": "resources_js_components_ui_card_cardcontent",
+      "label": "CardContent()",
+      "degree": 34
+    },
+    {
+      "id": "resources_js_pages_admin_pengaturan_pengaturansistem_pengaturansistem",
+      "label": "PengaturanSistem()",
+      "degree": 32
+    },
+    {
+      "id": "resources_js_components_ui_card_cardheader",
+      "label": "CardHeader()",
+      "degree": 32
+    },
+    {
+      "id": "resources_js_components_ui_card_cardtitle",
+      "label": "CardTitle()",
+      "degree": 32
+    },
+    {
+      "id": "resources_js_components_ui_card_carddescription",
+      "label": "CardDescription()",
+      "degree": 32
+    },
+    {
+      "id": "resources_js_components_ui_page_header_pageheader",
+      "label": "PageHeader()",
+      "degree": 31
+    },
+    {
+      "id": "ref_lucide_react",
+      "label": "lucide-react",
+      "degree": 30
+    }
+  ],
+  "surprises": [
+    {
+      "source": "renderAdminLayout()",
+      "target": "LayoutUtama()",
+      "source_files": [
+        "resources/js/app.jsx",
+        "resources/js/Layouts/LayoutUtama.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `renderAdminLayout()` unexpectedly reaches hub `LayoutUtama()`"
+    },
+    {
+      "source": "LayoutUtama()",
+      "target": "Toast()",
+      "source_files": [
+        "resources/js/Layouts/LayoutUtama.jsx",
+        "resources/js/components/ui/toast.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "Beranda()",
+      "target": "Table",
+      "source_files": [
+        "resources/js/Pages/Admin/Beranda/Beranda.jsx",
+        "resources/js/components/ui/table.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "Beranda()",
+      "target": "TableBody",
+      "source_files": [
+        "resources/js/Pages/Admin/Beranda/Beranda.jsx",
+        "resources/js/components/ui/table.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "Beranda()",
+      "target": "TableCell",
+      "source_files": [
+        "resources/js/Pages/Admin/Beranda/Beranda.jsx",
+        "resources/js/components/ui/table.jsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `react` connect `Community 0` to `Community 1`, `Community 3`, `Community 5`, `Community 6`, `Community 7`?",
+      "why": "High betweenness centrality (0.074) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Aturan Antislop & Ponytail` to the rest of the system?",
+      "why": "1 weakly-connected nodes found - possible missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.0595959595959596 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `lucide-react` connect `Community 0` to `Community 1`, `Community 3`, `Community 5`, `Community 6`?",
+      "why": "High betweenness centrality (0.039) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `@inertiajs/react` connect `Community 0` to `Community 1`, `Community 3`, `Community 6`?",
+      "why": "High betweenness centrality (0.029) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 4` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06554621848739496 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

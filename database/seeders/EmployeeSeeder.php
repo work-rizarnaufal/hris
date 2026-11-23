@@ -14,42 +14,14 @@ class EmployeeSeeder extends Seeder
 {
     public function run(): void
     {
-        $defaultPassword = Hash::make('password');
-
-        // 1. Akun Super Administrator HCGA
+        // 1. Akun Super Administrator Nabiel
         User::updateOrCreate(
-            ['email' => 'admin@nusantaraperkasa.co.id'],
+            ['email' => 'nabiel@hrd.com'],
             [
-                'name' => 'Bambang Trihatmodjo, S.H., M.M.',
-                'password' => $defaultPassword,
+                'name' => 'Nabiel',
+                'password' => Hash::make('nabiel123'),
                 'role' => 'super_admin',
-                'nip' => 'HC-ADMIN',
-                'phone' => '0812-9988-7711',
-                'is_active' => true,
-            ]
-        );
-
-        // 2. Akun Supervisor Site (Nabiel F - CEO Cimalaka)
-        User::updateOrCreate(
-            ['email' => 'nabiel.f@nusantaraperkasa.co.id'],
-            [
-                'name' => 'NABIEL F',
-                'password' => $defaultPassword,
-                'role' => 'supervisor',
                 'nip' => 'HC-0001',
-                'phone' => null,
-                'is_active' => true,
-            ]
-        );
-
-        // 3. Akun Karyawan Lapangan (Abdul Saepudin - Mariuk)
-        User::updateOrCreate(
-            ['email' => 'abdul.saepudin@nusantaraperkasa.co.id'],
-            [
-                'name' => 'Abdul Saepudin',
-                'password' => $defaultPassword,
-                'role' => 'karyawan',
-                'nip' => 'HC-0027',
                 'phone' => null,
                 'is_active' => true,
             ]

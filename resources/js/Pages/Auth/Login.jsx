@@ -18,8 +18,8 @@ import {
 import { siteConfig } from '@/config/site.js';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@hcga.local');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('nabiel@hrd.com');
+  const [password, setPassword] = useState('nabiel123');
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -162,24 +162,18 @@ export default function Login() {
               <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
                 <span className="font-semibold text-slate-700 flex items-center gap-1">
                   <KeyRound className="w-3 h-3 text-[#c4a266]" />
-                  <span>Akun Demo Cepat:</span>
+                  <span>Akun Super Admin:</span>
                 </span>
                 <span className="text-[10px] text-slate-400">Klik untuk mengisi</span>
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => handleQuickFill('admin@hcga.local', 'password123')}
-                  className="flex-1 py-1 px-2.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:border-[#c4a266] hover:text-navy transition-colors text-center shadow-2xs"
+                  onClick={() => handleQuickFill('nabiel@hrd.com', 'nabiel123')}
+                  className="w-full py-1.5 px-3 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:border-[#c4a266] hover:text-navy transition-colors text-center shadow-2xs flex items-center justify-center gap-1.5"
                 >
-                  Admin HCGA
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('spv.operasional@hcga.local', 'password123')}
-                  className="flex-1 py-1 px-2.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:border-[#c4a266] hover:text-navy transition-colors text-center shadow-2xs"
-                >
-                  SPV Operasional
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#c4a266]" />
+                  <span>Super Admin (nabiel@hrd.com)</span>
                 </button>
               </div>
             </div>

@@ -12,10 +12,10 @@ export const ROLE_PROFILES = {
   [ROLES.SUPER_ADMIN]: {
     id: 'user-superadmin',
     roleKey: ROLES.SUPER_ADMIN,
-    name: 'Bambang Trihatmodjo, S.H., M.M.',
+    name: 'Nabiel',
     shortTitle: 'Super Admin',
     roleLabel: 'Super Administrator HCGA',
-    email: 'admin@nusantaraperkasa.co.id',
+    email: 'nabiel@hrd.com',
     nip: 'HC-0001',
     unit: 'Kantor Pusat & Lintas Site',
     badgeColor: 'amber',

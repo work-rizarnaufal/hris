@@ -831,7 +831,32 @@ Menindaklanjuti audit pengecekan data dummy pada tabel **Matriks Presensi 30 Har
 
 ---
 
-## 25. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 25. Konfigurasi Tunggal Pengguna Super Admin (`nabiel@hrd.com`)
+
+Lokasi: Database SQLite (`database/database.sqlite`), [`database/seeders/EmployeeSeeder.php`](database/seeders/EmployeeSeeder.php), [`resources/js/Pages/Auth/Login.jsx`](resources/js/Pages/Auth/Login.jsx), dan [`resources/js/services/authRole.js`](resources/js/services/authRole.js)
+
+Sesuai permintaan instruksi operasional, akun pengguna pada sistem disederhanakan dan dibersihkan menjadi tepat **1 pengguna tunggal** dengan hak akses penuh:
+
+1. **Detail Akun Super Admin**:
+   - **Email / Username**: `nabiel@hrd.com`
+   - **Kata Sandi**: `nabiel123` (dienkripsi dengan `Hash::make('nabiel123')`)
+   - **Nama**: `Nabiel`
+   - **Role**: `super_admin`
+   - **NIP**: `HC-0001`
+   - **Status**: Aktif (`is_active: 1`)
+
+2. **Pembersihan Database & Seeder**:
+   - Seluruh akun lama (seperti akun demo `admin@nusantaraperkasa.co.id`, `nabiel.f@nusantaraperkasa.co.id`, dan akun karyawan lain pada tabel `users`) telah dibersihkan. Jumlah baris pada tabel `users` tepat **1 akun**.
+   - [`EmployeeSeeder.php`](database/seeders/EmployeeSeeder.php) diselaraskan agar saat seeding hanya membuat akun tunggal `nabiel@hrd.com`.
+
+3. **Sinkronisasi Formulir Login & Quick Fill**:
+   - [`Login.jsx`](resources/js/Pages/Auth/Login.jsx) diatur default state `email: 'nabiel@hrd.com'` dan `password: 'nabiel123'`.
+   - Tombol Quick Fill disederhanakan menjadi tombol tunggal *Super Admin (`nabiel@hrd.com`)* untuk kenyamanan 1-klik masuk.
+   - Profile RBAC frontend simulasi pada [`authRole.js`](resources/js/services/authRole.js) diselaraskan dengan identitas akun Nabiel.
+
+---
+
+## 26. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
