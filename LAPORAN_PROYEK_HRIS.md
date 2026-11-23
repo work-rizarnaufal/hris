@@ -465,12 +465,10 @@ Lokasi: [`resources/js/Pages/Admin/Pengaturan/PengaturanSistem.jsx`](resources/j
 
 Lokasi: [`resources/js/Pages/Auth/Login.jsx`](resources/js/Pages/Auth/Login.jsx) dan [`routes/web.php`](routes/web.php)
 
-### A. Desain Korporat Split-Screen
-- **Sisi Kiri (Brand Showcase)**: Latar Deep Navy `#10273f` dengan lambang HCGA emas `#c4a266`, menampilkan nilai operasional:
-  1. *Roster Shift 2-Grup Otomatis*: Rotasi dinamis selang-seling Grup A & Grup B.
-  2. *Geofencing & Anti-Fake GPS*: Presensi presisi berbasis radius pabrik dan swafoto.
-  3. *Rapor Disiplin & Rekapitulasi*: Evaluasi kehadiran real-time dan dossier pembinaan.
-- **Sisi Kanan (Formulir Masuk)**: Tata letak bersih, fokus form terpusat, dan responsif di perangkat bergerak.
+### A. Desain Korporat Tunggal (Single-Layer Centered Card)
+- **Tata Letak Terpusat**: Menggantikan desain split-screen lama menjadi tata letak kartu tunggal minimalis (*single layer*) di tengah layar (`max-w-[440px]`), bersih dan bebas dari elemen dekoratif yang mengalihkan perhatian.
+- **Identitas Korporat**: Emblem logo HCGA dengan bingkai gradasi emas `#c4a266`, badge sistem, serta label legalitas *PT Manufaktur Nusantara Perkasa Tbk*.
+- **Ukuran Sangat Ringan**: Ukuran bundel JavaScript terpangkas menjadi hanya **7.23 kB** (2.51 kB gzip).
 
 ### B. Fitur & Keamanan Antarmuka (Production-Grade)
 - **Form Bersih & Aman**: Input email/NIP dan password diinisialisasi kosong (`useState('')`), tanpa menyimpan kredensial atau password hardcoded di client bundle.

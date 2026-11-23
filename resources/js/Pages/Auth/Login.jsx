@@ -7,10 +7,8 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  Layers,
   ArrowLeft,
+  ShieldCheck,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.js';
 
@@ -52,209 +50,149 @@ export default function Login() {
     <>
       <Head title="Masuk Administrator" />
 
-      <div className="min-h-screen w-full flex flex-col md:flex-row bg-slate-50 no-scrollbar">
-        {/* Kolom Kiri: Showcase Branding Korporat */}
-        <div className="relative md:w-5/12 lg:w-1/2 bg-[#10273f] text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-between overflow-hidden">
-          {/* Latar Belakang Dekoratif Halus */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(196,162,102,0.15),transparent_50%)] pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-[#193750]/50 blur-3xl pointer-events-none" />
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 flex flex-col justify-center items-center p-4 sm:p-6 no-scrollbar">
+        {/* Card Kontainer Tunggal (Single Layer) */}
+        <div className="w-full max-w-[440px] bg-white rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-6 sm:p-8">
+          {/* Header Identitas Korporat */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c4a266] to-[#ab874b] p-0.5 shadow-md flex items-center justify-center mb-3">
+              <div className="w-full h-full bg-[#10273f] rounded-[10px] flex items-center justify-center text-[#c4a266]">
+                <Building2 className="w-6 h-6" />
+              </div>
+            </div>
 
-          {/* Bagian Atas: Logo & Perusahaan */}
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#c4a266] to-[#ab874b] p-0.5 shadow-lg flex items-center justify-center">
-                <div className="w-full h-full bg-[#10273f] rounded-[10px] flex items-center justify-center text-[#c4a266]">
-                  <Building2 className="w-5 h-5" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-semibold text-slate-600 uppercase tracking-wider mb-2">
+              <ShieldCheck className="w-3 h-3 text-[#c4a266]" />
+              <span>{siteConfig.shortName} • HCGA System</span>
+            </div>
+
+            <h1 className="text-xl font-bold font-display text-navy tracking-tight">
+              Masuk ke Panel Kontrol
+            </h1>
+            <p className="text-xs text-slate-500 mt-1 max-w-xs">
+              Masukkan alamat email atau NIP terdaftar serta kata sandi akun Anda.
+            </p>
+          </div>
+
+          {/* Notifikasi Error */}
+          {errorMessage && (
+            <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Formulir Autentikasi */}
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5" htmlFor="email">
+                Alamat Email / NIP
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="w-4 h-4" />
                 </div>
-              </div>
-              <div>
-                <span className="text-xs font-bold tracking-widest text-[#c4a266] uppercase block">
-                  HCGA WORKFORCE SYSTEM
-                </span>
-                <span className="text-sm font-semibold text-slate-200">
-                  PT Manufaktur Nusantara Perkasa Tbk
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-3 max-w-md">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-display text-white leading-tight">
-                Monitoring Disiplin & Presensi Shift Terpadu.
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Platform operasional terintegrasi untuk pengelolaan presensi real-time, rotasi 2-grup selang-seling, dan rekapitulasi evaluasi 12 personel aktif.
-              </p>
-            </div>
-          </div>
-
-          {/* Bagian Tengah: 3 Kartu Keunggulan Sistem */}
-          <div className="relative z-10 my-8 space-y-3">
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#c4a266]/20 text-[#c4a266] flex items-center justify-center shrink-0">
-                <Layers className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Roster Rotasi 2-Grup Terstandarisasi</div>
-                <div className="text-[11px] text-slate-300">Pola otomatis dinas dan libur selang-seling Grup A & B</div>
+                <input
+                  id="email"
+                  name="email"
+                  type="text"
+                  autoComplete="off"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Masukkan alamat email atau NIP"
+                  className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-xl border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
+                />
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-4 h-4" />
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-slate-700" htmlFor="password">
+                  Kata Sandi
+                </label>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert('Untuk reset kata sandi akun korporat, hubungi tim IT Support di internal HCGA (ext. 104).');
+                  }}
+                  className="text-[11px] font-medium text-[#ab874b] hover:text-navy transition-colors"
+                >
+                  Lupa sandi?
+                </a>
               </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Geofencing & Anti-Fake GPS</div>
-                <div className="text-[11px] text-slate-300">Radius validasi 3 titik lokasi pabrik dan kantor utama</div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Masukkan kata sandi"
+                  className="w-full pl-9 pr-10 py-2.5 text-xs rounded-xl border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                  aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xs flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Evaluasi Rapor Kedisiplinan Personel</div>
-                <div className="text-[11px] text-slate-300">Heatmap 30 hari & log pembinaan terintegrasi</div>
-              </div>
+            <div className="flex items-center justify-between pt-0.5">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="w-4 h-4 rounded text-[#10273f] focus:ring-[#c4a266] border-slate-300 cursor-pointer"
+                />
+                <span className="text-xs text-slate-600 select-none">Ingat sesi di perangkat ini</span>
+              </label>
             </div>
-          </div>
 
-          {/* Bagian Bawah: Footer & Keamanan */}
-          <div className="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-            <span>Standar Keamanan ISO 27001</span>
-            <span>WIB (UTC+7) • Mariuk & Cimalaka</span>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-10 mt-1 rounded-xl bg-[#10273f] text-white hover:bg-[#18395b] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {loading ? (
+                <span>Memverifikasi kredensial...</span>
+              ) : (
+                <>
+                  <span>Masuk ke Panel Kontrol</span>
+                  <ArrowRight className="w-4 h-4 text-[#c4a266]" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Tautan Alternatif */}
+          <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-center">
+            <Link
+              href="/ringkasan-publik"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-navy transition-colors font-medium group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Buka Portal Ringkasan Publik</span>
+            </Link>
           </div>
         </div>
 
-        {/* Kolom Kanan: Form Login Eksekutif */}
-        <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 lg:p-16 bg-white">
-          <div className="w-full max-w-md mx-auto my-auto">
-            {/* Header Form */}
-            <div className="mb-8">
-              <Link
-                href="/ringkasan-publik"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-navy mb-6 transition-colors"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Lihat Ringkasan Publik</span>
-              </Link>
-
-              <h2 className="text-2xl font-bold font-display text-navy tracking-tight">
-                Masuk ke Panel Kontrol
-              </h2>
-              <p className="text-xs text-slate-500 mt-1.5">
-                Masukkan kredensial akun administrator Anda untuk mengelola presensi dan roster kerja.
-              </p>
-            </div>
-
-            {/* Notifikasi Error */}
-            {errorMessage && (
-              <div className="mb-5 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-600 shrink-0" />
-                <span>{errorMessage}</span>
-              </div>
-            )}
-
-            {/* Form Autentikasi */}
-            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5" htmlFor="email">
-                  Alamat Email / NIP
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="text"
-                    autoComplete="off"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="Masukkan alamat email atau NIP"
-                    className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-slate-700" htmlFor="password">
-                    Kata Sandi
-                  </label>
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      alert('Untuk reset kata sandi akun korporat, hubungi tim IT Support di internal HCGA (ext. 104).');
-                    }}
-                    className="text-[11px] font-medium text-[#ab874b] hover:text-navy transition-colors"
-                  >
-                    Lupa sandi?
-                  </a>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="Masukkan kata sandi"
-                    className="w-full pl-9 pr-10 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
-                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-1">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#10273f] focus:ring-[#c4a266] border-slate-300"
-                  />
-                  <span className="text-xs text-slate-600 select-none">Ingat sesi di perangkat ini</span>
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full h-10 mt-2 rounded-lg bg-[#10273f] text-white hover:bg-[#1a3a5c] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {loading ? (
-                  <span>Memverifikasi kredensial...</span>
-                ) : (
-                  <>
-                    <span>Masuk ke Panel Kontrol</span>
-                    <ArrowRight className="w-4 h-4 text-[#c4a266]" />
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Footer Bawah */}
-          <div className="w-full max-w-md mx-auto pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
-            <span>&copy; 2026 PT Manufaktur Nusantara Perkasa Tbk</span>
-            <span>Versi {siteConfig.version}</span>
+        {/* Footer Eksternal Card */}
+        <div className="mt-6 text-center text-[11px] text-slate-400 space-y-1">
+          <div>&copy; 2026 PT Manufaktur Nusantara Perkasa Tbk</div>
+          <div className="text-[10px] text-slate-400/80">
+            Sistem Monitoring Presensi Terpadu • Versi {siteConfig.version}
           </div>
         </div>
       </div>
