@@ -157,7 +157,7 @@ export default function Login() {
             )}
 
             {/* Form Autentikasi */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5" htmlFor="email">
                   Alamat Email / NIP
@@ -170,11 +170,11 @@ export default function Login() {
                     id="email"
                     name="email"
                     type="text"
-                    autoComplete="username"
+                    autoComplete="off"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="nama@perusahaan.com atau NIP (HC-XXXX)"
+                    placeholder="Masukkan alamat email atau NIP"
                     className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
@@ -204,11 +204,11 @@ export default function Login() {
                     id="password"
                     name="password"
                     type={showPassword ? 'text' : 'password'}
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="Masukkan kata sandi akun"
+                    placeholder="Masukkan kata sandi"
                     className="w-full pl-9 pr-10 py-2.5 text-xs rounded-lg border border-slate-300 focus:border-[#c4a266] focus:ring-2 focus:ring-[#c4a266]/20 transition-all outline-none bg-white text-slate-900 placeholder:text-slate-400"
                   />
                   <button
