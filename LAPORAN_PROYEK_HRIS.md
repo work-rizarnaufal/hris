@@ -904,7 +904,65 @@ Sebagai persiapan tahap deployment staging pada homeserver `zarhome`:
 
 ---
 
-## 28. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 28. Hosting & Deployment Produksi Homeserver (`https://hris.digiboolabs.com` / Port 1000)
+
+Lokasi: Homeserver `zarhome` (`192.168.1.100`), Direktori `/mnt/data/hris-web/`, Compose `/home/zarhome/hris/docker-compose.yml`
+
+Aplikasi HRIS telah sukses dideploy dan dihosting secara penuh pada homeserver `zarhome` dengan spesifikasi arsitektur produksi:
+
+1. **Arsitektur Container & Jaringan**:
+   - **Container**: `hris-web` berbasis image `sispra-web:latest` (Apache 2.4, PHP 8.3, `pdo_mysql`, `bcmath`, `gd`, `zip`, `mod_rewrite`).
+   - **Port Binding**: `0.0.0.0:1000:80` (terbuka di jaringan host).
+   - **Docker Network**: Terhubung ke `mysql_default` dan berkomunikasi langsung dengan `mysql-sispra:3306` (database `db_hris`).
+   - **Volume Mount**: `/mnt/data/hris-web` di-mount ke `/var/www/html`.
+
+2. **Konfigurasi Lingkungan Produksi (`.env`)**:
+   - `APP_ENV=production`, `APP_DEBUG=false`.
+   - `APP_URL=https://hris.digiboolabs.com`, `ASSET_URL=https://hris.digiboolabs.com`.
+   - `DB_CONNECTION=mysql`, `DB_HOST=mysql-sispra`, `DB_PORT=3306`, `DB_DATABASE=db_hris`.
+   - `SESSION_SECURE_COOKIE=true` dengan `TrustProxies(at: '*')` di `bootstrap/app.php` sehingga seluruh skema HTTPS Cloudflare dihormati secara native tanpa terjadi redirect loop.
+
+3. **Apache & Front Controller Routing**:
+   - Menyediakan berkas `public/.htaccess` standar Laravel dengan rewriting engine aktif ke `index.php`.
+   - Mengaktifkan `AllowOverride All` dan symlink `public/storage` ke `storage/app/public`.
+
+4. **Optimasi Cache Produksi**:
+   - `php artisan config:cache`: Konfigurasi ter-cache.
+   - `php artisan route:cache`: 18 rute terdaftar ter-cache.
+   - `php artisan view:cache`: Blade template terkompilasi.
+
+5. **Cloudflare Tunnel & Akses Domain Publik**:
+   - Domain publik resmi: [https://hris.digiboolabs.com](https://hris.digiboolabs.com).
+   - Routing: Cloudflare Tunnel mengarahkan trafik publik HTTPS langsung ke `http://localhost:1000`.
+   - Verifikasi Endpoint: Pengujian HTTP publik mengembalikan `200 OK` (Cloudflare Hong Kong edge node `CF-RAY`).
+   - Verifikasi Autentikasi: Login POST `/login` dengan akun Super Admin (`nabiel@hrd.com` / `nabiel123`) mengembalikan status `302 Found` dengan lokasi pengalihan ke `https://hris.digiboolabs.com/beranda`, cookie sesi beratribut `secure; httponly; samesite=lax`.
+
+---
+
+## 29. Eliminasi Total Modul Simulasi RBAC & Penyelarasan Menu Card Profile Otentik
+
+Lokasi: [`app/Http/Middleware/HandleInertiaRequests.php`](app/Http/Middleware/HandleInertiaRequests.php), [`resources/js/services/authRole.js`](resources/js/services/authRole.js), [`resources/js/components/ui/topbar.jsx`](resources/js/components/ui/topbar.jsx), [`resources/js/components/ui/sidebar.jsx`](resources/js/components/ui/sidebar.jsx), [`resources/js/Layouts/LayoutUtama.jsx`](resources/js/Layouts/LayoutUtama.jsx), dan [`resources/js/Pages/Auth/Login.jsx`](resources/js/Pages/Auth/Login.jsx)
+
+Menindaklanjuti audit antarmuka bahwa bagian mock lama **"Ganti Peran Simulasi (RBAC)"** beserta 3 kartu tombol perannya masih muncul pada Menu Card Profile di server produksi:
+
+1. **Eliminasi Total Mock Widget Simulasi**:
+   - Bagian UI *"Ganti Peran Simulasi (RBAC)"* yang terdiri dari kartu tombol peran (*Super Admin*, *Supervisor Site*, *Personel Lapangan*) serta box deskripsi peran telah dihapus 100% dari [`topbar.jsx`](resources/js/components/ui/topbar.jsx).
+   - Menghapus fungsi switcher simulasi (`handleSwitchRole`, `handleResetToAuth`, `isSimulated`, serta listener `hris:role-changed`) di seluruh UI (`Topbar.jsx`, `Sidebar.jsx`, `LayoutUtama.jsx`).
+   - Membersihkan impor ikon usang (`Sparkles`, `RotateCcw`).
+
+2. **Antarmuka Menu Card Profile Otentik & Bersih (Production-Grade)**:
+   - **Header Card Profil**: Menampilkan avatar inisial resmi (`N`), Nama lengkap (`Nabiel`), Jabatan resmi (`Super Administrator HCGA`), Email (`nabiel@hrd.com`), serta badge hijau hidup `● Sesi Super Admin Aktif` dan `NIP: HC-0001`.
+   - **Informasi Konteks Operasional**: Dua kartu ringkas menampilkan `UNIT TUGAS: Kantor Pusat & Lintas Site` dan `HAK AKSES: Super Admin`.
+   - **Pintasan Navigasi Cepat**: Akses 1-klik ke *Beranda & Dashboard*, *Direktori Karyawan*, dan *Pengaturan Sistem & Kebijakan*.
+   - **Footer Logout**: Tombol keluar sesi terautentikasi (`POST /logout`).
+
+3. **Verifikasi Produksi Live**:
+   - Bundle frontend `app-RxmY7Mjk.js` telah dibangun dan dideploy ke container `hris-web` di homeserver `zarhome` (`https://hris.digiboolabs.com`).
+   - Verifikasi string pada bundle produksi mengonfirmasi teks `"Ganti Peran Simulasi"` telah bersih total (`STRING_NOT_FOUND_CLEAN`).
+
+---
+
+## 30. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 

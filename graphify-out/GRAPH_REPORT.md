@@ -1,17 +1,17 @@
 # Graph Report - hris  (2026-11-23)
 
 ## Corpus Check
-- 159 files · ~101,928 words
+- 159 files · ~102,510 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 12 file(s) not represented in the graph (top: (none) 8, .example 1, .xml 1)
+- Unclassified: 13 file(s) not represented in the graph (top: (none) 9, .example 1, .xml 1)
 
 ## Summary
-- 743 nodes · 1777 edges · 53 communities (21 shown, 32 thin omitted)
+- 747 nodes · 1786 edges · 53 communities (19 shown, 34 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 5 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2804c76e`
+- Built from commit: `06900588`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -21,8 +21,8 @@
 - Backend Composer Dependencies
 - HCGA HRIS Enterprise Design System (DESIGN.md)
 - Illuminate\Http\Request
-- Illuminate\Database\Eloquent\Factories\HasFactory
-- Employee
+- App\Models\Employee
+- Illuminate\Database\Eloquent\Relations\BelongsTo
 - Illuminate\Database\Schema\Blueprint
 - Module Group 8 (Illuminate\Foundation\Exceptions\Renderer\Renderer)
 - App\Http\Middleware\HandleInertiaRequests
@@ -34,11 +34,11 @@
 - PengaturanSistem.jsx
 - App\Models\Employee
 - Illuminate\Database\Seeder
-- App\Models\Employee
+- FingerprintAndManualAttendanceTest
+- AuthTest
 - sidebar.jsx
 - LaporanBackendTest.php
-- Inertia\Response
-- AuthTest
+- PengaturanController
 - LaporanController.php
 - PengaturanSistem.jsx
 - User
@@ -70,7 +70,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (53 total, 32 thin omitted)
+## Communities (53 total, 34 thin omitted)
 
 ### Community 0 - "@inertiajs/react"
 Cohesion: 0.39
@@ -89,16 +89,16 @@ Cohesion: 0.06
 Nodes (33): 1. Overview, 2. Colors, 3. Typography, 4. Layout, 5. Elevation & Depth, 6. Shapes & Form Controls, 7. Atomic UI Component Catalog, 8. Do's and Don'ts (+25 more)
 
 ### Community 4 - "Illuminate\Http\Request"
-Cohesion: 0.15
-Nodes (4): JadwalController, KehadiranController, AuthController, FingerprintImportService
+Cohesion: 0.10
+Nodes (5): BerandaController, JadwalController, KehadiranController, AuthController, FingerprintImportService
 
-### Community 5 - "Illuminate\Database\Eloquent\Factories\HasFactory"
-Cohesion: 0.18
-Nodes (4): Holiday, Location, Shift, SystemSetting
-
-### Community 6 - "Employee"
+### Community 5 - "App\Models\Employee"
 Cohesion: 0.07
-Nodes (4): Attendance, Employee, ShiftSchedule, ShiftSwap
+Nodes (5): Employee, Holiday, Location, Shift, SystemSetting
+
+### Community 6 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
+Cohesion: 0.17
+Nodes (3): Attendance, ShiftSchedule, ShiftSwap
 
 ### Community 7 - "Illuminate\Database\Schema\Blueprint"
 Cohesion: 0.07
@@ -129,37 +129,29 @@ Cohesion: 0.40
 Nodes (4): Non-Negotiable Boundaries (Never Cut Corners Here), Output Standard, Ponytail (Companion Pragmatism Skill), The Decision Ladder
 
 ### Community 41 - "PengaturanSistem.jsx"
-Cohesion: 0.10
-Nodes (26): lucide-react, react, recharts, xlsx, DIVISIONS, GROUPS, CatatanKehadiran(), DEFAULT_DATE (+18 more)
+Cohesion: 0.11
+Nodes (25): lucide-react, react, recharts, xlsx, PanelJadwalManual(), PanelRotasiGrup(), DIVISIONS, GROUPS (+17 more)
 
 ### Community 43 - "Illuminate\Database\Seeder"
 Cohesion: 0.12
 Nodes (7): AttendanceSeeder, DatabaseSeeder, EmployeeSeeder, HolidaySeeder, LocationSeeder, ShiftSeeder, SystemSettingSeeder
 
-### Community 45 - "App\Models\Employee"
-Cohesion: 0.20
-Nodes (4): {closure#1}(), {closure#2}(), {closure#1}(), {closure#5}()
-
 ### Community 47 - "sidebar.jsx"
-Cohesion: 0.09
-Nodes (17): renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar(), Topbar(), getPageMetadata(), navigationConfig, siteConfig (+9 more)
+Cohesion: 0.08
+Nodes (21): renderAdminLayout(), renderUserLayout(), IMPLEMENTED_ROUTES, Sidebar(), Topbar(), getPageMetadata(), navigationConfig, siteConfig (+13 more)
 
 ### Community 48 - "LaporanBackendTest.php"
-Cohesion: 0.07
-Nodes (7): BerandaBackendTest, FingerprintAndManualAttendanceTest, {closure#1}(), JadwalBackendTest, KaryawanBackendTest, LaporanBackendTest, TestCase
-
-### Community 49 - "Inertia\Response"
-Cohesion: 0.14
-Nodes (3): BerandaController, PengaturanController, Controller
+Cohesion: 0.08
+Nodes (10): BerandaBackendTest, {closure#1}(), {closure#2}(), {closure#1}(), JadwalBackendTest, KaryawanBackendTest, {closure#1}(), {closure#5}() (+2 more)
 
 ### Community 52 - "PengaturanSistem.jsx"
 Cohesion: 0.08
-Nodes (50): JadwalShift(), JadwalExceptionsTab(), JadwalKpiCards(), JadwalRosterTab(), getDynamicShift12HOptions(), ModalFormTukarShift(), PanelJadwalManual(), PanelRotasiGrup() (+42 more)
+Nodes (51): JadwalShift(), JadwalExceptionsTab(), JadwalKpiCards(), JadwalRosterTab(), getDynamicShift12HOptions(), ModalFormTukarShift(), calculateWeeklyHours(), exportRosterToExcel() (+43 more)
 
 ## Knowledge Gaps
 - **1 isolated node(s):** `Aturan Antislop & Ponytail`
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 268 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **32 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

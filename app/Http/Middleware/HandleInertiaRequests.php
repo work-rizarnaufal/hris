@@ -37,6 +37,33 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
+        $roleInfo = match ($user?->role) {
+            'super_admin' => [
+                'role_key' => 'SUPER_ADMIN',
+                'role_label' => 'Super Administrator HCGA',
+                'short_title' => 'Super Admin',
+                'unit' => 'Kantor Pusat & Lintas Site',
+            ],
+            'supervisor' => [
+                'role_key' => 'SUPERVISOR',
+                'role_label' => 'Supervisor Operasional Site',
+                'short_title' => 'Supervisor Site',
+                'unit' => 'Lokasi Cimalaka (Pabrik 2)',
+            ],
+            'karyawan' => [
+                'role_key' => 'KARYAWAN',
+                'role_label' => 'Senior Operator Lapangan',
+                'short_title' => 'Personel Lapangan',
+                'unit' => 'Lokasi Mariuk (Pabrik 1)',
+            ],
+            default => [
+                'role_key' => 'SUPER_ADMIN',
+                'role_label' => 'Super Administrator HCGA',
+                'short_title' => 'Super Admin',
+                'unit' => 'Kantor Pusat & Lintas Site',
+            ],
+        };
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -46,6 +73,10 @@ class HandleInertiaRequests extends Middleware
                     'email' => $user->email,
                     'role' => $user->role,
                     'nip' => $user->nip,
+                    'role_key' => $roleInfo['role_key'],
+                    'role_label' => $roleInfo['role_label'],
+                    'short_title' => $roleInfo['short_title'],
+                    'unit' => $roleInfo['unit'],
                 ] : null,
             ],
             'flash' => [

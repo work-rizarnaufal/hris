@@ -59,7 +59,57 @@ export const ROLE_PROFILES = {
   },
 };
 
-export function getActiveRoleKey() {
+export function mapUserRoleToKey(role) {
+  const roleKeyMap = {
+    super_admin: ROLES.SUPER_ADMIN,
+    supervisor: ROLES.SUPERVISOR,
+    karyawan: ROLES.KARYAWAN,
+  };
+  return roleKeyMap[role] || ROLES.SUPER_ADMIN;
+}
+
+export function resolveUserRoleProfile(user) {
+  if (!user) return getActiveRoleProfile();
+
+  const mappedKey = user.role_key || mapUserRoleToKey(user.role);
+  const baseProfile = ROLE_PROFILES[mappedKey] || ROLE_PROFILES[ROLES.SUPER_ADMIN];
+
+  return {
+    ...baseProfile,
+    id: user.id ? `user-${user.id}` : baseProfile.id,
+    roleKey: mappedKey,
+    name: user.name || baseProfile.name,
+    email: user.email || baseProfile.email,
+    nip: user.nip || baseProfile.nip,
+    roleLabel: user.role_label || baseProfile.roleLabel,
+    shortTitle: user.short_title || baseProfile.shortTitle,
+    unit: user.unit || baseProfile.unit,
+  };
+}
+
+export function syncUserRole(user) {
+  if (!isClient || !user) return;
+  const mappedKey = user.role_key || mapUserRoleToKey(user.role);
+  try {
+    localStorage.setItem(ROLE_STORAGE_KEY, mappedKey);
+  } catch {
+    // Abaikan kegagalan localStorage
+  }
+}
+
+export function clearSimulatedRole() {
+  if (!isClient) return;
+  try {
+    localStorage.removeItem(ROLE_STORAGE_KEY);
+  } catch {
+    // Abaikan kegagalan localStorage
+  }
+}
+
+export function getActiveRoleKey(user) {
+  if (user?.role || user?.role_key) {
+    return user.role_key || mapUserRoleToKey(user.role);
+  }
   if (!isClient) return ROLES.SUPER_ADMIN;
   try {
     const saved = localStorage.getItem(ROLE_STORAGE_KEY);
@@ -72,7 +122,10 @@ export function getActiveRoleKey() {
   }
 }
 
-export function getActiveRoleProfile() {
+export function getActiveRoleProfile(user) {
+  if (user) {
+    return resolveUserRoleProfile(user);
+  }
   const roleKey = getActiveRoleKey();
   return ROLE_PROFILES[roleKey] || ROLE_PROFILES[ROLES.SUPER_ADMIN];
 }

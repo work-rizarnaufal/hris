@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/react';
 import { Building2, LogOut } from 'lucide-react';
 import { navigationConfig } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
-import { getActiveRoleProfile, isRouteAllowed, ROLE_PROFILES } from '@/services/authRole.js';
+import { resolveUserRoleProfile, isRouteAllowed } from '@/services/authRole.js';
 
 // Daftar rute modul yang sudah memiliki implementasi halaman penuh
 const IMPLEMENTED_ROUTES = new Set([
@@ -23,31 +23,13 @@ export function Sidebar({
   currentUrl = '',
   user,
 }) {
-  const [roleProfile, setRoleProfile] = useState(() => getActiveRoleProfile());
+  const [roleProfile, setRoleProfile] = useState(() => resolveUserRoleProfile(user));
 
   useEffect(() => {
-    if (user?.role) {
-      const roleKeyMap = {
-        super_admin: 'SUPER_ADMIN',
-        supervisor: 'SUPERVISOR',
-        karyawan: 'KARYAWAN',
-      };
-      const mappedKey = roleKeyMap[user.role] || 'SUPER_ADMIN';
-      if (ROLE_PROFILES[mappedKey]) {
-        setRoleProfile(ROLE_PROFILES[mappedKey]);
-      }
+    if (user) {
+      setRoleProfile(resolveUserRoleProfile(user));
     }
   }, [user]);
-
-  useEffect(() => {
-    const handleRoleChange = (e) => {
-      if (e.detail?.profile) {
-        setRoleProfile(e.detail.profile);
-      }
-    };
-    window.addEventListener('hris:role-changed', handleRoleChange);
-    return () => window.removeEventListener('hris:role-changed', handleRoleChange);
-  }, []);
 
   const displayName = user?.name || roleProfile.name;
 

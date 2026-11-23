@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.js';
+import { clearSimulatedRole } from '@/services/authRole.js';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -19,6 +20,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  React.useEffect(() => {
+    clearSimulatedRole();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();

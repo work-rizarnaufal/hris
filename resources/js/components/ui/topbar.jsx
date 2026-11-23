@@ -10,15 +10,10 @@ import {
   CalendarDays,
   ShieldCheck,
   MapPin,
-  Sparkles,
   Users,
 } from 'lucide-react';
 import { siteConfig } from '@/config/site.js';
-import {
-  getActiveRoleProfile,
-  setActiveRole,
-  ROLE_PROFILES,
-} from '@/services/authRole.js';
+import { resolveUserRoleProfile } from '@/services/authRole.js';
 
 export function Topbar({
   title = 'Beranda',
@@ -28,7 +23,7 @@ export function Topbar({
 }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
-  const [currentRole, setCurrentRole] = useState(() => getActiveRoleProfile());
+  const [currentRole, setCurrentRole] = useState(() => resolveUserRoleProfile(user));
 
   const currentDateWIB = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
@@ -38,31 +33,12 @@ export function Topbar({
     timeZone: 'Asia/Jakarta',
   }).format(new Date());
 
-  // Sinkronkan profil peran saat data user autentikasi tersedia
+  // Sinkronkan profil peran saat data user autentikasi tersedia / berubah
   useEffect(() => {
-    if (user?.role) {
-      const roleKeyMap = {
-        super_admin: 'SUPER_ADMIN',
-        supervisor: 'SUPERVISOR',
-        karyawan: 'KARYAWAN',
-      };
-      const mappedKey = roleKeyMap[user.role] || 'SUPER_ADMIN';
-      if (ROLE_PROFILES[mappedKey]) {
-        setCurrentRole(ROLE_PROFILES[mappedKey]);
-      }
+    if (user) {
+      setCurrentRole(resolveUserRoleProfile(user));
     }
   }, [user]);
-
-  // Dengarkan perubahan role real-time dari komponen lain
-  useEffect(() => {
-    const handleRoleChange = (e) => {
-      if (e.detail?.profile) {
-        setCurrentRole(e.detail.profile);
-      }
-    };
-    window.addEventListener('hris:role-changed', handleRoleChange);
-    return () => window.removeEventListener('hris:role-changed', handleRoleChange);
-  }, []);
 
   const displayName = user?.name || currentRole.name;
   const displayEmail = user?.email || currentRole.email;
@@ -97,10 +73,6 @@ export function Topbar({
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isProfileOpen]);
-
-  const handleSwitchRole = (roleKey) => {
-    setActiveRole(roleKey);
-  };
 
   return (
     <header className="topbar sticky top-0 z-20 backdrop-blur-md bg-white/95 border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center transition-all">
@@ -208,7 +180,7 @@ export function Topbar({
 
                   {/* Sesi Status & NIP Badge */}
                   <div className="mt-3.5 pt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
-                    <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
+                    <span className="inline-flex items-center gap-1.5 font-medium text-emerald-400">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                       Sesi {currentRole.shortTitle} Aktif
                     </span>
@@ -218,55 +190,7 @@ export function Topbar({
                   </div>
                 </div>
 
-                {/* 2. Simulasi Peran Pengguna (Role Switcher 1-Klik) */}
-                <div className="p-3 bg-slate-50/90 border-b border-slate-200/80">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                      Ganti Peran Simulasi (RBAC)
-                    </span>
-                    <span className="text-[10px] text-[#ab874b] font-medium flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-[#c4a266]" />
-                      Live Switcher
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {Object.values(ROLE_PROFILES).map((r) => {
-                      const isActive = currentRole.roleKey === r.roleKey;
-                      return (
-                        <button
-                          key={r.roleKey}
-                          type="button"
-                          onClick={() => handleSwitchRole(r.roleKey)}
-                          className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
-                            isActive
-                              ? r.roleKey === 'SUPER_ADMIN'
-                                ? 'bg-amber-50/90 border-amber-300 text-amber-900 font-bold ring-1 ring-amber-300 shadow-2xs'
-                                : r.roleKey === 'SUPERVISOR'
-                                ? 'bg-indigo-50/90 border-indigo-300 text-indigo-900 font-bold ring-1 ring-indigo-300 shadow-2xs'
-                                : 'bg-emerald-50/90 border-emerald-300 text-emerald-900 font-bold ring-1 ring-emerald-300 shadow-2xs'
-                              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-slate-300'
-                          }`}
-                          title={`Beralih ke peran ${r.roleLabel}`}
-                        >
-                          <span className="text-[11px] leading-tight block">
-                            {r.shortTitle}
-                          </span>
-                          {isActive ? (
-                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                          ) : (
-                            <span className="text-[9px] text-slate-400 font-normal">Pilih</span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <p className="text-[10px] text-slate-500 mt-2 leading-relaxed bg-white/70 p-2 rounded-lg border border-slate-200/50">
-                    {currentRole.description}
-                  </p>
-                </div>
-
-                {/* 3. Informasi Konteks Operasional */}
+                {/* 2. Informasi Konteks Operasional */}
                 <div className="px-4 py-2.5 bg-white border-b border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
                   <div className="p-2 rounded-lg bg-slate-50 border border-slate-200/70 shadow-2xs">
                     <span className="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1">

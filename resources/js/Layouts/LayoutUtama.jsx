@@ -18,7 +18,12 @@ import {
 } from '@/components/ui';
 import { getPageMetadata } from '@/config/navigation.js';
 import { siteConfig } from '@/config/site.js';
-import { getActiveRoleProfile, isRouteAllowed, ROLE_PROFILES } from '@/services/authRole.js';
+import {
+  resolveUserRoleProfile,
+  syncUserRole,
+  isRouteAllowed,
+  ROLE_PROFILES,
+} from '@/services/authRole.js';
 
 export default function LayoutUtama({
   children,
@@ -28,42 +33,25 @@ export default function LayoutUtama({
   maxWidth = 'max-w-[1600px]',
 }) {
   const { url, props } = usePage();
+  const authUser = props.auth?.user;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState(null);
-  const [roleProfile, setRoleProfile] = useState(() => getActiveRoleProfile());
+  const [roleProfile, setRoleProfile] = useState(() => resolveUserRoleProfile(authUser));
 
   const meta = getPageMetadata(url);
   const pageTitle = title !== undefined ? title : meta.title;
   const pageSubtitle = subtitle !== undefined ? subtitle : meta.subtitle;
 
-  const actorName = props.auth?.user?.name || props.appData?.actor || siteConfig.defaultActor;
+  const actorName = authUser?.name || props.appData?.actor || siteConfig.defaultActor;
   const companyName = props.appData?.config?.company || siteConfig.defaultCompany;
 
   // Sinkronkan peran dengan user terautentikasi jika ada
   useEffect(() => {
-    if (props.auth?.user?.role) {
-      const roleKeyMap = {
-        super_admin: 'SUPER_ADMIN',
-        supervisor: 'SUPERVISOR',
-        karyawan: 'KARYAWAN',
-      };
-      const mappedKey = roleKeyMap[props.auth.user.role] || 'SUPER_ADMIN';
-      if (ROLE_PROFILES[mappedKey]) {
-        setRoleProfile(ROLE_PROFILES[mappedKey]);
-      }
+    if (authUser) {
+      setRoleProfile(resolveUserRoleProfile(authUser));
+      syncUserRole(authUser);
     }
-  }, [props.auth?.user]);
-
-  // Dengarkan perubahan role simulasi secara real-time
-  useEffect(() => {
-    const handleRoleChange = (e) => {
-      if (e.detail?.profile) {
-        setRoleProfile(e.detail.profile);
-      }
-    };
-    window.addEventListener('hris:role-changed', handleRoleChange);
-    return () => window.removeEventListener('hris:role-changed', handleRoleChange);
-  }, []);
+  }, [authUser]);
 
   // Tutup drawer mobile saat URL berpindah
   useEffect(() => {
