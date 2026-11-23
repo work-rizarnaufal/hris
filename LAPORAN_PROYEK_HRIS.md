@@ -879,7 +879,32 @@ Untuk menjamin keamanan penuh pada level rute dan memastikan status masuk tersin
 
 ---
 
-## 27. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
+## 27. Penyediaan Basis Data MySQL Homeserver (`db_hris`) & Migrasi Penuh
+
+Lokasi: Homeserver `zarhome` (`192.168.1.100`), MySQL Server 8.4 (`mysql-sispra`), dan [`.env.example`](.env.example)
+
+Sebagai persiapan tahap deployment staging pada homeserver `zarhome`:
+
+1. **Pembuatan Database MySQL**:
+   - Dibuat database baru bernama **`db_hris`** dengan *character set* `utf8mb4` dan *collation* `utf8mb4_unicode_ci` pada container `mysql-sispra`.
+   - Hak akses penuh diberikan kepada user superuser `root` dan user aplikasi `n8n_bot`.
+
+2. **Eksekusi Migrasi Skema & Salin Data (SQLite $\to$ MySQL)**:
+   - Dijalankan 11 berkas migrasi Laravel secara *fresh* pada basis data MySQL target.
+   - Seluruh data operasional disalin secara presisi dari basis data SQLite lokal ke MySQL homeserver:
+     - `locations`: 2 lokasi pabrik terdaftar.
+     - `shifts`: 3 master shift standar (PAGI, MALAM, OFFICE).
+     - `users`: 1 pengguna tunggal Super Admin (`nabiel@hrd.com`).
+     - `employees`: 86 personil riil aktif (Mariuk & Cimalaka).
+     - `system_settings`: 3 parameter pengaturan sistem.
+     - `holidays`, `attendances`, `shift_schedules`, `shift_swaps`: 0 baris (bersih dari data dummy).
+
+3. **Verifikasi Integritas**:
+   - Diperiksa langsung via SQL query ke container `mysql-sispra`: total 10 tabel terbuat dan 86 personil berhasil terverifikasi utuh dengan rasio kesesuaian 100%.
+
+---
+
+## 28. Rencana Aksi Sesi Selanjutnya (Roadmap Backend Lanjutan)
 
 Langkah strategis yang direkomendasikan untuk pengembangan tahap berikutnya:
 
